@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pagamento Pix — Reporting Bot</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#4f46e5;--secondary:#7c3aed;--accent:#ec4899;--ok:#10b981;--warn:#f59e0b;--err:#ef4444;--paper:rgba(255,255,255,.92);--ink:#0f172a;--muted:#667085;--line:#e5e7eb;--bg1:#f8fafc;--bg2:#eef2f7;--pix:#00b2a9}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',sans-serif}
+body{min-height:100vh;display:flex;flex-direction:column;color:var(--ink);background:radial-gradient(1200px 600px at -10% 0,#e9d5ff26,transparent),radial-gradient(1200px 600px at 110% 40%,#93c5fd26,transparent),linear-gradient(135deg,var(--bg1),var(--bg2))}
+.container{max-width:1120px;margin:0 auto;padding:32px 16px}
+.header{display:flex;flex-direction:column;align-items:center;gap:12px;margin:12px 0 20px}
+.logo{width:72px;height:72px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,var(--primary),var(--secondary));box-shadow:0 20px 40px -20px rgba(79,70,229,.5)}
+.logo svg{width:32px;height:32px;fill:#fff}
+.brand{font-weight:900;letter-spacing:-.2px;background:linear-gradient(90deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.brand span{font-size:1.7rem}
+.tag{display:inline-flex;gap:8px;align-items:center;margin-top:4px;padding:6px 10px;border-radius:999px;border:1px solid rgba(79,70,229,.25);background:rgba(79,70,229,.12);color:var(--primary);font-weight:800;font-size:.92rem}
+.tag svg{width:18px;height:18px;fill:var(--primary)}
+.wrap{display:grid;grid-template-columns:1.25fr .75fr;gap:18px;margin-top:14px}
+@media (max-width:980px){.wrap{grid-template-columns:1fr}}
+.card{position:relative;border:1px solid var(--line);background:var(--paper);backdrop-filter:blur(8px);border-radius:22px;padding:18px;box-shadow:0 30px 70px -20px rgba(2,6,23,.15);overflow:hidden}
+.card:before{content:"";position:absolute;inset:-1;border-radius:24px;background:conic-gradient(from 0deg,transparent,rgba(79,70,229,.18),transparent 30%);filter:blur(6px);z-index:-1;animation:spin 6s linear infinite}
+.title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.title-left{display:flex;align-items:center;gap:12px}
+.icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#fff,rgba(255,255,255,.65));box-shadow:0 12px 24px -12px rgba(79,70,229,.4)}
+.icon i{color:var(--primary)}
+.t1{font-weight:900}
+.status{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:rgba(79,70,229,.1);color:var(--primary);font-weight:900}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 4px}
+@media (max-width:560px){.summary{grid-template-columns:1fr}}
+.kv{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:#fff}
+.kv .k{color:var(--muted);font-weight:700}
+.kv .v{font-weight:900}
+.qr-wrap{display:grid;grid-template-columns:280px 1fr;gap:18px;margin-top:12px;align-items:start}
+@media (max-width:980px){.qr-wrap{grid-template-columns:1fr}}
+.qr-box{display:grid;place-items:center;border:1px dashed var(--line);border-radius:16px;background:#fff;padding:12px}
+.qr-box img{width:240px;height:240px;border-radius:12px}
+.copycol{display:flex;gap:10px;margin-top:8px}
+.copycol input{flex:1;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-weight:700}
+.btn{border:none;border-radius:12px;padding:12px 14px;font-weight:900;cursor:pointer}
+.btn-primary{color:#fff;background:linear-gradient(90deg,var(--primary),var(--secondary));box-shadow:0 15px 30px -10px rgba(79,70,229,.4)}
+.btn-ghost{background:#fff;border:1px solid var(--line);font-weight:800}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.howto{margin-top:8px;border:1px solid var(--line);border-radius:16px;background:#fff;padding:14px}
+.steps{display:grid;gap:8px;margin-top:6px}
+.step{display:flex;gap:10px;align-items:flex-start}
+.num{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;font-weight:900;font-size:.9rem}
+.text{flex:1}
+.aside .title{margin:4px 0 8px}
+.timer{display:flex;align-items:center;gap:10px;margin:8px 0}
+.ring{--p:0;position:relative;width:46px;height:46px;border-radius:50%;background:conic-gradient(var(--primary) calc(var(--p)*1%),#e5e7eb 0)}
+.ring:after{content:"";position:absolute;inset:4px;border-radius:50%;background:#fff}
+.tval{font-weight:900}
+.badge{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(16,185,129,.12);color:var(--ok);font-weight:900;border:1px solid rgba(16,185,129,.25)}
+.warn{background:rgba(245,158,11,.12);color:var(--warn);border-color:rgba(245,158,11,.25)}
+.toast{position:fixed;left:50%;top:18px;transform:translateX(-50%) translateY(-18px);opacity:0;z-index:80;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 20px 50px -20px rgba(2,6,23,.25);padding:12px 16px;font-weight:800;display:flex;align-items:center;gap:10px;transition:opacity .25s,transform .25s}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:70}
+.tips{margin-top:10px;display:grid;gap:8px}
+.tips .kv{background:rgba(79,70,229,.04)}
+.cta{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap}
+.note{font-size:.92rem;color:var(--muted)}
+footer{text-align:center;margin-top:auto;background:#fff;border-top:1px solid var(--line);padding:22px 12px;color:var(--muted);font-size:.95rem}
+@keyframes spin{to{transform:rotate(1turn)}}
+@keyframes fall{0%{transform:translateY(-20vh) rotate(0)}100%{transform:translateY(105vh) rotate(720deg)}}
+</style>
+</head>
+<body>
+<div class="container" id="page" data-plan="{{ plan }}" data-amount="{{ amount_brl }}" data-hash="{{ hash }}" data-status="{{ status }}" data-pixurl="{{ pix_url }}">
+<header class="header">
+<div class="logo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4" transform="rotate(45 12 12)"/></svg></div>
+<div class="brand"><span>Reporting Bot</span></div>
+<div class="tag"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4" transform="rotate(45 12 12)"/></svg> Pagamento via Pix</div>
+</header>
+<section class="wrap">
+<div class="card">
+<div class="title">
+<div class="title-left"><div class="icon"><i class="fa-solid fa-bolt"></i></div><div class="t1">Finalize seu pagamento</div></div>
+<div class="status" id="status-badge"><i class="fa-solid fa-circle"></i> Aguardando pagamento</div>
+</div>
+<div class="summary">
+<div class="kv"><div class="k">Plano</div><div class="v" id="sum-plan">{{ plan }}</div></div>
+<div class="kv"><div class="k">Valor</div><div class="v" id="sum-amount">{{ amount_brl }}</div></div>
+<div class="kv"><div class="k">Identificador</div><div class="v" id="sum-hash">{{ hash }}</div></div>
+</div>
+<div class="qr-wrap">
+<div>
+<div class="qr-box"><img id="qr" alt="QR Code Pix" src="data:image/png;base64,{{ qr_b64 }}"></div>
+<div class="copycol"><input id="copiacola" readonly value="{{ emv }}"><button class="btn btn-primary" id="btn-copy"><i class="fa-solid fa-copy"></i> Copiar código</button></div>
+<div class="actions"><button class="btn btn-ghost" id="btn-open"><i class="fa-solid fa-up-right-from-square"></i> Abrir app do banco</button><button class="btn btn-primary" id="btn-paid"><i class="fa-solid fa-check"></i> Já paguei</button></div>
+</div>
+<div class="howto">
+<div class="badge"><i class="fa-solid fa-bolt"></i> Pagamento instantâneo</div>
+<div class="timer"><div class="ring" id="ring"></div><div class="tval">Expira em <span id="ttl">15:00</span></div></div>
+<div class="steps">
+<div class="step"><div class="num">1</div><div class="text"><b>Abra</b> o aplicativo do seu banco.</div></div>
+<div class="step"><div class="num">2</div><div class="text"><b>Escolha Pix</b> e a opção <b>“Copia e Cola”</b> para colar o código abaixo <u>ou</u> selecione <b>“QR Code”</b> e <b>escaneie</b> a imagem.</div></div>
+<div class="step"><div class="num">3</div><div class="text"><b>Confira o valor</b> e o recebedor <b>Reporting Bot Pagamentos</b>. Finalize.</div></div>
+<div class="step"><div class="num">4</div><div class="text">Assim que o pagamento for identificado, você será <b>redirecionado automaticamente</b> para o painel com todas as funções liberadas.</div></div>
+</div>
+<div class="tips">
+<div class="kv"><div class="k">Método</div><div class="v">Pix QR Code ou Pix Copia e Cola</div></div>
+<div class="kv"><div class="k">Confirmação</div><div class="v">Detecção automática em segundos</div></div>
+<div class="kv"><div class="k">Suporte</div><div class="v">Chat rápido</div></div>
+<div class="kv"><div class="k">Cobrança</div><div class="v">Sem renovação automática</div></div>
+</div>
+<div class="cta"><div class="note">Se preferir, clique em <b>Já paguei</b> após concluir no aplicativo do banco.</div></div>
+</div>
+</div>
+</section>
+</div>
+<div id="toast" class="toast"><i class="fa-solid fa-circle-check" style="color:#10b981"></i><span id="toast-text">Copiado</span></div>
+<div id="confetti" class="confetti"></div>
+<footer><p>Reporting Bot © 2025 — Todos os direitos reservados</p></footer>
+<script>
+const page=document.getElementById('page');const PLAN=page.dataset.plan||'—';const AMOUNT=page.dataset.amount||'—';const HASH=page.dataset.hash||'';let STATUS=(page.dataset.status||'waiting_payment').toLowerCase();const PIXURL=page.dataset.pixurl||'';const badge=document.getElementById('status-badge');const ttlEl=document.getElementById('ttl');const ring=document.getElementById('ring');const toastEl=document.getElementById('toast');const toastText=document.getElementById('toast-text');const confetti=document.querySelector('.confetti');const copyBtn=document.getElementById('btn-copy');const openBtn=document.getElementById('btn-open');const paidBtn=document.getElementById('btn-paid');const input=document.getElementById('copiacola');const img=document.getElementById('qr');document.getElementById('sum-plan').textContent=PLAN;document.getElementById('sum-amount').textContent=AMOUNT;document.getElementById('sum-hash').textContent=HASH;function showToast(m){toastText.textContent=m;toastEl.classList.add('show');setTimeout(()=>toastEl.classList.remove('show'),1600)}function burst(x,y){for(let i=0;i<28;i++){const p=document.createElement('span');p.style.position='absolute';p.style.left=x+'px';p.style.top=y+'px';p.style.width='10px';p.style.height='10px';p.style.borderRadius='2px';p.style.background=`hsl(${Math.floor(Math.random()*360)} 90% 60%)`;p.style.transform=`translateY(-20vh)`;p.style.animation='fall 1.2s ease forwards';p.style.filter='drop-shadow(0 6px 6px rgba(0,0,0,.2))';p.style.left=`calc(${x}px + ${Math.random()*80-40}px)`;confetti.appendChild(p);setTimeout(()=>confetti.removeChild(p),1300)}}function setBadge(s){const st=s.toLowerCase();if(['paid','success','approved','confirmed','completed'].includes(st)){badge.innerHTML='<i class="fa-solid fa-circle-check"></i> Pagamento identificado';badge.style.background='rgba(16,185,129,.12)';badge.style.color='#10b981';return'paid'}if(['expired','canceled','cancelled'].includes(st)){badge.innerHTML='<i class="fa-solid fa-circle-exclamation"></i> Tempo esgotado';badge.classList.add('warn');return'expired'}badge.innerHTML='<i class="fa-solid fa-circle"></i> Aguardando pagamento';badge.style.background='rgba(79,70,229,.1)';badge.style.color='var(--primary)';return'waiting'}function normalizeUrl(u){if(!u)return'';if(/^https?:\/\//i.test(u))return u;return 'https://'+u}async function checkStatus(){try{const r=await fetch(`/pix/status?hash=${encodeURIComponent(HASH)}`,{cache:'no-store'});const j=await r.json();if(j&&j.ok){STATUS=(j.status||'').toLowerCase();const m=setBadge(STATUS);if(m==='paid'){showToast('Pagamento confirmado');burst(innerWidth/2,120);setTimeout(()=>{location.replace('/')},5000)}}}catch(e){}}copyBtn.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(input.value||'');showToast('Código Pix copiado')}catch(e){showToast('Falha ao copiar')}});openBtn.addEventListener('click',()=>{const u=normalizeUrl(PIXURL);if(u)window.open(u,'_blank');else showToast('Abra o app do seu banco e use Pix Copia e Cola ou QR Code')});paidBtn.addEventListener('click',checkStatus);let ttl=15*60;setBadge(STATUS);const tick=setInterval(()=>{ttl=Math.max(0,ttl-1);const m=String(Math.floor(ttl/60)).padStart(2,'0');const s=String(ttl%60).padStart(2,'0');ttlEl.textContent=`${m}:${s}`;ring.style.setProperty('--p',((900-ttl)/900)*100);if(ttl===0){clearInterval(tick);setBadge('expired')}},1000);let poller=setInterval(checkStatus,2000);document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInterval(poller)}else{checkStatus();poller=setInterval(checkStatus,2000)}});window.addEventListener('pageshow',()=>{checkStatus()});
+</script>
+</body>
+</html>

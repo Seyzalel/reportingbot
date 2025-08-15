@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login — Reporting Bot</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#6366f1;--secondary:#8b5cf6;--accent:#ec4899;--light:#ffffff;--paper:rgba(255,255,255,.72);--line:#e5e7eb;--ink:#0f172a;--muted:#64748b;--bg1:#f8fafc;--bg2:#eef2f7}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{min-height:100vh;display:flex;flex-direction:column;background:radial-gradient(1200px 600px at 10% -10%,#e9d5ff22,transparent),radial-gradient(1200px 600px at 110% 30%,#93c5fd26,transparent),linear-gradient(135deg,var(--bg1),var(--bg2));color:var(--ink)}
+.container{max-width:520px;width:100%;margin:0 auto;padding:40px 20px}
+.header{display:flex;flex-direction:column;align-items:center;gap:14px;margin:34px 0 22px}
+.logo{width:72px;height:72px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--primary),var(--secondary));box-shadow:0 20px 40px -20px rgba(99,102,241,.5)}
+.logo i{font-size:30px;color:#fff}
+.brand{font-size:1.7rem;font-weight:800;letter-spacing:-.2px;background:linear-gradient(90deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.card{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:28px 26px;backdrop-filter:blur(8px);box-shadow:0 30px 70px -20px rgba(2,6,23,.15)}
+.card:before{content:"";position:absolute;inset:-1;border-radius:24px;background:linear-gradient(120deg,transparent,rgba(99,102,241,.18),transparent);z-index:-1;filter:blur(6px)}
+.card h1{font-size:1.35rem;margin-bottom:6px}
+.subtitle{font-size:.95rem;color:var(--muted);margin-bottom:18px}
+.form{display:flex;flex-direction:column;gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.label{font-weight:600;font-size:.95rem}
+.input-wrap{position:relative}
+.input{width:100%;padding:14px 48px 14px 44px;border:2px solid var(--line);border-radius:14px;background:#fff;outline:none;font-size:1rem;transition:border-color .15s,box-shadow .15s}
+.input:focus{border-color:var(--primary);box-shadow:0 0 0 6px rgba(99,102,241,.12)}
+.icon-left{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1rem;color:var(--muted)}
+.icon-right{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:1rem;color:var(--muted);cursor:pointer}
+.error{font-size:.85rem;color:#ef4444;min-height:18px}
+.remember{display:flex;align-items:center;gap:12px;margin-top:2px}
+.check-input{position:absolute;opacity:0;pointer-events:none}
+.check{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.box{width:24px;height:24px;border-radius:8px;border:2px solid var(--line);display:grid;place-items:center;background:#fff;transition:all .2s}
+.box i{font-size:.9rem;color:#fff;opacity:0;transform:scale(.6);transition:transform .2s,opacity .2s}
+.check-input:focus+label .box{box-shadow:0 0 0 6px rgba(99,102,241,.12);border-color:var(--primary)}
+.check-input:checked+label .box{border-color:transparent;background:linear-gradient(135deg,var(--primary),var(--secondary));box-shadow:0 8px 18px -6px rgba(99,102,241,.5)}
+.check-input:checked+label .box i{opacity:1;transform:scale(1)}
+.remember-text{font-size:.95rem;color:var(--ink)}
+.badge{display:inline-block;margin-left:6px;padding:4px 10px;border-radius:999px;font-size:.8rem;font-weight:700;background:rgba(99,102,241,.12);color:var(--primary);border:1px solid rgba(99,102,241,.25)}
+.actions{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.btn{width:100%;padding:14px 16px;border:none;border-radius:14px;font-weight:800;font-size:1rem;color:#fff;background:linear-gradient(90deg,var(--primary),var(--secondary));cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 15px 30px -10px rgba(99,102,241,.4)}
+.btn:active{transform:translateY(1px)}
+.helper{font-size:.92rem;color:var(--muted);text-align:center}
+.helper a{text-decoration:none;color:var(--primary);font-weight:600}
+.toast{position:fixed;left:50%;top:20px;transform:translateX(-50%) translateY(-20px);opacity:0;z-index:50;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 20px 50px -20px rgba(2,6,23,.25);padding:12px 16px;font-weight:600;display:flex;align-items:center;gap:10px;transition:opacity .25s,transform .25s}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+footer{text-align:center;margin-top:auto;background:#fff;border-top:1px solid var(--line);padding:22px 12px;color:var(--muted);font-size:.95rem}
+@media (max-width:420px){.container{padding:28px 16px}.card{padding:22px}.input{padding:13px 46px 13px 42px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="header">
+    <div class="logo"><i class="fas fa-robot"></i></div>
+    <div class="brand">Reporting Bot</div>
+  </header>
+
+  <section class="card">
+    <h1>Entrar</h1>
+    <div class="subtitle">Acesse sua conta</div>
+    <form id="login" class="form" novalidate>
+      <div class="field">
+        <label class="label" for="username">Nome de usuário</label>
+        <div class="input-wrap">
+          <i class="fa-regular fa-user icon-left"></i>
+          <input class="input" id="username" name="username" type="text" inputmode="latin" autocomplete="username" minlength="3" maxlength="32" required>
+        </div>
+        <div id="err-u" class="error"></div>
+      </div>
+
+      <div class="field">
+        <label class="label" for="password">Senha</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-lock icon-left"></i>
+          <input class="input" id="password" name="password" type="password" autocomplete="current-password" minlength="8" required>
+          <i id="toggle-pw" class="fa-regular fa-eye icon-right" aria-hidden="true"></i>
+        </div>
+        <div id="err-p" class="error"></div>
+      </div>
+
+      <div class="remember">
+        <input id="remember" class="check-input" type="checkbox">
+        <label for="remember" class="check">
+          <span class="box"><i class="fa-solid fa-check"></i></span>
+          <span class="remember-text">Manter conectado por <span class="badge">15 dias</span></span>
+        </label>
+      </div>
+
+      <div class="actions">
+        <button id="submit" class="btn" type="submit"><i class="fa-solid fa-right-to-bracket"></i>&nbsp;Entrar</button>
+        <div class="helper"><a href="#">Esqueci minha senha</a></div>
+      </div>
+    </form>
+  </section>
+</div>
+
+<div id="toast" class="toast"><i class="fa-solid fa-circle-check" style="color:#10b981"></i><span>Login efetuado</span></div>
+
+<footer>
+  <p>Reporting Bot © 2025 — Todos os direitos reservados</p>
+</footer>
+
+<script>
+const f=document.getElementById('login');
+const u=document.getElementById('username');
+const p=document.getElementById('password');
+const errU=document.getElementById('err-u');
+const errP=document.getElementById('err-p');
+const btn=document.getElementById('submit');
+const toast=document.getElementById('toast');
+const toastIcon=toast.querySelector('i');
+const toastText=toast.querySelector('span');
+const togglePw=document.getElementById('toggle-pw');
+const remember=document.getElementById('remember');
+
+function validUsername(v){return /^[a-zA-Z0-9._]{3,32}$/.test(v)}
+function clearErrors(){errU.textContent='';errP.textContent=''}
+function validate(){let ok=true;clearErrors();const uv=u.value.trim();const pv=p.value;if(!validUsername(uv)){errU.textContent='Use 3–32 caracteres: letras, números, ponto ou _';ok=false}if(pv.length<8){errP.textContent='Mínimo de 8 caracteres';ok=false}btn.disabled=!ok;btn.style.opacity=ok?'1':'.65';return ok}
+function showToast(msg,type){toastText.textContent=msg;if(type==='error'){toastIcon.classList.remove('fa-circle-check');toastIcon.classList.add('fa-circle-xmark');toastIcon.style.color='#ef4444'}else{toastIcon.classList.remove('fa-circle-xmark');toastIcon.classList.add('fa-circle-check');toastIcon.style.color='#10b981'}toast.classList.add('show');setTimeout(()=>{toast.classList.remove('show')},1700)}
+function setLoading(v){if(v){btn.disabled=true;btn.style.opacity='.65';btn.dataset.label=btn.innerHTML;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i>&nbsp;Entrando...'}else{btn.disabled=false;btn.style.opacity='1';if(btn.dataset.label)btn.innerHTML=btn.dataset.label}}
+
+[u,p].forEach(x=>x.addEventListener('input',()=>{validate()}));
+togglePw.addEventListener('click',()=>{const t=p.getAttribute('type')==='password'?'text':'password';p.setAttribute('type',t);togglePw.classList.toggle('fa-eye');togglePw.classList.toggle('fa-eye-slash')});
+
+f.addEventListener('submit',async ev=>{
+ev.preventDefault();
+if(!validate()){if(errU.textContent)u.focus();else if(errP.textContent)p.focus();return}
+setLoading(true);
+try{
+const res=await fetch('/login',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:'same-origin',body:JSON.stringify({username:u.value.trim(),password:p.value,remember:remember.checked})});
+const data=await res.json().catch(()=>({}));
+if(res.ok&&data&&data.ok){showToast('Login efetuado','success');setTimeout(()=>{window.location.href=data.redirect||'/'},800);return}
+clearErrors();
+if(res.status===400){showToast((data&&data.error)||'Credenciais inválidas','error');validate()}
+else if(res.status===401){errP.textContent=(data&&data.error)||'Usuário ou senha incorretos';showToast('Usuário ou senha incorretos','error')}
+else{showToast((data&&data.error)||'Não foi possível entrar','error')}
+if(errU.textContent)u.focus();else if(errP.textContent)p.focus()
+}catch(e){
+showToast('Falha de conexão. Tente novamente.','error')
+}finally{
+setLoading(false)
+}
+});
+
+validate();
+</script>
+</body>
+</html>

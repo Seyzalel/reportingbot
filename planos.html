@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Planos — Reporting Bot</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#6366f1;--secondary:#8b5cf6;--accent:#ec4899;--light:#ffffff;--paper:rgba(255,255,255,.80);--line:#e5e7eb;--ink:#0f172a;--muted:#667085;--bg1:#f8fafc;--bg2:#eef2f7;--ok:#10b981;--warn:#f59e0b;--err:#ef4444}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+body{min-height:100vh;display:flex;flex-direction:column;background:radial-gradient(1200px 600px at 10% -10%,#e9d5ff22,transparent),radial-gradient(1200px 600px at 110% 30%,#93c5fd26,transparent),linear-gradient(135deg,var(--bg1),var(--bg2));color:var(--ink)}
+.container{max-width:1140px;width:100%;margin:0 auto;padding:40px 20px}
+.header{display:flex;flex-direction:column;align-items:center;gap:14px;margin:34px 0 8px}
+.logo{width:72px;height:72px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--primary),var(--secondary));box-shadow:0 20px 40px -20px rgba(99,102,241,.5)}
+.logo i{font-size:30px;color:#fff}
+.brand{font-size:1.7rem;font-weight:800;letter-spacing:-.2px;background:linear-gradient(90deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero{margin-top:14px;text-align:center}
+.hero h1{font-size:2rem}
+.hero p{color:var(--muted);margin-top:8px}
+.ribbon{display:inline-flex;align-items:center;gap:10px;margin-top:16px;padding:8px 14px;border-radius:999px;border:1px solid rgba(99,102,241,.25);background:rgba(99,102,241,.12);color:var(--primary);font-weight:800;font-size:.92rem}
+.ribbon .pix{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid rgba(16,185,129,.25);background:rgba(16,185,129,.12);color:var(--ok)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin:28px 0 20px;perspective:1200px}
+.card{position:relative;border:1px solid var(--line);background:var(--paper);backdrop-filter:blur(8px);border-radius:22px;padding:22px;box-shadow:0 30px 70px -20px rgba(2,6,23,.15);overflow:hidden;transform-style:preserve-3d;transition:transform .25s ease,box-shadow .25s ease}
+.card:before{content:"";position:absolute;inset:-1;border-radius:24px;background:conic-gradient(from 0deg,transparent,rgba(99,102,241,.18),transparent 30%);filter:blur(6px);z-index:-1;animation:spin 6s linear infinite}
+.card:hover{box-shadow:0 40px 90px -30px rgba(2,6,23,.25)}
+.badge{position:absolute;top:14px;right:14px;padding:6px 10px;border-radius:999px;background:linear-gradient(90deg,var(--primary),var(--secondary));color:#fff;font-size:.8rem;font-weight:800;box-shadow:0 8px 18px -6px rgba(99,102,241,.45)}
+.period-chip{position:absolute;top:14px;left:14px;display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid rgba(16,185,129,.25);background:rgba(16,185,129,.12);color:var(--ok);font-weight:800;font-size:.8rem}
+.period-chip i{font-size:.9rem}
+.head{display:flex;align-items:center;gap:12px;margin-bottom:10px;margin-top:26px}
+.head .icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#fff,rgba(255,255,255,.6));box-shadow:0 12px 24px -12px rgba(99,102,241,.4)}
+.head .icon i{font-size:18px;color:var(--primary)}
+.title{font-weight:800}
+.price{display:flex;align-items:flex-end;gap:8px;margin:10px 0 6px}
+.price .amount{font-size:2.2rem;font-weight:900;letter-spacing:-.5px}
+.price .period{color:var(--muted);font-weight:700}
+.quota{font-size:.95rem;color:var(--ink)}
+.features{margin:14px 0 16px;display:grid;gap:8px}
+.feature{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.95rem}
+.feature i{color:var(--ok)}
+.payline{display:flex;align-items:center;gap:8px;margin-top:2px;font-weight:700;color:var(--ink)}
+.payline i{color:var(--ok)}
+.actions{display:flex;flex-direction:column;gap:10px}
+.btn{width:100%;padding:14px 16px;border:none;border-radius:14px;font-weight:800;font-size:1rem;color:#fff;background:linear-gradient(90deg,var(--primary),var(--secondary));cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 15px 30px -10px rgba(99,102,241,.4)}
+.btn:hover{transform:translateY(-1px)}
+.note{font-size:.85rem;color:var(--muted);text-align:center}
+.compare{margin-top:20px;background:var(--paper);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{padding:14px 16px;border-bottom:1px solid var(--line);text-align:left}
+.table th{background:#fff;font-weight:800}
+.table td.center{text-align:center}
+.pulse{animation:pulse 1.2s ease}
+.toast{position:fixed;left:50%;top:20px;transform:translateX(-50%) translateY(-20px);opacity:0;z-index:50;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 20px 50px -20px rgba(2,6,23,.25);padding:12px 16px;font-weight:600;display:flex;align-items:center;gap:10px;transition:opacity .25s,transform .25s}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.confetti{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden}
+footer{text-align:center;margin-top:auto;background:#fff;border-top:1px solid var(--line);padding:22px 12px;color:var(--muted);font-size:.95rem}
+@keyframes spin{to{transform:rotate(1turn)}}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+@keyframes fall{0%{transform:translateY(-20vh) rotate(0)}100%{transform:translateY(105vh) rotate(720deg)}}
+@media (max-width:980px){.grid{grid-template-columns:1fr;gap:16px}.container{max-width:640px}}
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:90}
+.modal.show{display:flex}
+.modal .overlay{position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(4px)}
+.modal .panel{position:relative;width:min(640px,92vw);border-radius:20px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.92));box-shadow:0 30px 80px -20px rgba(2,6,23,.45);padding:20px}
+.modal .head{display:flex;align-items:center;justify-content:space-between;margin:0}
+.modal .hleft{display:flex;align-items:center;gap:12px}
+.modal .hicon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#fff,rgba(255,255,255,.65));box-shadow:0 12px 24px -12px rgba(99,102,241,.4)}
+.modal .hicon i{color:var(--primary)}
+.modal .htitle{font-weight:900}
+.modal .close{appearance:none;border:none;background:transparent;font-size:20px;cursor:pointer;color:var(--muted)}
+.form{margin-top:12px;display:grid;gap:12px}
+.row{display:grid;grid-template-columns:1fr;gap:12px}
+.kv{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff}
+.kv .k{color:var(--muted);font-weight:700}
+.kv .v{font-weight:900}
+.input{display:flex;flex-direction:column;gap:6px}
+.input label{font-weight:800}
+.input input{border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-weight:700}
+.err{display:none;color:var(--err);font-weight:700;font-size:.92rem}
+.actions-modal{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.btn-ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+.btn-primary{background:linear-gradient(90deg,var(--primary),var(--secondary));color:#fff}
+@media (max-width:560px){.modal .panel{padding:16px;border-radius:18px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="header">
+    <div class="logo"><i class="fas fa-robot"></i></div>
+    <div class="brand">Reporting Bot</div>
+  </header>
+
+  <section class="hero">
+    <h1>Escolha o plano ideal</h1>
+    <p>Planos mensais de 30 dias e opção vitalícia. Pagamento exclusivo via Pix, suporte rápido por chat</p>
+    <div class="ribbon"><i class="fa-solid fa-bolt"></i> Ativação imediata <span class="pix"><i class="fa-solid fa-qrcode"></i> Pagamento via Pix</span></div>
+  </section>
+
+  <section class="grid">
+    <article class="card tilt" data-plan="Essencial" data-price="R$35" data-period="Mensal (30 dias)">
+      <div class="period-chip"><i class="fa-solid fa-rotate"></i> Mensal (30 dias)</div>
+      <div class="head">
+        <div class="icon"><i class="fa-regular fa-gem"></i></div>
+        <div class="title">Essencial</div>
+      </div>
+      <div class="price"><div class="amount">R$35</div><div class="period">/ mês • 30 dias</div></div>
+      <div class="quota">Permite denunciar até 10 contas por dia</div>
+      <div class="features">
+        <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Suporte rápido por chat</span></div>
+        <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Fila de processamento padrão</span></div>
+        <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Histórico de atividades</span></div>
+      </div>
+      <div class="payline"><i class="fa-solid fa-qrcode"></i><span>Pagamento via Pix</span></div>
+      <div class="actions">
+        <button class="btn select">Assinar Essencial</button>
+        <div class="note">QR Code Pix emitido na confirmação</div>
+      </div>
+    </article>
+
+    <article class="card tilt pulse" data-plan="Profissional" data-price="R$45,50" data-period="Mensal (30 dias)">
+      <div class="badge">Mais popular</div>
+      <div class="period-chip"><i class="fa-solid fa-rotate"></i> Mensal (30 dias)</div>
+      <div class="head">
+        <div class="icon"><i class="fa-solid fa-rocket"></i></div>
+        <div class="title">Profissional</div>
+      </div>
+      <div class="price"><div class="amount">R$45,50</div><div class="period">/ mês • 30 dias</div></div>
+      <div class="quota">Permite denunciar até 25 contas por dia</div>
+      <div class="features">
+        <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Suporte rápido por chat</span></div>
+        <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Prioridade na fila</span></div>
+        <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Painel detalhado</span></div>
+      </div>
+      <div class="payline"><i class="fa-solid fa-qrcode"></i><span>Pagamento via Pix</span></div>
+      <div class="actions">
+        <button class="btn select">Assinar Profissional</button>
+        <div class="note">QR Code Pix emitido na confirmação</div>
+      </div>
+    </article>
+
+    <article class="card tilt" data-plan="Vitalício" data-price="R$119" data-period="Acesso permanente">
+      <div class="badge">Melhor valor</div>
+      <div class="head">
+        <div class="icon"><i class="fa-solid fa-infinity"></i></div>
+        <div class="title">Vitalício</div>
+      </div>
+      <div class="price"><div class="amount">R$119</div><div class="period">• acesso permanente</div></div>
+      <div class="quota">Permite denunciar ilimitadamente e acesso vitalício permanente</div>
+      <div class="features">
+        <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Suporte rápido por chat</span></div>
+        <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Uso ilimitado</span></div>
+        <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Recursos premium</span></div>
+      </div>
+      <div class="payline"><i class="fa-solid fa-qrcode"></i><span>Pagamento via Pix</span></div>
+      <div class="actions">
+        <button class="btn select">Assinar Vitalício</button>
+        <div class="note">Pagamento único com Pix</div>
+      </div>
+    </article>
+  </section>
+
+  <section class="compare">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Recursos</th>
+          <th>Essencial</th>
+          <th>Profissional</th>
+          <th>Vitalício</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Limite diário</td>
+          <td class="center">10</td>
+          <td class="center">25</td>
+          <td class="center">Ilimitado</td>
+        </tr>
+        <tr>
+          <td>Período</td>
+          <td class="center">Mensal (30 dias)</td>
+          <td class="center">Mensal (30 dias)</td>
+          <td class="center">Permanente</td>
+        </tr>
+        <tr>
+          <td>Pagamento</td>
+          <td class="center">Pix (30 dias)</td>
+          <td class="center">Pix (30 dias)</td>
+          <td class="center">Pix (único)</td>
+        </tr>
+        <tr>
+          <td>Prioridade</td>
+          <td class="center"><i class="fa-regular fa-circle"></i></td>
+          <td class="center"><i class="fa-solid fa-circle-half-stroke"></i></td>
+          <td class="center"><i class="fa-solid fa-star"></i></td>
+        </tr>
+        <tr>
+          <td>Suporte</td>
+          <td class="center">Chat rápido</td>
+          <td class="center">Chat rápido</td>
+          <td class="center">Chat rápido</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+
+<div id="toast" class="toast"><i class="fa-solid fa-circle-check" style="color:#10b981"></i><span id="toast-text">Plano selecionado</span></div>
+<div id="confetti" class="confetti"></div>
+
+<div class="modal" id="modal">
+  <div class="overlay" id="overlay"></div>
+  <div class="panel">
+    <div class="head">
+      <div class="hleft">
+        <div class="hicon"><i class="fa-solid fa-qrcode"></i></div>
+        <div class="htitle">Finalizar assinatura</div>
+      </div>
+      <button class="close" id="closeModal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <div class="kv"><div class="k">Plano</div><div class="v" id="m-plan">—</div></div>
+      <div class="kv"><div class="k">Valor</div><div class="v" id="m-price">—</div></div>
+    </div>
+    <form class="form" id="pix-form" action="/pixPayment" method="post" novalidate>
+      <input type="hidden" name="plan" id="f-plan">
+      <div class="input">
+        <label for="f-name">Nome completo</label>
+        <input id="f-name" name="name" type="text" placeholder="Digite seu nome completo" required>
+        <div class="err" id="e-name">Informe seu nome completo</div>
+      </div>
+      <div class="input">
+        <label for="f-cpf">CPF (apenas números)</label>
+        <input id="f-cpf" name="cpf" inputmode="numeric" pattern="^\d{11}$" maxlength="11" placeholder="Somente números" required>
+        <div class="err" id="e-cpf">Informe um CPF com 11 dígitos</div>
+      </div>
+      <div class="actions-modal">
+        <button type="button" class="btn btn-ghost" id="cancel">Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="submitBtn">Continuar para Pix</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<footer>
+  <p>Reporting Bot © 2025 — Todos os direitos reservados</p>
+</footer>
+
+<script>
+const cards=document.querySelectorAll('.card .select');
+const toast=document.getElementById('toast');
+const toastText=document.getElementById('toast-text');
+const confetti=document.getElementById('confetti');
+const modal=document.getElementById('modal');
+const overlay=document.getElementById('overlay');
+const closeModalBtn=document.getElementById('closeModal');
+const cancelBtn=document.getElementById('cancel');
+const form=document.getElementById('pix-form');
+const fPlan=document.getElementById('f-plan');
+const fName=document.getElementById('f-name');
+const fCpf=document.getElementById('f-cpf');
+const mPlan=document.getElementById('m-plan');
+const mPrice=document.getElementById('m-price');
+const submitBtn=document.getElementById('submitBtn');
+function showToast(msg){toastText.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1600)}
+function burstConfetti(x,y){const n=28;for(let i=0;i<n;i++){const p=document.createElement('span');p.style.position='absolute';p.style.left=x+'px';p.style.top=y+'px';p.style.width='10px';p.style.height='10px';p.style.borderRadius='2px';p.style.background=`hsl(${Math.floor(Math.random()*360)} 90% 60%)`;p.style.transform=`translateY(-20vh)`;p.style.animation='fall 1.2s ease forwards';p.style.filter='drop-shadow(0 6px 6px rgba(0,0,0,.2))';p.style.left=`calc(${x}px + ${Math.random()*80-40}px)`;confetti.appendChild(p);setTimeout(()=>confetti.removeChild(p),1300)}}
+function openModal(plan,price){mPlan.textContent=plan;mPrice.textContent=price;fPlan.value=plan;modal.classList.add('show');document.body.style.overflow='hidden';setTimeout(()=>fName.focus(),50)}
+function closeModal(){modal.classList.remove('show');document.body.style.overflow='auto'}
+cards.forEach(b=>{b.addEventListener('click',e=>{const card=e.currentTarget.closest('.card');card.classList.add('pulse');setTimeout(()=>card.classList.remove('pulse'),600);const plan=card.getAttribute('data-plan');const price=card.getAttribute('data-price');const period=card.getAttribute('data-period');showToast(`${plan} selecionado (${price} • ${period} • Pix)`);const r=card.getBoundingClientRect();burstConfetti(r.left+r.width/2, r.top+window.scrollY+40);openModal(plan,price)})});
+overlay.addEventListener('click',closeModal);closeModalBtn.addEventListener('click',closeModal);cancelBtn.addEventListener('click',closeModal);document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('show'))closeModal()});
+const tilts=document.querySelectorAll('.tilt');tilts.forEach(card=>{card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect();const x=e.clientX-r.left;const y=e.clientY-r.top;const rx=((y-r.height/2)/r.height)*6;const ry=((x-r.width/2)/r.width)*-6;card.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`});card.addEventListener('mouseleave',()=>{card.style.transform='rotateX(0) rotateY(0)'})});
+function onlyDigits(s){return String(s||'').replace(/\D+/g,'')}
+fCpf.addEventListener('input',e=>{const d=onlyDigits(e.target.value).slice(0,11);e.target.value=d})
+function validate(){let ok=true;const name=String(fName.value||'').trim();const cpf=onlyDigits(fCpf.value);document.getElementById('e-name').style.display=name.length>=3?'none':'block';document.getElementById('e-cpf').style.display=cpf.length===11?'none':'block';if(name.length<3)ok=false;if(cpf.length!==11)ok=false;return ok}
+form.addEventListener('submit',e=>{e.preventDefault();if(!validate())return;submitBtn.disabled=true;fCpf.value=onlyDigits(fCpf.value);form.submit()})
+</script>
+</body>
+</html>
