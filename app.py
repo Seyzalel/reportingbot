@@ -29,6 +29,8 @@ users.create_index([('email', ASCENDING)], unique=True)
 transactions = db['transactions']
 transactions.create_index([('hash', ASCENDING)], unique=True)
 transactions.create_index([('user_id', ASCENDING)])
+usage = db['usage']
+usage.create_index([('user_id', ASCENDING), ('date', ASCENDING)], unique=True)
 
 app = Flask(__name__, template_folder='.')
 _app_secret_env = os.environ.get('SECRET_KEY', '')
@@ -53,6 +55,10 @@ PLANS = {
     'Vitalício': {'amount_cents': 11900, 'product_hash': 'sixft0cqgo', 'offer_hash': 'iayrjqznxp', 'title': 'Plano Vitalício'}
 }
 
+PLAN_CODES = {'Essencial': 'essencial', 'Profissional': 'profissional', 'Vitalício': 'vitalicio'}
+PLAN_LIMITS = {'padrao': 0, 'essencial': 10, 'profissional': 25, 'vitalicio': None}
+PAID_STATUSES = {'paid', 'approved', 'completed', 'confirmed', 'paid_out', 'finished', 'success'}
+
 def is_logged_in():
     return 'user_id' in session
 
@@ -73,6 +79,34 @@ def generate_qr_base64(emv):
     buf = BytesIO()
     img.save(buf, format='PNG')
     return base64.b64encode(buf.getvalue()).decode('utf-8')
+
+def get_user():
+    uid = session.get('user_id')
+    if not uid:
+        return None
+    try:
+        u = users.find_one({'_id': ObjectId(uid)})
+        return u
+    except Exception:
+        return None
+
+def normalize_plan(user_doc):
+    code = (user_doc or {}).get('plans') or 'padrao'
+    exp = (user_doc or {}).get('plan_expires_at')
+    now = datetime.utcnow()
+    if code in ('essencial', 'profissional') and exp and now > exp:
+        users.update_one({'_id': user_doc['_id']}, {'$set': {'plans': 'padrao', 'plan_started_at': None, 'plan_expires_at': None}})
+        code = 'padrao'
+        exp = None
+    return code, exp
+
+def plan_meta(code):
+    limit = PLAN_LIMITS.get(code, 0)
+    return limit
+
+def date_key_utc(dt=None):
+    dt = dt or datetime.utcnow()
+    return dt.strftime('%Y-%m-%d')
 
 @app.before_request
 def redirect_auth_pages_when_logged():
@@ -120,7 +154,7 @@ def register():
         return jsonify(ok=False, error='Usuário ou e-mail já cadastrado'), 409
     password_hash = generate_password_hash(password)
     try:
-        ins = users.insert_one({'username': username, 'email': email, 'password_hash': password_hash, 'created_at': datetime.utcnow(), 'last_login_at': None})
+        ins = users.insert_one({'username': username, 'email': email, 'password_hash': password_hash, 'created_at': datetime.utcnow(), 'last_login_at': None, 'plans': 'padrao', 'plan_started_at': None, 'plan_expires_at': None})
     except errors.DuplicateKeyError:
         return jsonify(ok=False, error='Usuário ou e-mail já cadastrado'), 409
     session.clear()
@@ -132,6 +166,9 @@ def register():
 @app.route('/')
 @login_required
 def dashboard():
+    u = get_user()
+    if u:
+        normalize_plan(u)
     return render_template('dashboard.html', username=session.get('username'))
 
 @app.route('/logout', methods=['POST', 'GET'])
@@ -286,9 +323,66 @@ def tribopay_webhook():
     if not tx:
         transactions.update_one({'hash': h}, {'$setOnInsert': {'created_at': datetime.utcnow()}, '$set': {'raw': data}}, upsert=True)
         return jsonify(ok=True)
-    st = status or data.get('status') or tx.get('payment_status')
-    transactions.update_one({'_id': tx['_id']}, {'$set': {'payment_status': st, 'updated_at': datetime.utcnow(), 'raw': data}})
+    st = (status or data.get('status') or tx.get('payment_status') or '').lower()
+    transactions.update_one({'_id': tx['_id']}, {'$set': {'payment_status': st or tx.get('payment_status'), 'updated_at': datetime.utcnow(), 'raw': data}})
+    if st in PAID_STATUSES:
+        uid = tx.get('user_id')
+        plan_name = tx.get('plan')
+        code = PLAN_CODES.get(plan_name)
+        if uid and code:
+            exp = None
+            if code in ('essencial', 'profissional'):
+                exp = datetime.utcnow() + timedelta(days=30)
+            try:
+                users.update_one({'_id': ObjectId(uid)}, {'$set': {'plans': code, 'plan_started_at': datetime.utcnow(), 'plan_expires_at': exp}})
+            except Exception:
+                pass
     return jsonify(ok=True)
+
+@app.route('/api/plan/status', methods=['GET'])
+@login_required
+def api_plan_status():
+    u = get_user()
+    if not u:
+        return jsonify(ok=False), 401
+    code, exp = normalize_plan(u)
+    limit = plan_meta(code)
+    today = date_key_utc()
+    used = 0
+    if limit:
+        rec = usage.find_one({'user_id': str(u['_id']), 'date': today})
+        used = rec.get('used', 0) if rec else 0
+    remaining = None if limit is None else max(0, int(limit) - int(used))
+    return jsonify(ok=True, plan=code, expires_at=(exp.isoformat() if exp else None), daily_limit=limit, used_today=used if limit else 0, remaining_today=remaining)
+
+@app.route('/api/usage/consume', methods=['POST'])
+@login_required
+def api_usage_consume():
+    u = get_user()
+    if not u:
+        return jsonify(ok=False), 401
+    code, exp = normalize_plan(u)
+    if code == 'padrao':
+        return jsonify(ok=False, error='Plano insuficiente'), 403
+    limit = plan_meta(code)
+    if limit is None:
+        return jsonify(ok=True, remaining_today=None)
+    try:
+        data = request.get_json(silent=True) or request.form
+        count = int(str(data.get('count', '0')))
+    except Exception:
+        return jsonify(ok=False, error='Parâmetro inválido'), 400
+    if count <= 0:
+        return jsonify(ok=False, error='Parâmetro inválido'), 400
+    today = date_key_utc()
+    rec = usage.find_one({'user_id': str(u['_id']), 'date': today}) or {'used': 0}
+    used = int(rec.get('used', 0))
+    if used + count > int(limit):
+        return jsonify(ok=False, error='Limite diário excedido', remaining=int(limit) - used), 400
+    usage.update_one({'user_id': str(u['_id']), 'date': today}, {'$setOnInsert': {'user_id': str(u['_id']), 'date': today}, '$inc': {'used': count}}, upsert=True)
+    new_used = used + count
+    remaining = int(limit) - new_used
+    return jsonify(ok=True, remaining_today=remaining)
 
 if __name__ == '__main__':
     app.run(host=os.environ.get('HOST', '0.0.0.0'), port=int(os.environ.get('PORT', 5000)))
