@@ -30,7 +30,7 @@ transactions = db['transactions']
 transactions.create_index([('hash', ASCENDING)], unique=True)
 transactions.create_index([('user_id', ASCENDING)])
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='.')
 _app_secret_env = os.environ.get('SECRET_KEY', '')
 app.secret_key = _app_secret_env if isinstance(_app_secret_env, str) and len(_app_secret_env) >= 32 else secrets.token_urlsafe(64)
 app.config['SESSION_COOKIE_HTTPONLY'] = True
