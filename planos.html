@@ -1,278 +1,211 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Planos — Reporting Bot</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
-:root{--primary:#6366f1;--secondary:#8b5cf6;--accent:#ec4899;--light:#ffffff;--paper:rgba(255,255,255,.80);--line:#e5e7eb;--ink:#0f172a;--muted:#667085;--bg1:#f8fafc;--bg2:#eef2f7;--ok:#10b981;--warn:#f59e0b;--err:#ef4444}
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
-body{min-height:100vh;display:flex;flex-direction:column;background:radial-gradient(1200px 600px at 10% -10%,#e9d5ff22,transparent),radial-gradient(1200px 600px at 110% 30%,#93c5fd26,transparent),linear-gradient(135deg,var(--bg1),var(--bg2));color:var(--ink)}
-.container{max-width:1140px;width:100%;margin:0 auto;padding:40px 20px}
-.header{display:flex;flex-direction:column;align-items:center;gap:14px;margin:34px 0 8px}
-.logo{width:72px;height:72px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--primary),var(--secondary));box-shadow:0 20px 40px -20px rgba(99,102,241,.5)}
-.logo i{font-size:30px;color:#fff}
-.brand{font-size:1.7rem;font-weight:800;letter-spacing:-.2px;background:linear-gradient(90deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero{margin-top:14px;text-align:center}
-.hero h1{font-size:2rem}
-.hero p{color:var(--muted);margin-top:8px}
-.ribbon{display:inline-flex;align-items:center;gap:10px;margin-top:16px;padding:8px 14px;border-radius:999px;border:1px solid rgba(99,102,241,.25);background:rgba(99,102,241,.12);color:var(--primary);font-weight:800;font-size:.92rem}
-.ribbon .pix{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid rgba(16,185,129,.25);background:rgba(16,185,129,.12);color:var(--ok)}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin:28px 0 20px;perspective:1200px}
-.card{position:relative;border:1px solid var(--line);background:var(--paper);backdrop-filter:blur(8px);border-radius:22px;padding:22px;box-shadow:0 30px 70px -20px rgba(2,6,23,.15);overflow:hidden;transform-style:preserve-3d;transition:transform .25s ease,box-shadow .25s ease}
-.card:before{content:"";position:absolute;inset:-1;border-radius:24px;background:conic-gradient(from 0deg,transparent,rgba(99,102,241,.18),transparent 30%);filter:blur(6px);z-index:-1;animation:spin 6s linear infinite}
+:root{--primary:#6366f1;--primary-dark:#4f46e5;--primary-darker:#4338ca;--secondary:#8b5cf6;--accent:#ec4899;--light:#fff;--light-gray:#f8fafc;--gray:#e2e8f0;--dark-gray:#64748b;--darker-gray:#475569;--dark:#0f172a;--success:#10b981;--error:#ef4444;--warning:#f59e0b;--r:18px;--pad:clamp(1rem,2.2vw,2rem);--gap:clamp(.7rem,2vw,1.5rem);--fs-xxl:clamp(1.6rem,4.2vw,2.85rem);--fs-xl:clamp(1.25rem,2.8vw,2.1rem);--fs-lg:clamp(1.02rem,1.7vw,1.3rem);--fs-md:clamp(.95rem,1.3vw,1.05rem);--fs-sm:clamp(.84rem,1vw,.95rem)}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(135deg,#f8fafc,#f1f5f9);color:var(--dark)}
+a{text-decoration:none;color:inherit}
+.container{width:min(1365px,97%);margin-inline:auto;padding-inline:clamp(.6rem,1.6vw,1.2rem)}
+header{padding-top:clamp(1.6rem,5vw,3.6rem);padding-bottom:clamp(.8rem,2.6vw,1.8rem);text-align:center;position:relative}
+header::after{content:"";position:absolute;inset:auto 6% 0 6%;height:1px;background:linear-gradient(90deg,transparent,var(--gray),transparent)}
+.brand{display:flex;align-items:center;justify-content:center;gap:.9rem;margin-bottom:.5rem}
+.brand-badge{width:clamp(2.6rem,7.4vw,4rem);height:clamp(2.6rem,7.4vw,4rem);border-radius:22%;background:linear-gradient(135deg,var(--primary),var(--secondary));display:grid;place-items:center;box-shadow:0 18px 45px -14px rgba(99,102,241,.35)}
+.brand-badge i{font-size:clamp(1.1rem,2.8vw,1.55rem);color:#fff}
+.brand-title{font-weight:900;font-size:var(--fs-xxl);background:linear-gradient(90deg,var(--primary) 10%,var(--secondary) 55%,var(--accent) 95%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-.02em}
+.tagline{font-size:var(--fs-lg);color:var(--darker-gray);max-width:70ch;margin:0 auto}
+.ribbon{display:inline-flex;align-items:center;gap:.5rem;margin-top:.8rem;padding:.45rem .7rem;border-radius:999px;border:1px solid rgba(99,102,241,.25);background:rgba(99,102,241,.12);color:var(--primary);font-weight:900;font-size:.92rem}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap);margin-block:clamp(1rem,3.6vw,2rem);perspective:1000px}
+@media(max-width:980px){.grid{grid-template-columns:1fr}}
+.card{position:relative;background:var(--light);border:1px solid var(--gray);border-radius:22px;padding:var(--pad);box-shadow:0 30px 70px -20px rgba(2,6,23,.15);overflow:hidden;transform-style:preserve-3d;transition:transform .25s ease,box-shadow .25s ease}
+.card:before{content:"";position:absolute;inset:-1;border-radius:24px;background:conic-gradient(from 0deg,transparent,rgba(99,102,241,.18),transparent 30%);filter:blur(6px);z-index:-1;animation:spin 8s linear infinite}
 .card:hover{box-shadow:0 40px 90px -30px rgba(2,6,23,.25)}
-.badge{position:absolute;top:14px;right:14px;padding:6px 10px;border-radius:999px;background:linear-gradient(90deg,var(--primary),var(--secondary));color:#fff;font-size:.8rem;font-weight:800;box-shadow:0 8px 18px -6px rgba(99,102,241,.45)}
-.period-chip{position:absolute;top:14px;left:14px;display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid rgba(16,185,129,.25);background:rgba(16,185,129,.12);color:var(--ok);font-weight:800;font-size:.8rem}
-.period-chip i{font-size:.9rem}
-.head{display:flex;align-items:center;gap:12px;margin-bottom:10px;margin-top:26px}
-.head .icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#fff,rgba(255,255,255,.6));box-shadow:0 12px 24px -12px rgba(99,102,241,.4)}
-.head .icon i{font-size:18px;color:var(--primary)}
-.title{font-weight:800}
-.price{display:flex;align-items:flex-end;gap:8px;margin:10px 0 6px}
-.price .amount{font-size:2.2rem;font-weight:900;letter-spacing:-.5px}
-.price .period{color:var(--muted);font-weight:700}
-.quota{font-size:.95rem;color:var(--ink)}
-.features{margin:14px 0 16px;display:grid;gap:8px}
-.feature{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.95rem}
-.feature i{color:var(--ok)}
-.payline{display:flex;align-items:center;gap:8px;margin-top:2px;font-weight:700;color:var(--ink)}
-.payline i{color:var(--ok)}
-.actions{display:flex;flex-direction:column;gap:10px}
-.btn{width:100%;padding:14px 16px;border:none;border-radius:14px;font-weight:800;font-size:1rem;color:#fff;background:linear-gradient(90deg,var(--primary),var(--secondary));cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 15px 30px -10px rgba(99,102,241,.4)}
+.badge{position:absolute;top:.8rem;right:.8rem;padding:.45rem .7rem;border-radius:999px;background:linear-gradient(90deg,var(--primary),var(--secondary));color:#fff;font-weight:900;font-size:.8rem;box-shadow:0 10px 22px -10px rgba(99,102,241,.45)}
+.period-chip{position:absolute;top:.8rem;left:.8rem;display:inline-flex;align-items:center;gap:.45rem;padding:.45rem .7rem;border-radius:999px;border:1px solid rgba(16,185,129,.25);background:rgba(16,185,129,.12);color:var(--success);font-weight:900;font-size:.8rem}
+.period-chip i{font-size:.85rem}
+.head{display:flex;align-items:center;gap:.9rem;margin:1.4rem 0 .4rem 0}
+.head .icon{width:2.6rem;height:2.6rem;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#fff,rgba(255,255,255,.6));box-shadow:0 12px 24px -12px rgba(99,102,241,.4)}
+.head .icon i{font-size:1.1rem;color:var(--primary)}
+.title{font-weight:900}
+.price{display:flex;align-items:flex-end;gap:.5rem;margin:.4rem 0 .2rem}
+.price .amount{font-size:2.15rem;font-weight:900;letter-spacing:-.4px}
+.price .period{color:var(--dark-gray);font-weight:800}
+.quota{font-size:.96rem;color:var(--darker-gray)}
+.features{margin:1rem 0;display:grid;gap:.55rem}
+.feature{display:flex;align-items:flex-start;gap:.6rem;color:var(--dark-gray);font-size:.95rem}
+.feature i{color:var(--success);min-width:1rem}
+.payline{display:flex;align-items:center;gap:.5rem;margin-top:.1rem;font-weight:800;color:var(--dark)}
+.actions{display:flex;flex-direction:column;gap:.55rem;margin-top:.6rem}
+.btn{width:100%;padding:.9rem 1rem;border:none;border-radius:14px;font-weight:900;font-size:1rem;color:#fff;background:linear-gradient(90deg,var(--primary),var(--secondary));cursor:pointer;transition:transform .12s,box-shadow .12s;box-shadow:0 15px 30px -12px rgba(99,102,241,.4)}
 .btn:hover{transform:translateY(-1px)}
-.note{font-size:.85rem;color:var(--muted);text-align:center}
-.compare{margin-top:20px;background:var(--paper);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.note{font-size:.85rem;color:var(--dark-gray);text-align:center}
+.compare{margin-top:clamp(1rem,3vw,1.6rem);background:linear-gradient(180deg,#fff,rgba(255,255,255,.94));border:1px solid var(--gray);border-radius:18px;overflow:hidden}
 .table{width:100%;border-collapse:collapse}
-.table th,.table td{padding:14px 16px;border-bottom:1px solid var(--line);text-align:left}
-.table th{background:#fff;font-weight:800}
+.table th,.table td{padding:14px 16px;border-bottom:1px solid var(--gray);text-align:left}
+.table th{background:#fff;font-weight:900}
 .table td.center{text-align:center}
-.pulse{animation:pulse 1.2s ease}
-.toast{position:fixed;left:50%;top:20px;transform:translateX(-50%) translateY(-20px);opacity:0;z-index:50;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 20px 50px -20px rgba(2,6,23,.25);padding:12px 16px;font-weight:600;display:flex;align-items:center;gap:10px;transition:opacity .25s,transform .25s}
+.toast{position:fixed;left:50%;top:20px;transform:translateX(-50%) translateY(-20px);opacity:0;z-index:50;background:#fff;border:1px solid var(--gray);border-radius:12px;box-shadow:0 20px 50px -20px rgba(2,6,23,.25);padding:12px 16px;font-weight:800;display:flex;align-items:center;gap:10px;transition:opacity .25s,transform .25s}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.confetti{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden}
-footer{text-align:center;margin-top:auto;background:#fff;border-top:1px solid var(--line);padding:22px 12px;color:var(--muted);font-size:.95rem}
-@keyframes spin{to{transform:rotate(1turn)}}
-@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
-@keyframes fall{0%{transform:translateY(-20vh) rotate(0)}100%{transform:translateY(105vh) rotate(720deg)}}
-@media (max-width:980px){.grid{grid-template-columns:1fr;gap:16px}.container{max-width:640px}}
-.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:90}
+.confetti{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:60}
+footer{color:var(--dark-gray);text-align:center;font-size:var(--fs-sm);padding:1.4rem 0;position:relative}
+footer::before{content:"";position:absolute;inset:0 6% auto 6%;height:1px;background:linear-gradient(90deg,transparent,var(--gray),transparent)}
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:9999}
 .modal.show{display:flex}
-.modal .overlay{position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(4px)}
-.modal .panel{position:relative;width:min(640px,92vw);border-radius:20px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.92));box-shadow:0 30px 80px -20px rgba(2,6,23,.45);padding:20px}
+.modal .overlay{position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(4px);z-index:0}
+.modal .panel{position:relative;z-index:1;width:min(640px,92vw);border-radius:20px;border:1px solid var(--gray);background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.92));box-shadow:0 30px 80px -20px rgba(2,6,23,.45);padding:20px;max-height:calc(100vh - 48px);overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .modal .head{display:flex;align-items:center;justify-content:space-between;margin:0}
 .modal .hleft{display:flex;align-items:center;gap:12px}
 .modal .hicon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#fff,rgba(255,255,255,.65));box-shadow:0 12px 24px -12px rgba(99,102,241,.4)}
 .modal .hicon i{color:var(--primary)}
 .modal .htitle{font-weight:900}
-.modal .close{appearance:none;border:none;background:transparent;font-size:20px;cursor:pointer;color:var(--muted)}
+.modal .close{appearance:none;border:none;background:transparent;font-size:20px;cursor:pointer;color:var(--dark-gray)}
 .form{margin-top:12px;display:grid;gap:12px}
 .row{display:grid;grid-template-columns:1fr;gap:12px}
-.kv{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff}
-.kv .k{color:var(--muted);font-weight:700}
+.kv{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--gray);border-radius:12px;padding:10px 12px;background:#fff}
+.kv .k{color:var(--dark-gray);font-weight:800}
 .kv .v{font-weight:900}
 .input{display:flex;flex-direction:column;gap:6px}
-.input label{font-weight:800}
-.input input{border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-weight:700}
-.err{display:none;color:var(--err);font-weight:700;font-size:.92rem}
+.input label{font-weight:900}
+.input input{border:1px solid var(--gray);border-radius:12px;padding:12px 14px;font-weight:800;outline:none;transition:border-color .15s,box-shadow .15s}
+.input input:focus{box-shadow:0 0 0 4px rgba(99,102,241,.15);border-color:var(--primary)}
+.input input.valid{border-color:var(--success);box-shadow:0 0 0 4px rgba(16,185,129,.15)}
+.input input.invalid{border-color:var(--error);box-shadow:0 0 0 4px rgba(239,68,68,.15)}
+.err{display:none;color:var(--error);font-weight:800;font-size:.92rem}
 .actions-modal{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
-.btn-ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+.btn-ghost{background:#fff;border:1px solid var(--gray);color:var(--dark)}
 .btn-primary{background:linear-gradient(90deg,var(--primary),var(--secondary));color:#fff}
+.policy{margin-top:12px;border:1px solid rgba(99,102,241,.25);border-radius:16px;background:linear-gradient(180deg,#fff,rgba(255,255,255,.94));padding:12px}
+.policy .ph{display:flex;align-items:center;gap:.6rem;font-weight:900}
+.policy .ph i{color:var(--primary)}
+.policy .pb{margin-top:8px;color:var(--darker-gray);font-size:.94rem;line-height:1.4}
+.policy .pts{display:grid;gap:6px;margin-top:8px}
+.policy .pt{display:flex;gap:.55rem;align-items:flex-start}
+.policy .pt i{color:var(--success);min-width:1rem;margin-top:.15rem}
+@keyframes spin{to{transform:rotate(1turn)}}
+@keyframes fall{0%{transform:translateY(-20vh) rotate(0turn);opacity:1}100%{transform:translateY(60vh) rotate(1.5turn);opacity:0}}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+@keyframes pop{0%{opacity:0;transform:translateY(8px) scale(.98)}100%{opacity:1;transform:translateY(0) scale(1)}}
+.modal.show .panel{animation:pop .28s ease}
 @media (max-width:560px){.modal .panel{padding:16px;border-radius:18px}}
+.tilt{will-change:transform}
+.body-modal-open{overflow:hidden}
 </style>
 </head>
 <body>
 <div class="container">
-  <header class="header">
-    <div class="logo"><i class="fas fa-robot"></i></div>
-    <div class="brand">Reporting Bot</div>
-  </header>
-
-  <section class="hero">
-    <h1>Escolha o plano ideal</h1>
-    <p>Planos mensais de 30 dias e opção vitalícia. Pagamento exclusivo via Pix, suporte rápido por chat</p>
-    <div class="ribbon"><i class="fa-solid fa-bolt"></i> Ativação imediata <span class="pix"><i class="fa-solid fa-qrcode"></i> Pagamento via Pix</span></div>
-  </section>
-
-  <section class="grid">
-    <article class="card tilt" data-plan="Essencial" data-price="R$35" data-period="Mensal (30 dias)">
-      <div class="period-chip"><i class="fa-solid fa-rotate"></i> Mensal (30 dias)</div>
-      <div class="head">
-        <div class="icon"><i class="fa-regular fa-gem"></i></div>
-        <div class="title">Essencial</div>
-      </div>
-      <div class="price"><div class="amount">R$35</div><div class="period">/ mês • 30 dias</div></div>
-      <div class="quota">Permite denunciar até 10 contas por dia</div>
-      <div class="features">
-        <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Suporte rápido por chat</span></div>
-        <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Fila de processamento padrão</span></div>
-        <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Histórico de atividades</span></div>
-      </div>
-      <div class="payline"><i class="fa-solid fa-qrcode"></i><span>Pagamento via Pix</span></div>
-      <div class="actions">
-        <button class="btn select">Assinar Essencial</button>
-        <div class="note">QR Code Pix emitido na confirmação</div>
-      </div>
-    </article>
-
-    <article class="card tilt pulse" data-plan="Profissional" data-price="R$45,50" data-period="Mensal (30 dias)">
-      <div class="badge">Mais popular</div>
-      <div class="period-chip"><i class="fa-solid fa-rotate"></i> Mensal (30 dias)</div>
-      <div class="head">
-        <div class="icon"><i class="fa-solid fa-rocket"></i></div>
-        <div class="title">Profissional</div>
-      </div>
-      <div class="price"><div class="amount">R$45,50</div><div class="period">/ mês • 30 dias</div></div>
-      <div class="quota">Permite denunciar até 25 contas por dia</div>
-      <div class="features">
-        <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Suporte rápido por chat</span></div>
-        <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Prioridade na fila</span></div>
-        <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Painel detalhado</span></div>
-      </div>
-      <div class="payline"><i class="fa-solid fa-qrcode"></i><span>Pagamento via Pix</span></div>
-      <div class="actions">
-        <button class="btn select">Assinar Profissional</button>
-        <div class="note">QR Code Pix emitido na confirmação</div>
-      </div>
-    </article>
-
-    <article class="card tilt" data-plan="Vitalício" data-price="R$119" data-period="Acesso permanente">
-      <div class="badge">Melhor valor</div>
-      <div class="head">
-        <div class="icon"><i class="fa-solid fa-infinity"></i></div>
-        <div class="title">Vitalício</div>
-      </div>
-      <div class="price"><div class="amount">R$119</div><div class="period">• acesso permanente</div></div>
-      <div class="quota">Permite denunciar ilimitadamente e acesso vitalício permanente</div>
-      <div class="features">
-        <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Suporte rápido por chat</span></div>
-        <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Uso ilimitado</span></div>
-        <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Recursos premium</span></div>
-      </div>
-      <div class="payline"><i class="fa-solid fa-qrcode"></i><span>Pagamento via Pix</span></div>
-      <div class="actions">
-        <button class="btn select">Assinar Vitalício</button>
-        <div class="note">Pagamento único com Pix</div>
-      </div>
-    </article>
-  </section>
-
-  <section class="compare">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Recursos</th>
-          <th>Essencial</th>
-          <th>Profissional</th>
-          <th>Vitalício</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Limite diário</td>
-          <td class="center">10</td>
-          <td class="center">25</td>
-          <td class="center">Ilimitado</td>
-        </tr>
-        <tr>
-          <td>Período</td>
-          <td class="center">Mensal (30 dias)</td>
-          <td class="center">Mensal (30 dias)</td>
-          <td class="center">Permanente</td>
-        </tr>
-        <tr>
-          <td>Pagamento</td>
-          <td class="center">Pix (30 dias)</td>
-          <td class="center">Pix (30 dias)</td>
-          <td class="center">Pix (único)</td>
-        </tr>
-        <tr>
-          <td>Prioridade</td>
-          <td class="center"><i class="fa-regular fa-circle"></i></td>
-          <td class="center"><i class="fa-solid fa-circle-half-stroke"></i></td>
-          <td class="center"><i class="fa-solid fa-star"></i></td>
-        </tr>
-        <tr>
-          <td>Suporte</td>
-          <td class="center">Chat rápido</td>
-          <td class="center">Chat rápido</td>
-          <td class="center">Chat rápido</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
+<header>
+<div class="brand"><div class="brand-badge"><i class="fa-solid fa-robot"></i></div><div class="brand-title">Reporting Bot</div></div>
+<p class="tagline">Escolha o plano ideal.
+Planos mensais de 30 dias e opção vitalícia. Pagamento exclusivo via Pix, suporte rápido por chat</p>
+<div class="ribbon"><i class="fa-solid fa-bolt"></i><span>Ativação imediata</span><span style="display:inline-flex;align-items:center;gap:.45rem;padding:.3rem .6rem;border:1px solid rgba(16,185,129,.25);border-radius:999px;background:rgba(16,185,129,.12);color:var(--success);font-weight:900"><i class="fa-brands fa-pix"></i> Pagamento via Pix</span></div>
+</header>
+<section class="grid">
+<article class="card tilt" data-plan="Essencial" data-price="R$35" data-period="30 dias">
+<div class="period-chip"><i class="fa-solid fa-rotate"></i> Mensal (30 dias)</div>
+<div class="head"><div class="icon"><i class="fa-regular fa-gem"></i></div><div class="title">Essencial</div></div>
+<div class="price"><div class="amount">R$35</div><div class="period">/ mês • 30 dias</div></div>
+<div class="quota">Indicado para remover contas de até 300 seguidores</div>
+<div class="features">
+<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Permite denunciar até 5 contas por dia</span></div>
+<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Intervalo mínimo de 1 hora para repetir a mesma conta</span></div>
+<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Limite de até 500 denúncias por conta</span></div>
+<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Suporte por chat</span></div>
+<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Fila de processamento padrão</span></div>
 </div>
-
-<div id="toast" class="toast"><i class="fa-solid fa-circle-check" style="color:#10b981"></i><span id="toast-text">Plano selecionado</span></div>
+<div class="payline"><i class="fa-brands fa-pix"></i><span>Pagamento via Pix</span></div>
+<div class="actions"><button class="btn select">Assinar Essencial</button><div class="note">QR Code Pix emitido na confirmação</div></div>
+</article>
+<article class="card tilt" data-plan="Profissional" data-price="R$45,50" data-period="30 dias">
+<div class="badge">Mais popular</div>
+<div class="period-chip"><i class="fa-solid fa-rotate"></i> Mensal (30 dias)</div>
+<div class="head"><div class="icon"><i class="fa-solid fa-rocket"></i></div><div class="title">Profissional</div></div>
+<div class="price"><div class="amount">R$45,50</div><div class="period">/ mês • 30 dias</div></div>
+<div class="quota">Exigente para remover contas de até 10.000 seguidores e não verificadas</div>
+<div class="features">
+<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Permite denunciar até 15 contas por dia</span></div>
+<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Permite repetir a mesma conta</span></div>
+<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Limite de até 5.000 denúncias por conta</span></div>
+<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Suporte por chat</span></div>
+<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Processamento de fila prioritário</span></div>
+</div>
+<div class="payline"><i class="fa-brands fa-pix"></i><span>Pagamento via Pix</span></div>
+<div class="actions"><button class="btn select">Assinar Profissional</button><div class="note">QR Code Pix emitido na confirmação</div></div>
+</article>
+<article class="card tilt" data-plan="Vitalício" data-price="R$119" data-period="Acesso permanente">
+<div class="badge">Melhor valor</div>
+<div class="head"><div class="icon"><i class="fa-solid fa-infinity"></i></div><div class="title">Vitalício</div></div>
+<div class="price"><div class="amount">R$119</div><div class="period">• acesso permanente</div></div>
+<div class="quota">Ideal para remover contas sem limites de seguidores e verificadas por assinatura</div>
+<div class="features">
+<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Sem renovação: acesso vitalício</span></div>
+<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Permite repetir a mesma conta</span></div>
+<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Limite de até 15.950 denúncias por conta</span></div>
+<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Suporte por chat</span></div>
+<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Recursos ilimitados, sucesso garantido e maior prioridade</span></div>
+</div>
+<div class="payline"><i class="fa-brands fa-pix"></i><span>Pagamento via Pix</span></div>
+<div class="actions"><button class="btn select">Assinar Vitalício</button><div class="note">Pagamento único com Pix</div></div>
+</article>
+</section>
+<section class="compare">
+<table class="table">
+<thead>
+<tr><th>Recursos</th><th>Essencial</th><th>Profissional</th><th>Vitalício</th></tr>
+</thead>
+<tbody>
+<tr><td>Contas por dia</td><td class="center">5</td><td class="center">15</td><td class="center">Sob demanda</td></tr>
+<tr><td>Repetir mesma conta</td><td class="center">Após 1h</td><td class="center">Permitido</td><td class="center">Permitido</td></tr>
+<tr><td>Limite denúncias por operação</td><td class="center">500</td><td class="center">5.000</td><td class="center">15.950</td></tr>
+<tr><td>Período</td><td class="center">30 dias</td><td class="center">30 dias</td><td class="center">Permanente</td></tr>
+<tr><td>Pagamento</td><td class="center">Pix</td><td class="center">Pix</td><td class="center">Pix (único)</td></tr>
+<tr><td>Prioridade</td><td class="center"><i class="fa-regular fa-circle"></i></td><td class="center"><i class="fa-solid fa-circle-half-stroke"></i></td><td class="center"><i class="fa-solid fa-star"></i></td></tr>
+<tr><td>Suporte</td><td class="center">Chat</td><td class="center">Chat</td><td class="center">Chat</td></tr>
+</tbody>
+</table>
+</section>
+</div>
+<div id="toast" class="toast" aria-live="polite"><i class="fa-solid fa-circle-check" style="color:#10b981"></i><span id="toast-text">Plano selecionado</span></div>
 <div id="confetti" class="confetti"></div>
-
-<div class="modal" id="modal">
-  <div class="overlay" id="overlay"></div>
-  <div class="panel">
-    <div class="head">
-      <div class="hleft">
-        <div class="hicon"><i class="fa-solid fa-qrcode"></i></div>
-        <div class="htitle">Finalizar assinatura</div>
-      </div>
-      <button class="close" id="closeModal"><i class="fa-solid fa-xmark"></i></button>
-    </div>
-    <div class="row" style="margin-top:10px">
-      <div class="kv"><div class="k">Plano</div><div class="v" id="m-plan">—</div></div>
-      <div class="kv"><div class="k">Valor</div><div class="v" id="m-price">—</div></div>
-    </div>
-    <form class="form" id="pix-form" action="/pixPayment" method="post" novalidate>
-      <input type="hidden" name="plan" id="f-plan">
-      <div class="input">
-        <label for="f-name">Nome completo</label>
-        <input id="f-name" name="name" type="text" placeholder="Digite seu nome completo" required>
-        <div class="err" id="e-name">Informe seu nome completo</div>
-      </div>
-      <div class="input">
-        <label for="f-cpf">CPF (apenas números)</label>
-        <input id="f-cpf" name="cpf" inputmode="numeric" pattern="^\d{11}$" maxlength="11" placeholder="Somente números" required>
-        <div class="err" id="e-cpf">Informe um CPF com 11 dígitos</div>
-      </div>
-      <div class="actions-modal">
-        <button type="button" class="btn btn-ghost" id="cancel">Cancelar</button>
-        <button type="submit" class="btn btn-primary" id="submitBtn">Continuar para Pix</button>
-      </div>
-    </form>
-  </div>
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="dlg-title">
+<div class="overlay" id="overlay"></div>
+<div class="panel">
+<div class="head">
+<div class="hleft"><div class="hicon"><i class="fa-brands fa-pix"></i></div><div class="htitle" id="dlg-title">Finalizar assinatura</div></div>
+<button class="close" id="closeModal" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
 </div>
-
-<footer>
-  <p>Reporting Bot © 2025 — Todos os direitos reservados</p>
-</footer>
-
+<div class="row" style="margin-top:10px">
+<div class="kv"><div class="k">Plano</div><div class="v" id="m-plan">—</div></div>
+<div class="kv"><div class="k">Valor</div><div class="v" id="m-price">—</div></div>
+</div>
+<form class="form" id="pix-form" action="/pixPayment" method="post" novalidate>
+<input type="hidden" name="plan" id="f-plan">
+<div class="input"><label for="f-name">Nome completo</label><input id="f-name" name="name" type="text" placeholder="Digite seu nome completo" required aria-describedby="e-name" aria-invalid="false"><div class="err" id="e-name">Informe seu nome completo</div></div>
+<div class="input"><label for="f-cpf">CPF (apenas números)</label><input id="f-cpf" name="cpf" inputmode="numeric" pattern="^\d{11}$" maxlength="11" placeholder="Somente números" required aria-describedby="e-cpf e-cpf-invalid" aria-invalid="false"><div class="err" id="e-cpf">Informe um CPF com 11 dígitos</div><div class="err" id="e-cpf-invalid">CPF inválido. Verifique os dígitos.</div></div>
+<div class="actions-modal"><button type="button" class="btn btn-ghost" id="cancel">Cancelar</button><button type="submit" class="btn btn-primary" id="submitBtn">Continuar para Pix</button></div>
+</form>
+<div class="policy" id="policy">
+<div class="ph"><i class="fa-solid fa-shield-halved"></i><span>Por que pedimos seu nome completo e CPF?</span></div>
+<div class="pb">Usamos essas informações exclusivamente para gerar a cobrança Pix e para que a instituição financeira valide e aprove o pagamento automaticamente. Assim que o pagamento é confirmado, seu acesso é liberado imediatamente e todas as funções são ativadas sem espera.</div>
+<div class="pts">
+<div class="pt"><i class="fa-solid fa-circle-check"></i><div>Dados usados apenas para aprovar sua transação Pix (QR Code e copia e cola). Não salvamos seu nome ou CPF em nossos servidores nem em nosso banco de dados.</div></div>
+<div class="pt"><i class="fa-solid fa-circle-check"></i><div>As informações seguem para a processadora/banco com a finalidade de autenticar a cobrança e garantir a aprovação instantânea do pagamento.</div></div>
+<div class="pt"><i class="fa-solid fa-circle-check"></i><div>Após a confirmação do pagamento, o acesso é liberado automaticamente e nada do seu cadastro é retido por nós.</div></div>
+</div>
+</div>
+</div>
+</div>
+<footer>Reporting Bot © 2025 • Todos os direitos reservados</footer>
 <script>
-const cards=document.querySelectorAll('.card .select');
-const toast=document.getElementById('toast');
-const toastText=document.getElementById('toast-text');
-const confetti=document.getElementById('confetti');
-const modal=document.getElementById('modal');
-const overlay=document.getElementById('overlay');
-const closeModalBtn=document.getElementById('closeModal');
-const cancelBtn=document.getElementById('cancel');
-const form=document.getElementById('pix-form');
-const fPlan=document.getElementById('f-plan');
-const fName=document.getElementById('f-name');
-const fCpf=document.getElementById('f-cpf');
-const mPlan=document.getElementById('m-plan');
-const mPrice=document.getElementById('m-price');
-const submitBtn=document.getElementById('submitBtn');
-function showToast(msg){toastText.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1600)}
-function burstConfetti(x,y){const n=28;for(let i=0;i<n;i++){const p=document.createElement('span');p.style.position='absolute';p.style.left=x+'px';p.style.top=y+'px';p.style.width='10px';p.style.height='10px';p.style.borderRadius='2px';p.style.background=`hsl(${Math.floor(Math.random()*360)} 90% 60%)`;p.style.transform=`translateY(-20vh)`;p.style.animation='fall 1.2s ease forwards';p.style.filter='drop-shadow(0 6px 6px rgba(0,0,0,.2))';p.style.left=`calc(${x}px + ${Math.random()*80-40}px)`;confetti.appendChild(p);setTimeout(()=>confetti.removeChild(p),1300)}}
-function openModal(plan,price){mPlan.textContent=plan;mPrice.textContent=price;fPlan.value=plan;modal.classList.add('show');document.body.style.overflow='hidden';setTimeout(()=>fName.focus(),50)}
-function closeModal(){modal.classList.remove('show');document.body.style.overflow='auto'}
-cards.forEach(b=>{b.addEventListener('click',e=>{const card=e.currentTarget.closest('.card');card.classList.add('pulse');setTimeout(()=>card.classList.remove('pulse'),600);const plan=card.getAttribute('data-plan');const price=card.getAttribute('data-price');const period=card.getAttribute('data-period');showToast(`${plan} selecionado (${price} • ${period} • Pix)`);const r=card.getBoundingClientRect();burstConfetti(r.left+r.width/2, r.top+window.scrollY+40);openModal(plan,price)})});
-overlay.addEventListener('click',closeModal);closeModalBtn.addEventListener('click',closeModal);cancelBtn.addEventListener('click',closeModal);document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('show'))closeModal()});
-const tilts=document.querySelectorAll('.tilt');tilts.forEach(card=>{card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect();const x=e.clientX-r.left;const y=e.clientY-r.top;const rx=((y-r.height/2)/r.height)*6;const ry=((x-r.width/2)/r.width)*-6;card.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`});card.addEventListener('mouseleave',()=>{card.style.transform='rotateX(0) rotateY(0)'})});
-function onlyDigits(s){return String(s||'').replace(/\D+/g,'')}
-fCpf.addEventListener('input',e=>{const d=onlyDigits(e.target.value).slice(0,11);e.target.value=d})
-function validate(){let ok=true;const name=String(fName.value||'').trim();const cpf=onlyDigits(fCpf.value);document.getElementById('e-name').style.display=name.length>=3?'none':'block';document.getElementById('e-cpf').style.display=cpf.length===11?'none':'block';if(name.length<3)ok=false;if(cpf.length!==11)ok=false;return ok}
-form.addEventListener('submit',e=>{e.preventDefault();if(!validate())return;submitBtn.disabled=true;fCpf.value=onlyDigits(fCpf.value);form.submit()})
+const cards=document.querySelectorAll('.card .select');const toast=document.getElementById('toast');const toastText=document.getElementById('toast-text');const confetti=document.getElementById('confetti');const modal=document.getElementById('modal');const overlay=document.getElementById('overlay');const closeModalBtn=document.getElementById('closeModal');const cancelBtn=document.getElementById('cancel');const form=document.getElementById('pix-form');const fPlan=document.getElementById('f-plan');const fName=document.getElementById('f-name');const fCpf=document.getElementById('f-cpf');const mPlan=document.getElementById('m-plan');const mPrice=document.getElementById('m-price');const submitBtn=document.getElementById('submitBtn');const main=document.querySelector('.container');let lastFocus=null;function showToast(msg){toastText.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1600)}function burstConfetti(x,y){const n=28;for(let i=0;i<n;i++){const p=document.createElement('span');p.style.position='absolute';p.style.left=x+'px';p.style.top=y+'px';p.style.width='10px';p.style.height='10px';p.style.borderRadius='2px';p.style.background=`hsl(${Math.floor(Math.random()*360)} 90% 60%)`;p.style.transform=`translateY(-20vh)`;p.style.animation='fall 1.2s ease forwards';p.style.filter='drop-shadow(0 6px 6px rgba(0,0,0,.2))';p.style.left=`calc(${x}px + ${Math.random()*80-40}px)`;confetti.appendChild(p);setTimeout(()=>confetti.removeChild(p),1300)}}function cpfIsValid(c){const s=(c||'').replace(/\D+/g,'');if(s.length!==11)return false;if(/^(\d)\1+$/.test(s))return false;let sum=0;for(let i=0;i<9;i++)sum+=parseInt(s[i],10)*(10-i);let dv1=(sum*10)%11;dv1=dv1===10?0:dv1;if(dv1!==parseInt(s[9],10))return false;sum=0;for(let i=0;i<10;i++)sum+=parseInt(s[i],10)*(11-i);let dv2=(sum*10)%11;dv2=dv2===10?0:dv2;return dv2===parseInt(s[10],10)}function nameIsValid(n){const p=String(n||'').trim().split(/\s+/).filter(x=>x.length>=2);return p.length>=2}function setFieldState(input,ok,errIds){input.classList.remove('valid','invalid');input.setAttribute('aria-invalid',String(!ok));errIds.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none'});if(ok){input.classList.add('valid')}else{input.classList.add('invalid')}}function validate(){let ok=true;const name=String(fName.value||'').trim();const cpf=String(fCpf.value||'').replace(/\D+/g,'');let nameOk=nameIsValid(name);let cpfLenOk=cpf.length===11;let cpfOk=cpfLenOk&&cpfIsValid(cpf);document.getElementById('e-name').style.display=nameOk?'none':'block';document.getElementById('e-cpf').style.display=cpfLenOk?'none':'block';document.getElementById('e-cpf-invalid').style.display=cpfLenOk&&!cpfOk?'block':'none';setFieldState(fName,nameOk,['e-name']);setFieldState(fCpf,cpfOk,['e-cpf','e-cpf-invalid']);if(!nameOk)ok=false;if(!cpfOk)ok=false;return ok}function openModal(plan,price){lastFocus=document.activeElement;mPlan.textContent=plan;mPrice.textContent=price;fPlan.value=plan;modal.classList.add('show');document.body.classList.add('body-modal-open');if(main)main.setAttribute('inert','');setTimeout(()=>fName.focus(),50)}function closeModal(){modal.classList.remove('show');document.body.classList.remove('body-modal-open');if(main)main.removeAttribute('inert');if(lastFocus&&lastFocus.focus)lastFocus.focus()}cards.forEach(b=>{b.addEventListener('click',e=>{const card=e.currentTarget.closest('.card');card.style.animation='pulse .6s ease';setTimeout(()=>card.style.animation='',620);const plan=card.getAttribute('data-plan');const price=card.getAttribute('data-price');const period=card.getAttribute('data-period');showToast(`${plan} selecionado (${price} • ${period} • Pix)`);const r=card.getBoundingClientRect();burstConfetti(r.left+r.width/2, r.top+window.scrollY+40);openModal(plan,price)})});overlay.addEventListener('click',closeModal);closeModalBtn.addEventListener('click',closeModal);cancelBtn.addEventListener('click',closeModal);document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('show'))closeModal()});const tilts=document.querySelectorAll('.tilt');tilts.forEach(card=>{card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect();const x=e.clientX-r.left;const y=e.clientY-r.top;const rx=((y-r.height/2)/r.height)*6;const ry=((x-r.width/2)/r.width)*-6;card.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`});card.addEventListener('mouseleave',()=>{card.style.transform='rotateX(0) rotateY(0)'})});function onlyDigits(s){return String(s||'').replace(/\D+/g,'')}fCpf.addEventListener('input',e=>{const d=onlyDigits(e.target.value).slice(0,11);e.target.value=d;validate()});fName.addEventListener('input',()=>validate());function handleTabTrap(e){if(!modal.classList.contains('show'))return;const focusables=modal.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');const f=Array.from(focusables).filter(el=>!el.hasAttribute('disabled')&&el.tabIndex!==-1);if(f.length===0)return;const first=f[0];const last=f[f.length-1];if(e.key==='Tab'){if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}}document.addEventListener('keydown',handleTabTrap);function validateAndSubmit(){if(!validate())return;submitBtn.disabled=true;fCpf.value=onlyDigits(fCpf.value);form.submit()}form.addEventListener('submit',e=>{e.preventDefault();validateAndSubmit()})
 </script>
 </body>
 </html>
