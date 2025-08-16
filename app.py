@@ -4,6 +4,8 @@ import json
 import base64
 import logging
 import secrets
+import hmac
+import hashlib
 from io import BytesIO
 from datetime import datetime, timedelta
 from urllib.parse import quote_plus
@@ -57,7 +59,12 @@ PLANS = {
 
 PLAN_CODES = {'Essencial': 'essencial', 'Profissional': 'profissional', 'Vitalício': 'vitalicio'}
 PLAN_LIMITS = {'padrao': 0, 'essencial': 10, 'profissional': 25, 'vitalicio': None}
-PAID_STATUSES = {'paid', 'approved', 'completed', 'confirmed', 'paid_out', 'finished', 'success'}
+PAID_STATUSES = {'paid', 'approved', 'completed', 'confirmed', 'paid_out', 'finished', 'success', 'settled', 'captured', 'accredited', 'credited', 'confirmed_payment'}
+FAILED_STATUSES = {'canceled', 'cancelled', 'refunded', 'chargeback', 'reversed', 'voided', 'failed', 'expired', 'denied'}
+WEBHOOK_SECRET = os.environ.get('TRIBOPAY_WEBHOOK_SECRET', '')
+
+if not isinstance(WEBHOOK_SECRET, str) or len(WEBHOOK_SECRET) < 16:
+    raise RuntimeError('TRIBOPAY_WEBHOOK_SECRET ausente ou fraco')
 
 def is_logged_in():
     return 'user_id' in session
@@ -107,6 +114,18 @@ def plan_meta(code):
 def date_key_utc(dt=None):
     dt = dt or datetime.utcnow()
     return dt.strftime('%Y-%m-%d')
+
+def valid_webhook(req):
+    token = req.args.get('token') or ''
+    if token and secrets.compare_digest(token, WEBHOOK_SECRET):
+        return True
+    sig = req.headers.get('X-TriboPay-Signature') or ''
+    if sig:
+        raw = req.get_data(cache=False, as_text=False)
+        expected = hmac.new(WEBHOOK_SECRET.encode('utf-8'), raw, hashlib.sha256).hexdigest()
+        if secrets.compare_digest(sig, expected):
+            return True
+    return False
 
 @app.before_request
 def redirect_auth_pages_when_logged():
@@ -253,7 +272,7 @@ def pix_payment():
             "utm_term": "",
             "utm_content": ""
         },
-        "postback_url": url_for('tribopay_webhook', _external=True)
+        "postback_url": url_for('tribopay_webhook', _external=True, token=WEBHOOK_SECRET)
     }
     try:
         r = requests.post(f"{TRIBOPAY_API}?api_token={TRIBOPAY_TOKEN}", headers=TRIBO_HEADERS, json=payload, timeout=30)
@@ -272,7 +291,7 @@ def pix_payment():
     pix_url = pix.get('pix_url') or d.get('pix_url')
     emv = pix.get('pix_qr_code') or pix.get('copy_and_paste') or pix.get('emv') or d.get('pix_qr_code')
     h = d.get('hash') or ''
-    status = d.get('payment_status') or 'waiting_payment'
+    status = (d.get('payment_status') or 'waiting_payment').lower()
     if not emv:
         return jsonify(ok=False, error='Falha ao criar cobrança Pix'), 502
     qr_b64 = generate_qr_base64(emv)
@@ -306,6 +325,8 @@ def pix_status():
 
 @app.route('/webhook/tribopay', methods=['POST'])
 def tribopay_webhook():
+    if not valid_webhook(request):
+        return jsonify(ok=False), 401
     try:
         data = request.get_json(force=True, silent=False)
     except Exception:
@@ -313,7 +334,7 @@ def tribopay_webhook():
     if not isinstance(data, dict):
         return jsonify(ok=False), 400
     h = data.get('hash') or ''
-    status = data.get('payment_status') or ''
+    status = (data.get('payment_status') or '').lower()
     if not h:
         pix = data.get('pix') or {}
         h = pix.get('hash') or ''
@@ -321,22 +342,27 @@ def tribopay_webhook():
         return jsonify(ok=False), 400
     tx = transactions.find_one({'hash': h})
     if not tx:
-        transactions.update_one({'hash': h}, {'$setOnInsert': {'created_at': datetime.utcnow()}, '$set': {'raw': data}}, upsert=True)
+        transactions.update_one({'hash': h}, {'$setOnInsert': {'created_at': datetime.utcnow()}, '$set': {'raw': data, 'updated_at': datetime.utcnow()}}, upsert=True)
         return jsonify(ok=True)
     st = (status or data.get('status') or tx.get('payment_status') or '').lower()
     transactions.update_one({'_id': tx['_id']}, {'$set': {'payment_status': st or tx.get('payment_status'), 'updated_at': datetime.utcnow(), 'raw': data}})
     if st in PAID_STATUSES:
-        uid = tx.get('user_id')
-        plan_name = tx.get('plan')
-        code = PLAN_CODES.get(plan_name)
-        if uid and code:
-            exp = None
-            if code in ('essencial', 'profissional'):
-                exp = datetime.utcnow() + timedelta(days=30)
-            try:
-                users.update_one({'_id': ObjectId(uid)}, {'$set': {'plans': code, 'plan_started_at': datetime.utcnow(), 'plan_expires_at': exp}})
-            except Exception:
-                pass
+        already = transactions.find_one({'_id': tx['_id']}).get('activated_at')
+        if not already:
+            uid = tx.get('user_id')
+            plan_name = tx.get('plan')
+            code = PLAN_CODES.get(plan_name)
+            if uid and code:
+                exp = None
+                if code in ('essencial', 'profissional'):
+                    exp = datetime.utcnow() + timedelta(days=30)
+                try:
+                    users.update_one({'_id': ObjectId(uid)}, {'$set': {'plans': code, 'plan_started_at': datetime.utcnow(), 'plan_expires_at': exp}})
+                    transactions.update_one({'_id': tx['_id'], 'activated_at': {'$exists': False}}, {'$set': {'activated_at': datetime.utcnow()}})
+                except Exception:
+                    pass
+    if st in FAILED_STATUSES:
+        transactions.update_one({'_id': tx['_id']}, {'$set': {'failed_at': datetime.utcnow()}})
     return jsonify(ok=True)
 
 @app.route('/api/plan/status', methods=['GET'])
@@ -375,13 +401,16 @@ def api_usage_consume():
     if count <= 0:
         return jsonify(ok=False, error='Parâmetro inválido'), 400
     today = date_key_utc()
+    q = {'user_id': str(u['_id']), 'date': today, '$expr': {'$lte': [{'$add': [{'$ifNull': ['$used', 0]}, count]}, int(limit)]}}
+    upd = {'$setOnInsert': {'user_id': str(u['_id']), 'date': today, 'used': 0}, '$inc': {'used': count}}
+    res = usage.update_one(q, upd, upsert=True)
+    if not res.matched_count and not res.upserted_id:
+        rec = usage.find_one({'user_id': str(u['_id']), 'date': today}) or {'used': 0}
+        used_now = int(rec.get('used', 0))
+        return jsonify(ok=False, error='Limite diário excedido', remaining=max(0, int(limit) - used_now)), 400
     rec = usage.find_one({'user_id': str(u['_id']), 'date': today}) or {'used': 0}
-    used = int(rec.get('used', 0))
-    if used + count > int(limit):
-        return jsonify(ok=False, error='Limite diário excedido', remaining=int(limit) - used), 400
-    usage.update_one({'user_id': str(u['_id']), 'date': today}, {'$setOnInsert': {'user_id': str(u['_id']), 'date': today}, '$inc': {'used': count}}, upsert=True)
-    new_used = used + count
-    remaining = int(limit) - new_used
+    new_used = int(rec.get('used', 0))
+    remaining = None if limit is None else max(0, int(limit) - new_used)
     return jsonify(ok=True, remaining_today=remaining)
 
 if __name__ == '__main__':
