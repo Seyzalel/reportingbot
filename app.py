@@ -4,8 +4,8 @@ import json
 import base64
 import logging
 import secrets
-import hmac
-import hashlib
+import threading
+import time
 from io import BytesIO
 from datetime import datetime, timedelta
 from urllib.parse import quote_plus
@@ -58,13 +58,9 @@ PLANS = {
 }
 
 PLAN_CODES = {'Essencial': 'essencial', 'Profissional': 'profissional', 'Vitalício': 'vitalicio'}
-PLAN_LIMITS = {'padrao': 0, 'essencial': 10, 'profissional': 25, 'vitalicio': None}
+PLAN_LIMITS = {'padrao': 0, 'essencial': 5, 'profissional': 15, 'vitalicio': None}
 PAID_STATUSES = {'paid', 'approved', 'completed', 'confirmed', 'paid_out', 'finished', 'success', 'settled', 'captured', 'accredited', 'credited', 'confirmed_payment'}
 FAILED_STATUSES = {'canceled', 'cancelled', 'refunded', 'chargeback', 'reversed', 'voided', 'failed', 'expired', 'denied'}
-WEBHOOK_SECRET = os.environ.get('TRIBOPAY_WEBHOOK_SECRET', '')
-
-if not isinstance(WEBHOOK_SECRET, str) or len(WEBHOOK_SECRET) < 16:
-    raise RuntimeError('TRIBOPAY_WEBHOOK_SECRET ausente ou fraco')
 
 def is_logged_in():
     return 'user_id' in session
@@ -115,17 +111,56 @@ def date_key_utc(dt=None):
     dt = dt or datetime.utcnow()
     return dt.strftime('%Y-%m-%d')
 
-def valid_webhook(req):
-    token = req.args.get('token') or ''
-    if token and secrets.compare_digest(token, WEBHOOK_SECRET):
-        return True
-    sig = req.headers.get('X-TriboPay-Signature') or ''
-    if sig:
-        raw = req.get_data(cache=False, as_text=False)
-        expected = hmac.new(WEBHOOK_SECRET.encode('utf-8'), raw, hashlib.sha256).hexdigest()
-        if secrets.compare_digest(sig, expected):
-            return True
-    return False
+def tribopay_fetch_status(tx_hash):
+    try:
+        r = requests.get(f"{TRIBOPAY_API}/{tx_hash}?api_token={TRIBOPAY_TOKEN}", headers=TRIBO_HEADERS, timeout=15)
+        r.raise_for_status()
+        resp = r.json()
+    except Exception:
+        return None, None
+    obj = resp.get('data') if isinstance(resp, dict) else None
+    if not obj and isinstance(resp, dict):
+        obj = resp
+    status = None
+    if isinstance(obj, dict):
+        status = obj.get('status') or obj.get('status_payment') or obj.get('payment_status')
+    return (status.lower() if isinstance(status, str) else None), obj
+
+def try_activation(tx):
+    st = (tx.get('payment_status') or '').lower()
+    if st not in PAID_STATUSES:
+        return
+    res = transactions.update_one({'_id': tx['_id'], 'activated_at': {'$exists': False}}, {'$set': {'activated_at': datetime.utcnow()}})
+    if not res.modified_count:
+        return
+    uid = tx.get('user_id')
+    plan_name = tx.get('plan')
+    code = PLAN_CODES.get(plan_name)
+    if not uid or not code:
+        return
+    exp = None
+    if code in ('essencial', 'profissional'):
+        exp = datetime.utcnow() + timedelta(days=30)
+    try:
+        users.update_one({'_id': ObjectId(uid)}, {'$set': {'plans': code, 'plan_started_at': datetime.utcnow(), 'plan_expires_at': exp}})
+    except Exception:
+        pass
+
+def monitor_transaction(tx_hash):
+    for _ in range(86400):
+        st, payload = tribopay_fetch_status(tx_hash)
+        if st:
+            now = datetime.utcnow()
+            transactions.update_one({'hash': tx_hash}, {'$set': {'payment_status': st, 'updated_at': now, 'raw_last': payload}})
+            if st in PAID_STATUSES:
+                tx = transactions.find_one({'hash': tx_hash})
+                if tx:
+                    try_activation(tx)
+                break
+            if st in FAILED_STATUSES:
+                transactions.update_one({'hash': tx_hash}, {'$set': {'failed_at': now}})
+                break
+        time.sleep(1)
 
 @app.before_request
 def redirect_auth_pages_when_logged():
@@ -272,7 +307,7 @@ def pix_payment():
             "utm_term": "",
             "utm_content": ""
         },
-        "postback_url": url_for('tribopay_webhook', _external=True, token=WEBHOOK_SECRET)
+        "postback_url": url_for('tribopay_webhook', _external=True)
     }
     try:
         r = requests.post(f"{TRIBOPAY_API}?api_token={TRIBOPAY_TOKEN}", headers=TRIBO_HEADERS, json=payload, timeout=30)
@@ -310,6 +345,9 @@ def pix_payment():
         'updated_at': datetime.utcnow()
     }
     transactions.update_one({'hash': h}, {'$set': tx_doc}, upsert=True)
+    res = transactions.update_one({'hash': h, 'monitoring': {'$ne': True}}, {'$set': {'monitoring': True}})
+    if res.modified_count:
+        threading.Thread(target=monitor_transaction, args=(h,), daemon=True).start()
     return render_template('checkout.html', username=session.get('username'), plan=plan, amount_brl=brl_from_cents(p['amount_cents']), status=status, hash=h, pix_url=pix_url, emv=emv, qr_b64=qr_b64)
 
 @app.route('/pix/status', methods=['GET'])
@@ -318,6 +356,16 @@ def pix_status():
     h = request.args.get('hash') or ''
     if not h:
         return jsonify(ok=False, error='Hash ausente'), 400
+    st, payload = tribopay_fetch_status(h)
+    if st:
+        now = datetime.utcnow()
+        transactions.update_one({'hash': h, 'user_id': session.get('user_id')}, {'$set': {'payment_status': st, 'updated_at': now, 'raw_last': payload}})
+        if st in PAID_STATUSES:
+            tx = transactions.find_one({'hash': h, 'user_id': session.get('user_id')})
+            if tx:
+                try_activation(tx)
+        if st in FAILED_STATUSES:
+            transactions.update_one({'hash': h, 'user_id': session.get('user_id')}, {'$set': {'failed_at': now}})
     tx = transactions.find_one({'hash': h, 'user_id': session.get('user_id')})
     if not tx:
         return jsonify(ok=False, error='Transação não encontrada'), 404
@@ -325,8 +373,6 @@ def pix_status():
 
 @app.route('/webhook/tribopay', methods=['POST'])
 def tribopay_webhook():
-    if not valid_webhook(request):
-        return jsonify(ok=False), 401
     try:
         data = request.get_json(force=True, silent=False)
     except Exception:
@@ -334,35 +380,14 @@ def tribopay_webhook():
     if not isinstance(data, dict):
         return jsonify(ok=False), 400
     h = data.get('hash') or ''
-    status = (data.get('payment_status') or '').lower()
     if not h:
         pix = data.get('pix') or {}
         h = pix.get('hash') or ''
     if not h:
         return jsonify(ok=False), 400
-    tx = transactions.find_one({'hash': h})
-    if not tx:
-        transactions.update_one({'hash': h}, {'$setOnInsert': {'created_at': datetime.utcnow()}, '$set': {'raw': data, 'updated_at': datetime.utcnow()}}, upsert=True)
-        return jsonify(ok=True)
-    st = (status or data.get('status') or tx.get('payment_status') or '').lower()
-    transactions.update_one({'_id': tx['_id']}, {'$set': {'payment_status': st or tx.get('payment_status'), 'updated_at': datetime.utcnow(), 'raw': data}})
-    if st in PAID_STATUSES:
-        already = transactions.find_one({'_id': tx['_id']}).get('activated_at')
-        if not already:
-            uid = tx.get('user_id')
-            plan_name = tx.get('plan')
-            code = PLAN_CODES.get(plan_name)
-            if uid and code:
-                exp = None
-                if code in ('essencial', 'profissional'):
-                    exp = datetime.utcnow() + timedelta(days=30)
-                try:
-                    users.update_one({'_id': ObjectId(uid)}, {'$set': {'plans': code, 'plan_started_at': datetime.utcnow(), 'plan_expires_at': exp}})
-                    transactions.update_one({'_id': tx['_id'], 'activated_at': {'$exists': False}}, {'$set': {'activated_at': datetime.utcnow()}})
-                except Exception:
-                    pass
-    if st in FAILED_STATUSES:
-        transactions.update_one({'_id': tx['_id']}, {'$set': {'failed_at': datetime.utcnow()}})
+    res = transactions.update_one({'hash': h, 'monitoring': {'$ne': True}}, {'$set': {'monitoring': True}})
+    if res.modified_count:
+        threading.Thread(target=monitor_transaction, args=(h,), daemon=True).start()
     return jsonify(ok=True)
 
 @app.route('/api/plan/status', methods=['GET'])
