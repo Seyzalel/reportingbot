@@ -27,7 +27,7 @@ client = MongoClient(MONGO_URI)
 db = client['reportingbot']
 users = db['users']
 users.create_index([('username', ASCENDING)], unique=True)
-users.create_index([('username_lower', ASCENDING)], unique=True)
+users.create_index([('username_lower', ASCENDING)], unique=True, partialFilterExpression={'username_lower': {'$type': 'string'}})
 users.create_index([('email', ASCENDING)], unique=True)
 transactions = db['transactions']
 transactions.create_index([('hash', ASCENDING)], unique=True)
