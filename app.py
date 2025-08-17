@@ -27,12 +27,15 @@ client = MongoClient(MONGO_URI)
 db = client['reportingbot']
 users = db['users']
 users.create_index([('username', ASCENDING)], unique=True)
+users.create_index([('username_lower', ASCENDING)], unique=True)
 users.create_index([('email', ASCENDING)], unique=True)
 transactions = db['transactions']
 transactions.create_index([('hash', ASCENDING)], unique=True)
 transactions.create_index([('user_id', ASCENDING)])
 usage = db['usage']
 usage.create_index([('user_id', ASCENDING), ('date', ASCENDING)], unique=True)
+settings = db['settings']
+settings.create_index([('key', ASCENDING)], unique=True)
 
 app = Flask(__name__, template_folder='.')
 _app_secret_env = os.environ.get('SECRET_KEY', '')
@@ -51,10 +54,10 @@ TRIBOPAY_TOKEN = os.environ.get('TRIBOPAY_API_TOKEN', 'UcsGgIwEkBW5FrLbjtJbVkSda
 TRIBOPAY_API = 'https://api.tribopay.com.br/api/public/v1/transactions'
 TRIBO_HEADERS = {'Content-Type': 'application/json', 'Accept': 'application/json'}
 
-PLANS = {
-    'Essencial': {'amount_cents': 3500, 'product_hash': 'ufgvfzaxun', 'offer_hash': 'fjthlgwzum', 'title': 'Plano Essencial'},
-    'Profissional': {'amount_cents': 4550, 'product_hash': 'rf8ctqw43w', 'offer_hash': 'fndb7wny84', 'title': 'Plano Profissional'},
-    'Vitalício': {'amount_cents': 11900, 'product_hash': 'sixft0cqgo', 'offer_hash': 'iayrjqznxp', 'title': 'Plano Vitalício'}
+PLANS_DEFAULT = {
+    'Essencial': {'amount_cents': 3500, 'product_hash': 'ufgvfzaxun', 'offer_hash': 'fjthlgwzum', 'title': 'Plano Essencial', 'active': True},
+    'Profissional': {'amount_cents': 4550, 'product_hash': 'rf8ctqw43w', 'offer_hash': 'fndb7wny84', 'title': 'Plano Profissional', 'active': True},
+    'Vitalício': {'amount_cents': 11900, 'product_hash': 'sixft0cqgo', 'offer_hash': 'iayrjqznxp', 'title': 'Plano Vitalício', 'active': True}
 }
 
 PLAN_CODES = {'Essencial': 'essencial', 'Profissional': 'profissional', 'Vitalício': 'vitalicio'}
@@ -65,11 +68,25 @@ FAILED_STATUSES = {'canceled', 'cancelled', 'refunded', 'chargeback', 'reversed'
 def is_logged_in():
     return 'user_id' in session
 
+def admin_allowed():
+    u = get_user()
+    return bool(u and (u.get('admin_permission') == 'yes'))
+
 def login_required(fn):
     @wraps(fn)
     def _wrap(*args, **kwargs):
         if not is_logged_in():
             return redirect(url_for('login'))
+        return fn(*args, **kwargs)
+    return _wrap
+
+def admin_required(fn):
+    @wraps(fn)
+    def _wrap(*args, **kwargs):
+        if not is_logged_in():
+            return redirect(url_for('login'))
+        if not admin_allowed():
+            return jsonify(ok=False, error='forbidden'), 403
         return fn(*args, **kwargs)
     return _wrap
 
@@ -110,6 +127,31 @@ def plan_meta(code):
 def date_key_utc(dt=None):
     dt = dt or datetime.utcnow()
     return dt.strftime('%Y-%m-%d')
+
+def get_plans():
+    doc = settings.find_one({'key': 'plans'}) or {}
+    custom = doc.get('value') or {}
+    out = {}
+    for k, v in PLANS_DEFAULT.items():
+        c = dict(v)
+        if k in custom:
+            if isinstance(custom[k].get('amount_cents'), int):
+                c['amount_cents'] = int(custom[k]['amount_cents'])
+            if isinstance(custom[k].get('active'), bool):
+                c['active'] = custom[k]['active']
+        out[k] = c
+    return out
+
+def save_plans(payload):
+    base = get_plans()
+    for k, cfg in payload.items():
+        if k in base:
+            if 'amount_cents' in cfg:
+                base[k]['amount_cents'] = int(cfg['amount_cents'])
+            if 'active' in cfg:
+                base[k]['active'] = bool(cfg['active'])
+    settings.update_one({'key': 'plans'}, {'$set': {'key': 'plans', 'value': base, 'updated_at': datetime.utcnow()}}, upsert=True)
+    return base
 
 def tribopay_fetch_status(tx_hash):
     try:
@@ -166,6 +208,20 @@ def monitor_transaction(tx_hash):
 def redirect_auth_pages_when_logged():
     if request.method == 'GET' and is_logged_in() and request.endpoint in ('login', 'register'):
         return redirect(url_for('dashboard'))
+    if is_logged_in():
+        u = get_user()
+        if not u or u.get('disabled') is True:
+            session.clear()
+            return redirect(url_for('login'))
+        issued = session.get('issued_at')
+        flo = u.get('force_logout_at')
+        if issued and flo and isinstance(flo, datetime):
+            try:
+                if float(issued) < float(flo.timestamp()):
+                    session.clear()
+                    return redirect(url_for('login'))
+            except Exception:
+                pass
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -177,12 +233,15 @@ def login():
     remember = str(data.get('remember', '')).lower() in ('1', 'true', 'on', 'yes')
     if not USERNAME_RE.match(username) or len(password) < 8:
         return jsonify(ok=False, error='Credenciais inválidas'), 400
-    user = users.find_one({'username': username})
+    user = users.find_one({'$or': [{'username': username}, {'username_lower': username.lower()}]})
     if not user or not check_password_hash(user.get('password_hash', ''), password):
         return jsonify(ok=False, error='Usuário ou senha incorretos'), 401
+    if user.get('disabled') is True:
+        return jsonify(ok=False, error='Conta desativada'), 403
     session.clear()
     session['user_id'] = str(user['_id'])
     session['username'] = user['username']
+    session['issued_at'] = float(datetime.utcnow().timestamp())
     session.permanent = bool(remember)
     users.update_one({'_id': user['_id']}, {'$set': {'last_login_at': datetime.utcnow()}})
     return jsonify(ok=True, redirect=url_for('dashboard'))
@@ -204,16 +263,17 @@ def register():
         return jsonify(ok=False, field='password', error='Senha muito curta'), 400
     if confirm != password:
         return jsonify(ok=False, field='confirm', error='As senhas não coincidem'), 400
-    if users.find_one({'$or': [{'username': username}, {'email': email}]}):
+    if users.find_one({'$or': [{'username_lower': username.lower()}, {'email': email}]}):
         return jsonify(ok=False, error='Usuário ou e-mail já cadastrado'), 409
     password_hash = generate_password_hash(password)
     try:
-        ins = users.insert_one({'username': username, 'email': email, 'password_hash': password_hash, 'created_at': datetime.utcnow(), 'last_login_at': None, 'plans': 'padrao', 'plan_started_at': None, 'plan_expires_at': None})
+        ins = users.insert_one({'username': username, 'username_lower': username.lower(), 'email': email, 'password_hash': password_hash, 'created_at': datetime.utcnow(), 'last_login_at': None, 'plans': 'padrao', 'plan_started_at': None, 'plan_expires_at': None, 'admin_permission': 'no', 'disabled': False})
     except errors.DuplicateKeyError:
         return jsonify(ok=False, error='Usuário ou e-mail já cadastrado'), 409
     session.clear()
     session['user_id'] = str(ins.inserted_id)
     session['username'] = username
+    session['issued_at'] = float(datetime.utcnow().timestamp())
     session.permanent = False
     return jsonify(ok=True, redirect=url_for('dashboard')), 201
 
@@ -253,8 +313,12 @@ def pix_payment():
     plan = (data.get('plan') or '').strip()
     name = (data.get('name') or '').strip()
     cpf = re.sub(r'\D+', '', data.get('cpf') or '')
-    if plan not in PLANS:
+    plans_cfg = get_plans()
+    if plan not in plans_cfg:
         return jsonify(ok=False, error='Plano inválido'), 400
+    p = plans_cfg[plan]
+    if not p.get('active', True):
+        return jsonify(ok=False, error='Plano indisponível'), 400
     if not name or not CPF_RE.match(cpf):
         return jsonify(ok=False, error='Dados inválidos'), 400
     uid = session.get('user_id')
@@ -265,9 +329,8 @@ def pix_payment():
         except Exception:
             user_doc = None
     if not user_doc and session.get('username'):
-        user_doc = users.find_one({'username': session.get('username')})
+        user_doc = users.find_one({'username_lower': session.get('username', '').lower()})
     user_email = (user_doc or {}).get('email') or ''
-    p = PLANS[plan]
     payload = {
         "amount": p['amount_cents'],
         "offer_hash": p['offer_hash'],
@@ -437,6 +500,198 @@ def api_usage_consume():
     new_used = int(rec.get('used', 0))
     remaining = None if limit is None else max(0, int(limit) - new_used)
     return jsonify(ok=True, remaining_today=remaining)
+
+@app.route('/admin_panel', methods=['GET'])
+@login_required
+def admin_panel():
+    if not admin_allowed():
+        return jsonify(ok=False, error='forbidden'), 403
+    return render_template('admin_panel.html', username=session.get('username'))
+
+@app.route('/admin/api/metrics', methods=['GET'])
+@admin_required
+def admin_metrics():
+    now = datetime.utcnow()
+    def sum_range(start_dt):
+        pipe = [
+            {'$match': {'activated_at': {'$gte': start_dt, '$lte': now}}},
+            {'$group': {'_id': None, 'total': {'$sum': '$amount_cents'}, 'count': {'$sum': 1}}}
+        ]
+        agg = list(transactions.aggregate(pipe))
+        if agg:
+            return int(agg[0].get('total', 0)), int(agg[0].get('count', 0))
+        return 0, 0
+    start_today = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    t_total, t_count = sum_range(start_today)
+    d7 = now - timedelta(days=7)
+    d7_total, d7_count = sum_range(d7)
+    d30 = now - timedelta(days=30)
+    d30_total, d30_count = sum_range(d30)
+    pending = transactions.count_documents({'payment_status': {'$nin': list(PAID_STATUSES | FAILED_STATUSES)}})
+    paid = transactions.count_documents({'payment_status': {'$in': list(PAID_STATUSES)}})
+    failed = transactions.count_documents({'payment_status': {'$in': list(FAILED_STATUSES)}})
+    return jsonify(ok=True, revenue_today_cents=t_total, revenue_7d_cents=d7_total, revenue_30d_cents=d30_total, count_today=t_count, count_7d=d7_count, count_30d=d30_count, tx_counts={'pending': pending, 'paid': paid, 'failed': failed})
+
+@app.route('/admin/api/transactions', methods=['GET'])
+@admin_required
+def admin_list_transactions():
+    q = {}
+    status = (request.args.get('status') or '').strip().lower()
+    text = (request.args.get('q') or '').strip()
+    plan = (request.args.get('plan') or '').strip()
+    date_from = request.args.get('from')
+    date_to = request.args.get('to')
+    if status:
+        q['payment_status'] = status
+    if plan:
+        q['plan'] = plan
+    if date_from:
+        try:
+            dtf = datetime.fromisoformat(date_from)
+            q['created_at'] = q.get('created_at', {})
+            q['created_at']['$gte'] = dtf
+        except Exception:
+            pass
+    if date_to:
+        try:
+            dtt = datetime.fromisoformat(date_to)
+            q['created_at'] = q.get('created_at', {})
+            q['created_at']['$lte'] = dtt
+        except Exception:
+            pass
+    if text:
+        q['$or'] = [{'hash': {'$regex': text, '$options': 'i'}}, {'username': {'$regex': text, '$options': 'i'}}]
+    page = max(1, int(request.args.get('page', '1')))
+    size = max(1, min(100, int(request.args.get('page_size', '20'))))
+    skip = (page - 1) * size
+    total = transactions.count_documents(q)
+    cur = transactions.find(q).sort('created_at', -1).skip(skip).limit(size)
+    items = []
+    for t in cur:
+        items.append({
+            'id': str(t.get('_id')),
+            'user_id': t.get('user_id'),
+            'username': t.get('username'),
+            'plan': t.get('plan'),
+            'amount_cents': t.get('amount_cents'),
+            'hash': t.get('hash'),
+            'payment_status': t.get('payment_status'),
+            'created_at': t.get('created_at').isoformat() if t.get('created_at') else None,
+            'updated_at': t.get('updated_at').isoformat() if t.get('updated_at') else None,
+            'activated_at': t.get('activated_at').isoformat() if t.get('activated_at') else None,
+            'failed_at': t.get('failed_at').isoformat() if t.get('failed_at') else None
+        })
+    return jsonify(ok=True, total=total, page=page, page_size=size, items=items)
+
+@app.route('/admin/api/transactions/<tid>', methods=['DELETE', 'PATCH'])
+@admin_required
+def admin_tx_modify(tid):
+    try:
+        oid = ObjectId(tid)
+    except Exception:
+        return jsonify(ok=False, error='invalid_id'), 400
+    if request.method == 'DELETE':
+        transactions.delete_one({'_id': oid})
+        return jsonify(ok=True)
+    data = request.get_json(silent=True) or {}
+    updates = {}
+    ps = data.get('payment_status')
+    if isinstance(ps, str) and ps:
+        updates['payment_status'] = ps.lower()
+        updates['updated_at'] = datetime.utcnow()
+    if not updates:
+        return jsonify(ok=False, error='no_updates'), 400
+    tx = transactions.find_one({'_id': oid})
+    if not tx:
+        return jsonify(ok=False, error='not_found'), 404
+    transactions.update_one({'_id': oid}, {'$set': updates})
+    tx = transactions.find_one({'_id': oid})
+    if tx.get('payment_status') in PAID_STATUSES:
+        try_activation(tx)
+    return jsonify(ok=True)
+
+@app.route('/admin/api/users', methods=['GET'])
+@admin_required
+def admin_users_list():
+    text = (request.args.get('q') or '').strip()
+    adm = request.args.get('admin')
+    disabled = request.args.get('disabled')
+    q = {}
+    if text:
+        q['$or'] = [{'username': {'$regex': text, '$options': 'i'}}, {'email': {'$regex': text, '$options': 'i'}}]
+    if adm in ('yes', 'no'):
+        q['admin_permission'] = adm
+    if disabled in ('true', 'false'):
+        q['disabled'] = (disabled == 'true')
+    page = max(1, int(request.args.get('page', '1')))
+    size = max(1, min(100, int(request.args.get('page_size', '20'))))
+    skip = (page - 1) * size
+    total = users.count_documents(q)
+    cur = users.find(q).sort('created_at', -1).skip(skip).limit(size)
+    items = []
+    for u in cur:
+        items.append({
+            'id': str(u.get('_id')),
+            'username': u.get('username'),
+            'email': u.get('email'),
+            'plans': u.get('plans'),
+            'plan_started_at': u.get('plan_started_at').isoformat() if u.get('plan_started_at') else None,
+            'plan_expires_at': u.get('plan_expires_at').isoformat() if u.get('plan_expires_at') else None,
+            'admin_permission': u.get('admin_permission'),
+            'disabled': bool(u.get('disabled')),
+            'created_at': u.get('created_at').isoformat() if u.get('created_at') else None,
+            'last_login_at': u.get('last_login_at').isoformat() if u.get('last_login_at') else None
+        })
+    return jsonify(ok=True, total=total, page=page, page_size=size, items=items)
+
+@app.route('/admin/api/users/<uid>/set_admin', methods=['POST'])
+@admin_required
+def admin_user_set_admin(uid):
+    data = request.get_json(silent=True) or {}
+    val = data.get('admin_permission')
+    if val not in ('yes', 'no'):
+        return jsonify(ok=False, error='invalid_value'), 400
+    try:
+        oid = ObjectId(uid)
+    except Exception:
+        return jsonify(ok=False, error='invalid_id'), 400
+    users.update_one({'_id': oid}, {'$set': {'admin_permission': val}})
+    return jsonify(ok=True)
+
+@app.route('/admin/api/users/<uid>/disable', methods=['POST'])
+@admin_required
+def admin_user_disable(uid):
+    data = request.get_json(silent=True) or {}
+    if 'disabled' not in data:
+        return jsonify(ok=False, error='invalid_value'), 400
+    try:
+        oid = ObjectId(uid)
+    except Exception:
+        return jsonify(ok=False, error='invalid_id'), 400
+    users.update_one({'_id': oid}, {'$set': {'disabled': bool(data.get('disabled'))}})
+    return jsonify(ok=True)
+
+@app.route('/admin/api/users/<uid>/force_logout', methods=['POST'])
+@admin_required
+def admin_user_force_logout(uid):
+    try:
+        oid = ObjectId(uid)
+    except Exception:
+        return jsonify(ok=False, error='invalid_id'), 400
+    users.update_one({'_id': oid}, {'$set': {'force_logout_at': datetime.utcnow()}})
+    return jsonify(ok=True)
+
+@app.route('/admin/api/plans', methods=['GET', 'PUT'])
+@admin_required
+def admin_plans():
+    if request.method == 'GET':
+        plans = get_plans()
+        return jsonify(ok=True, plans=plans)
+    data = request.get_json(silent=True) or {}
+    if not isinstance(data, dict) or not data:
+        return jsonify(ok=False, error='invalid_payload'), 400
+    updated = save_plans(data)
+    return jsonify(ok=True, plans=updated)
 
 if __name__ == '__main__':
     app.run(host=os.environ.get('HOST', '0.0.0.0'), port=int(os.environ.get('PORT', 5000)))
