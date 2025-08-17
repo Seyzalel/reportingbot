@@ -27,16 +27,32 @@ MONGO_URI = f"mongodb+srv://{USER}:{PWD}@cluster0.krrj4yp.mongodb.net/bcbravus?r
 client = MongoClient(MONGO_URI)
 db = client['reportingbot']
 users = db['users']
-users.create_index([('username', ASCENDING)], unique=True)
-users.create_index([('username_lower', ASCENDING)], unique=True)
-users.create_index([('email', ASCENDING)], unique=True)
 transactions = db['transactions']
-transactions.create_index([('hash', ASCENDING)], unique=True)
-transactions.create_index([('user_id', ASCENDING)])
 usage = db['usage']
-usage.create_index([('user_id', ASCENDING), ('date', ASCENDING)], unique=True)
 settings = db['settings']
-settings.create_index([('key', ASCENDING)], unique=True)
+
+def safe_create_index(coll, keys, **kwargs):
+    try:
+        return coll.create_index(keys, **kwargs)
+    except errors.OperationFailure as e:
+        if getattr(e, 'code', None) == 86:
+            return None
+        logging.exception('index_error')
+        return None
+    except Exception:
+        logging.exception('index_error')
+        return None
+
+def ensure_indexes():
+    safe_create_index(users, [('username', ASCENDING)], name='username_1', unique=True)
+    safe_create_index(users, [('username_lower', ASCENDING)], name='username_lower_1', unique=True, partialFilterExpression={'username_lower': {'$type': 'string'}})
+    safe_create_index(users, [('email', ASCENDING)], name='email_1', unique=True)
+    safe_create_index(transactions, [('hash', ASCENDING)], name='hash_1', unique=True)
+    safe_create_index(transactions, [('user_id', ASCENDING)], name='user_id_1')
+    safe_create_index(usage, [('user_id', ASCENDING), ('date', ASCENDING)], name='user_id_date_1', unique=True)
+    safe_create_index(settings, [('key', ASCENDING)], name='key_1', unique=True)
+
+ensure_indexes()
 
 app = Flask(__name__, template_folder='.')
 _app_secret_env = os.environ.get('SECRET_KEY', '')
