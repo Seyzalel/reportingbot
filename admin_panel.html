@@ -1,349 +1,277 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="format-detection" content="telephone=no">
-<title>Painel Administrador</title>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>Painel Administrativo</title>
 <style>
-:root{--bg:#ffffff;--muted:#f4f6f8;--text:#0f172a;--sub:#475569;--line:#e5e7eb;--brand:#0ea5e9;--brand-2:#0284c7;--ok:#10b981;--warn:#f59e0b;--err:#ef4444;--card:#ffffff;--shadow:0 2px 10px rgba(0,0,0,.06);--radius:12px}
-*{box-sizing:border-box}
-html,body{height:100%}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 "Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;overflow-x:hidden;touch-action:manipulation}
-.container{display:grid;grid-template-rows:auto 1fr auto;min-height:100dvh}
-.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:16px;padding:12px 20px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.9);backdrop-filter:saturate(180%) blur(8px)}
-.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;letter-spacing:.2px}
-.top-actions{margin-left:auto;display:flex;align-items:center;gap:12px}
-.user-pill{padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--sub)}
-.btn{display:inline-grid;place-items:center;gap:8px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--text);cursor:pointer;transition:.15s;user-select:none;min-width:40px}
-.btn:hover{box-shadow:var(--shadow);transform:translateY(-1px)}
-.btn:active{transform:translateY(0)}
-.btn.primary{border-color:transparent;background:var(--brand);color:#fff}
-.btn.primary:hover{background:var(--brand-2)}
-.btn.danger{border-color:transparent;background:var(--err);color:#fff}
-.btn.ghost{background:transparent}
-.tabs{display:flex;gap:6px;padding:12px 20px;border-bottom:1px solid var(--line);overflow:auto;scrollbar-width:none;-ms-overflow-style:none}
-.tabs::-webkit-scrollbar{display:none}
-.tab{padding:10px 12px;border-radius:10px;cursor:pointer;color:var(--sub);white-space:nowrap}
-.tab.active{background:var(--muted);color:var(--text);font-weight:600}
-.content{padding:clamp(12px,2vw,24px);max-width:1200px;margin:0 auto;width:100%}
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Ubuntu,"Helvetica Neue",Arial;line-height:1.45;background:#f7f8fa;color:#0e1117;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+:root{--bg:#f7f8fa;--card:#ffffff;--text:#0e1117;--muted:#5b6573;--brand:#0ea5e9;--accent:#111827;--border:#e5e7eb;--success:#10b981;--danger:#ef4444;--warning:#f59e0b;--shadow:0 1px 2px rgba(0,0,0,.04),0 6px 24px rgba(0,0,0,.06)}
+.layout{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+@media(max-width:1000px){.layout{grid-template-columns:1fr}}
+.sidebar{position:sticky;top:0;align-self:start;height:100vh;background:#ffffff;border-right:1px solid var(--border);display:flex;flex-direction:column;padding:20px;gap:16px}
+@media(max-width:1000px){.sidebar{position:fixed;z-index:30;left:0;top:0;width:280px;transform:translateX(-100%);transition:transform .25s ease;height:100vh}.sidebar.open{transform:translateX(0)}}
+.nav{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.nav button{all:unset;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;color:var(--muted)}
+.nav button[aria-current="page"]{background:#f0f9ff;color:#0369a1}
+.nav svg{width:18px;height:18px}
+.userbox{margin-top:auto;padding-top:12px;border-top:1px solid var(--border);color:var(--muted);font-size:14px}
+.main{min-width:0}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.8);backdrop-filter:saturate(180%) blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:12px}
+.topbar .menu{display:none}
+@media(max-width:1000px){.topbar .menu{display:inline-flex}}
+.topbar .spacer{flex:1}
+.btn{all:unset;display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:#111827;color:#fff;cursor:pointer}
+.btn.secondary{background:#eef2f7;color:#0e1117}
+.btn.ghost{background:transparent;color:#0e1117;border:1px solid var(--border)}
+.btn svg{width:18px;height:18px}
+.kpis{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;padding:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:16px;min-width:0}
+.kpi{grid-column:span 3}
+@media(max-width:1200px){.kpi{grid-column:span 6}}
+@media(max-width:700px){.kpi{grid-column:span 12}}
+.kpi .label{color:var(--muted);font-size:13px}
+.kpi .value{font-size:28px;font-weight:700;margin-top:4px}
+.kpi .sub{margin-top:8px;color:var(--muted);font-size:12px}
+.section{padding:0 16px 24px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:end;margin-bottom:12px}
+.input,select{height:38px;border:1px solid var(--border);border-radius:10px;padding:0 12px;background:#fff;color:var(--text);min-width:0}
+.input:disabled,select:disabled{opacity:.6}
+.field{display:flex;flex-direction:column;gap:6px}
+label{font-size:12px;color:var(--muted)}
+.tablewrap{overflow:auto;border-radius:14px;border:1px solid var(--border);background:#fff}
+table{width:100%;border-collapse:separate;border-spacing:0;min-width:900px}
+thead th{position:sticky;top:0;background:#fafafa;border-bottom:1px solid var(--border);font-size:12px;color:var(--muted);text-align:left;padding:12px}
+tbody td{padding:12px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:14px}
+tr:hover td{background:#fcfdff}
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 8px;font-size:12px}
+.badge.paid{background:#ecfdf5;color:#065f46}
+.badge.failed{background:#fef2f2;color:#991b1b}
+.badge.pending{background:#f1f5f9;color:#0f172a}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:12px;color:var(--muted)}
+.rowactions{display:flex;gap:6px;flex-wrap:wrap}
+.iconbtn{all:unset;display:inline-grid;place-items:center;width:32px;height:32px;border-radius:10px;border:1px solid var(--border);cursor:pointer;background:#fff}
+.iconbtn.success{border-color:rgba(16,185,129,.25);background:#ecfdf5}
+.iconbtn.warn{border-color:rgba(245,158,11,.25);background:#fffbeb}
+.iconbtn.danger{border-color:rgba(239,68,68,.25);background:#fef2f2}
+.iconbtn svg{width:16px;height:16px}
+.pagination{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:12px}
+.switch{position:relative;display:inline-block;width:44px;height:26px}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#e5e7eb;border-radius:999px;transition:.2s}
+.slider:before{position:absolute;content:"";height:20px;width:20px;left:3px;top:3px;background:white;border-radius:50%;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.switch input:checked+.slider{background:#34d399}
+.switch input:checked+.slider:before{transform:translateX(18px)}
 .grid{display:grid;gap:16px}
-.metrics{grid-template-columns:repeat(4,minmax(0,1fr))}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
-.kpi{display:flex;flex-direction:column;gap:8px}
-.kpi .label{color:var(--sub);font-size:12px}
-.kpi .value{font-size:22px;font-weight:700}
-.kpi .sub{color:var(--sub);font-size:12px}
-.section{display:flex;align-items:center;justify-content:space-between;margin:8px 0 16px}
-.section h2{margin:0;font-size:16px}
-.filters{display:flex;flex-wrap:wrap;gap:10px}
-.input,select{height:38px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--text);min-width:0}
-.input::placeholder{color:#9aa3af}
-.input:focus,select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(14,165,233,.15)}
-.switch{position:relative;width:42px;height:24px;border-radius:999px;background:#e5e7eb;cursor:pointer;display:inline-block;vertical-align:middle}
-.switch[data-on="true"]{background:var(--brand)}
-.switch i{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
-.switch[data-on="true"] i{left:21px}
-.table-wrap{width:100%;overflow:visible}
-.table{width:100%;border-collapse:separate;border-spacing:0 10px}
-.table thead th{font-size:12px;color:var(--sub);text-align:left;padding:0 12px}
-.row{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
-.row td{padding:12px;vertical-align:top;word-break:break-word;overflow-wrap:anywhere}
-.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;border:1px solid}
-.badge.ok{color:var(--ok);border-color:var(--ok);background:rgba(16,185,129,.06)}
-.badge.err{color:var(--err);border-color:var(--err);background:rgba(239,68,68,.06)}
-.badge.neutral{color:var(--sub);border-color:var(--line);background:#fff}
-.actions{display:flex;gap:8px;flex-wrap:wrap}
-.pagination{display:flex;align-items:center;gap:8px;justify-content:flex-end;padding-top:8px}
-.modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.4);z-index:50;padding:20px}
-.modal.open{display:grid}
-.modal .box{width:min(520px,92vw);background:#fff;border-radius:14px;border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.15);padding:16px}
-.modal .box h3{margin:0 0 8px 0;font-size:16px}
-.modal .body{display:grid;gap:10px;margin:10px 0}
-.modal .foot{display:flex;gap:10px;justify-content:flex-end}
-.inline{display:flex;align-items:center;gap:8px}
-.help{font-size:12px;color:var(--sub)}
-.toast-area{position:fixed;right:16px;bottom:16px;display:grid;gap:8px;z-index:60}
-.toast{background:#111827;color:#fff;padding:10px 12px;border-radius:10px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;opacity:.98}
-hr.sep{border:none;height:1px;background:var(--line);margin:6px 0 12px}
-.small{font-size:12px;color:var(--sub)}
-table.min{width:100%;border-collapse:collapse}
-table.min td{padding:6px 0}
-.field{display:grid;gap:6px}
-.currency{position:relative}
-.currency input{padding-left:34px}
-.currency span{position:absolute;left:10px;top:9px;color:var(--sub);font-size:12px}
-.tag{display:inline-block;background:var(--muted);border:1px solid var(--line);padding:3px 8px;border-radius:999px;font-size:12px;color:var(--sub)}
-.footer{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 16px;border-top:1px solid var(--line);background:#fff}
-.footer .mark{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff}
-.footer .copy{font-size:13px;color:var(--sub)}
-@media (max-width:1100px){.metrics{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media (max-width:900px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:640px){
-body{font-size:13px}
-.metrics{grid-template-columns:1fr}
-.filters{flex-direction:column;align-items:stretch}
-.top-actions{display:none}
-.row td{padding:10px}
-.kpi .value{font-size:20px}
-.table thead{display:none}
-.table{border-spacing:0 8px}
-.row{display:block}
-.row td{display:grid;grid-template-columns:110px 1fr;gap:6px;align-items:center}
-.row td::before{content:attr(data-label);font-size:12px;color:var(--sub)}
-}
+.grid.cols-2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:900px){.grid.cols-2{grid-template-columns:1fr}}
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:16px;z-index:40}
+.modal.open{display:flex}
+.modal .overlay{position:absolute;inset:0;background:rgba(0,0,0,.35)}
+.modal .dialog{position:relative;background:#fff;border-radius:16px;border:1px solid var(--border);box-shadow:var(--shadow);padding:16px;max-width:520px;width:100%}
+.modal .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.toast{position:fixed;right:16px;bottom:16px;display:grid;gap:8px;z-index:50}
+.toast .msg{background:#111827;color:#fff;border-radius:12px;padding:10px 12px;box-shadow:var(--shadow);font-size:14px}
+.loader{width:18px;height:18px;border-radius:50%;border:2px solid #cfd8e3;border-top-color:#111827;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.skeleton{display:block;background:linear-gradient(90deg,#f2f4f7, #eef1f6 40%, #f2f4f7 60%);background-size:200% 100%;animation:shine 1.2s infinite}
+@keyframes shine{to{background-position-x:-200%}}
+.hidden{display:none}
+.small{font-size:12px;color:var(--muted)}
+hr{border:none;border-top:1px solid var(--border);margin:12px 0}
+button:focus,select:focus,input:focus{outline:2px solid #93c5fd;outline-offset:2px;border-color:#93c5fd}
 </style>
 </head>
 <body>
-<div class="container">
+<div class="layout">
+<aside class="sidebar" id="sidebar" aria-label="Menu lateral">
+<div class="nav" role="tablist" aria-orientation="vertical">
+<button id="nav-dashboard" role="tab" aria-controls="tab-dashboard" aria-selected="true" aria-current="page"><svg viewBox="0 0 24 24" fill="none"><path d="M3 12h7V3H3v9ZM14 21h7v-9h-7v9ZM3 21h7v-6H3v6ZM14 10h7V3h-7v7Z" stroke="currentColor" stroke-width="1.5"/></svg>Visão geral</button>
+<button id="nav-trans" role="tab" aria-controls="tab-trans" aria-selected="false"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Transações</button>
+<button id="nav-users" role="tab" aria-controls="tab-users" aria-selected="false"><svg viewBox="0 0 24 24" fill="none"><path d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Zm5 14a7 7 0 0 0-14 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Usuários</button>
+<button id="nav-plans" role="tab" aria-controls="tab-plans" aria-selected="false"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7a2 2 0 0 1 2-2h5m9 12a2 2 0 0 1-2 2h-5M9 5v14m6-14v14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Planos</button>
+</div>
+<div class="userbox">
+<div class="small">Conectado como</div>
+<div><strong>{{ username }}</strong></div>
+</div>
+</aside>
+<main class="main">
 <div class="topbar">
-<div class="brand">Admin</div>
-<div class="tabs" id="tabs">
-<div class="tab active" data-tab="overview">Visão Geral</div>
-<div class="tab" data-tab="transactions">Transações</div>
-<div class="tab" data-tab="users">Usuários</div>
-<div class="tab" data-tab="plans">Planos</div>
+<button class="iconbtn" aria-label="Abrir menu" id="btnMenu"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+<div class="spacer"></div>
+<button class="btn secondary" id="btnRefresh"><svg viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 1 1-2.64-6.36M21 4v6h-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span>Atualizar</span></button>
+<div class="pills"><span class="pill" id="lastSync">Sincronizando…</span>
+<label class="pill" style="display:inline-flex;align-items:center;gap:8px">Auto<span class="switch"><input type="checkbox" id="autoTick" checked><span class="slider"></span></span></label></div>
 </div>
-<div class="top-actions">
-<div class="user-pill">Olá, {{ username }}</div>
-<a class="btn" href="/logout">Sair</a>
+
+<section id="tab-dashboard" role="tabpanel" aria-labelledby="nav-dashboard">
+<div class="kpis">
+<div class="card kpi"><div class="label">Receita hoje</div><div class="value" id="kpiToday" aria-live="polite">—</div><div class="sub" id="kpiTodayCount">—</div></div>
+<div class="card kpi"><div class="label">Receita 7 dias</div><div class="value" id="kpi7d">—</div><div class="sub" id="kpi7dCount">—</div></div>
+<div class="card kpi"><div class="label">Receita 30 dias</div><div class="value" id="kpi30d">—</div><div class="sub" id="kpi30dCount">—</div></div>
+<div class="card kpi"><div class="label">Transações</div><div class="value" id="kpiTx">—</div><div class="sub" id="kpiSplit">—</div></div>
 </div>
-</div>
-<div class="content">
-<div id="overview" class="grid">
-<div class="section"><h2>Métricas</h2><div class="inline"><button class="btn" id="refreshOverview">Atualizar</button><label class="inline small">Auto</label><div class="switch" id="autoOverview" data-on="false"><i></i></div></div></div>
-<div class="grid metrics">
-<div class="card kpi"><div class="label">Receita Hoje</div><div class="value" id="revToday">R$ 0,00</div><div class="sub"><span id="countToday">0</span> ativações</div></div>
-<div class="card kpi"><div class="label">Receita 7 dias</div><div class="value" id="rev7d">R$ 0,00</div><div class="sub"><span id="count7d">0</span> ativações</div></div>
-<div class="card kpi"><div class="label">Receita 30 dias</div><div class="value" id="rev30d">R$ 0,00</div><div class="sub"><span id="count30d">0</span> ativações</div></div>
-<div class="card kpi"><div class="label">Transações</div><div class="value"><span class="tag" id="txPending">0 pendentes</span> <span class="tag" id="txPaid">0 pagas</span> <span class="tag" id="txFailed">0 falhas</span></div></div>
-</div>
-</div>
-<div id="transactions" class="grid" style="display:none">
-<div class="section"><h2>Transações</h2><div class="inline"><button class="btn" id="refreshTx">Atualizar</button><label class="inline small">Auto</label><div class="switch" id="autoTx" data-on="false"><i></i></div></div></div>
+<div class="section">
 <div class="card">
-<div class="filters">
-<input class="input" id="txQ" placeholder="Buscar por hash ou usuário">
-<select id="txStatus">
-<option value="">Status: Todos</option>
-<option value="paid">Pagas</option>
-<option value="failed">Falhas</option>
-<option value="pending">Pendentes</option>
-</select>
-<select id="txPlan">
-<option value="">Plano: Todos</option>
-<option>Essencial</option>
-<option>Profissional</option>
-<option>Vitalício</option>
-</select>
-<input class="input" id="txFrom" type="datetime-local" placeholder="De">
-<input class="input" id="txTo" type="datetime-local" placeholder="Até">
-<select id="txSize">
-<option value="10">10 por página</option>
-<option value="20" selected>20 por página</option>
-<option value="50">50 por página</option>
-<option value="100">100 por página</option>
-</select>
-<button class="btn primary" id="applyTx">Aplicar</button>
-<button class="btn" id="resetTx">Limpar</button>
+<div class="grid cols-2">
+<div>
+<div class="label">Status agregado</div>
+<div class="pills" id="aggPills"></div>
 </div>
-<hr class="sep">
-<div class="table-wrap">
-<table class="table">
-<thead><tr><th>Data</th><th>Usuário</th><th>Plano</th><th>Valor</th><th>Status</th><th>Ativada</th><th>Falha</th><th>Hash</th><th>Ações</th></tr></thead>
-<tbody id="txBody"></tbody>
+<div>
+<div class="label">Ações rápidas</div>
+<div class="pills">
+<button class="btn ghost" id="goTrans"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Ver transações</button>
+<button class="btn ghost" id="goUsers"><svg viewBox="0 0 24 24" fill="none"><path d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Zm5 14a7 7 0 0 0-14 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Ver usuários</button>
+<button class="btn ghost" id="goPlans"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7a2 2 0 0 1 2-2h5m9 12a2 2 0 0 1-2 2h-5M9 5v14m6-14v14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Gerir planos</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="tab-trans" class="hidden" role="tabpanel" aria-labelledby="nav-trans">
+<div class="section">
+<div class="card">
+<div class="toolbar">
+<div class="field"><label>Status</label><select id="fStatus"><option value="">Todos</option><option value="paid">Pago</option><option value="approved">Aprovado</option><option value="completed">Concluído</option><option value="confirmed">Confirmado</option><option value="pending">Pendente</option><option value="failed">Falhou</option><option value="canceled">Cancelado</option><option value="refunded">Estornado</option><option value="expired">Expirado</option></select></div>
+<div class="field"><label>Plano</label><select id="fPlan"><option value="">Todos</option><option>Essencial</option><option>Profissional</option><option>Vitalício</option></select></div>
+<div class="field"><label>De</label><input id="fFrom" type="datetime-local" class="input"></div>
+<div class="field"><label>Até</label><input id="fTo" type="datetime-local" class="input"></div>
+<div class="field" style="min-width:220px"><label>Busca</label><input id="fQ" type="search" class="input" placeholder="hash ou usuário"></div>
+<div class="field"><label>Tamanho</label><select id="fPageSize"><option>20</option><option>50</option><option>100</option></select></div>
+<div class="spacer"></div>
+<button class="btn secondary" id="btnSearchTrans"><svg viewBox="0 0 24 24" fill="none"><path d="M10.5 17a6.5 6.5 0 1 1 4.596-11.104A6.5 6.5 0 0 1 10.5 17Zm0 0L19 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Buscar</button>
+<button class="btn ghost" id="btnResetTrans"><svg viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 1 0 9-9M3 4v8h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Limpar</button>
+</div>
+<div class="tablewrap">
+<table aria-label="Tabela de transações">
+<thead><tr><th>Data</th><th>Usuário</th><th>Plano</th><th>Valor</th><th>Hash</th><th>Status</th><th>Ativado</th><th>Ações</th></tr></thead>
+<tbody id="tblTrans"></tbody>
 </table>
 </div>
 <div class="pagination">
-<button class="btn" id="txPrev">Anterior</button>
-<div class="small" id="txPageInfo"></div>
-<button class="btn" id="txNext">Próxima</button>
+<button class="iconbtn" id="prevTrans" aria-label="Página anterior"><svg viewBox="0 0 24 24" fill="none"><path d="M15 6 9 12l6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+<div class="small" id="pgInfoTrans">—</div>
+<button class="iconbtn" id="nextTrans" aria-label="Próxima página"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
 </div>
 </div>
 </div>
-<div id="users" class="grid" style="display:none">
-<div class="section"><h2>Usuários</h2><div class="inline"><button class="btn" id="refreshUsers">Atualizar</button></div></div>
+</section>
+
+<section id="tab-users" class="hidden" role="tabpanel" aria-labelledby="nav-users">
+<div class="section">
 <div class="card">
-<div class="filters">
-<input class="input" id="uQ" placeholder="Buscar por nome ou e-mail">
-<select id="uAdmin">
-<option value="">Admin: Todos</option>
-<option value="yes">Somente admin</option>
-<option value="no">Somente não admin</option>
-</select>
-<select id="uDisabled">
-<option value="">Status: Todos</option>
-<option value="false">Ativos</option>
-<option value="true">Desabilitados</option>
-</select>
-<select id="uSize">
-<option value="10">10 por página</option>
-<option value="20" selected>20 por página</option>
-<option value="50">50 por página</option>
-<option value="100">100 por página</option>
-</select>
-<button class="btn primary" id="applyUsers">Aplicar</button>
-<button class="btn" id="resetUsers">Limpar</button>
+<div class="toolbar">
+<div class="field" style="min-width:220px"><label>Busca</label><input id="uQ" type="search" class="input" placeholder="usuário ou e-mail"></div>
+<div class="field"><label>Admin</label><select id="uAdmin"><option value="">Todos</option><option value="yes">Sim</option><option value="no">Não</option></select></div>
+<div class="field"><label>Ativo</label><select id="uDisabled"><option value="">Todos</option><option value="false">Ativo</option><option value="true">Desativado</option></select></div>
+<div class="field"><label>Tamanho</label><select id="uPageSize"><option>20</option><option>50</option><option>100</option></select></div>
+<div class="spacer"></div>
+<button class="btn secondary" id="btnSearchUsers"><svg viewBox="0 0 24 24" fill="none"><path d="M10.5 17a6.5 6.5 0 1 1 4.596-11.104A6.5 6.5 0 0 1 10.5 17Zm0 0L19 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Buscar</button>
+<button class="btn ghost" id="btnResetUsers"><svg viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 1 0 9-9M3 4v8h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Limpar</button>
 </div>
-<hr class="sep">
-<div class="table-wrap">
-<table class="table">
-<thead><tr><th>Usuário</th><th>Email</th><th>Plano</th><th>Início</th><th>Expira</th><th>Admin</th><th>Desabilitado</th><th>Criado</th><th>Login</th><th>Ações</th></tr></thead>
-<tbody id="uBody"></tbody>
+<div class="tablewrap">
+<table aria-label="Tabela de usuários">
+<thead><tr><th>Criado</th><th>Usuário</th><th>E-mail</th><th>Plano</th><th>Expira</th><th>Admin</th><th>Status</th><th>Último login</th><th>Ações</th></tr></thead>
+<tbody id="tblUsers"></tbody>
 </table>
 </div>
 <div class="pagination">
-<button class="btn" id="uPrev">Anterior</button>
-<div class="small" id="uPageInfo"></div>
-<button class="btn" id="uNext">Próxima</button>
+<button class="iconbtn" id="prevUsers" aria-label="Página anterior"><svg viewBox="0 0 24 24" fill="none"><path d="M15 6 9 12l6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+<div class="small" id="pgInfoUsers">—</div>
+<button class="iconbtn" id="nextUsers" aria-label="Próxima página"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
 </div>
 </div>
 </div>
-<div id="plans" class="grid" style="display:none">
-<div class="section"><h2>Planos</h2><div class="inline"><button class="btn" id="refreshPlans">Atualizar</button></div></div>
+</section>
+
+<section id="tab-plans" class="hidden" role="tabpanel" aria-labelledby="nav-plans">
+<div class="section">
 <div class="card">
-<div id="plansForm" class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr))"></div>
-<hr class="sep">
-<div class="inline" style="justify-content:flex-end"><button class="btn primary" id="savePlans" disabled>Salvar alterações</button></div>
+<div class="grid cols-2" id="plansGrid"></div>
+<hr>
+<div style="display:flex;gap:8px;justify-content:flex-end">
+<button class="btn ghost" id="btnReloadPlans"><svg viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 1 1-2.64-6.36M21 4v6h-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Recarregar</button>
+<button class="btn" id="btnSavePlans"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Salvar alterações</button>
 </div>
 </div>
 </div>
-<footer class="footer">
-<div class="mark">
-<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.82L18.18 22 12 18.77 5.82 22 7 14.09l-5-4.82 6.91-1.01L12 2z" fill="currentColor"/></svg>
+</section>
+</main>
 </div>
-<div class="copy">© 2025 Seyzalel — Todos os direitos reservados</div>
-</footer>
-</div>
-<div class="modal" id="modalTx">
-<div class="box">
-<h3>Editar Transação</h3>
-<div class="body">
-<div class="small" id="modalTxHash"></div>
-<div class="field">
-<label class="small">Status do pagamento</label>
-<select id="modalTxStatus">
-<option value="">Selecionar</option>
-<option value="paid">paid</option>
-<option value="approved">approved</option>
-<option value="completed">completed</option>
-<option value="confirmed">confirmed</option>
-<option value="paid_out">paid_out</option>
-<option value="finished">finished</option>
-<option value="success">success</option>
-<option value="settled">settled</option>
-<option value="captured">captured</option>
-<option value="accredited">accredited</option>
-<option value="credited">credited</option>
-<option value="confirmed_payment">confirmed_payment</option>
-<option value="canceled">canceled</option>
-<option value="cancelled">cancelled</option>
-<option value="refunded">refunded</option>
-<option value="chargeback">chargeback</option>
-<option value="reversed">reversed</option>
-<option value="voided">voided</option>
-<option value="failed">failed</option>
-<option value="expired">expired</option>
-<option value="denied">denied</option>
-</select>
-</div>
-<div class="field">
-<label class="small">Ou digite um status</label>
-<input class="input" id="modalTxCustom" placeholder="ex.: paid">
-</div>
-</div>
-<div class="foot">
-<button class="btn" id="modalTxClose">Cancelar</button>
-<button class="btn primary" id="modalTxSave">Salvar</button>
+
+<div class="modal" id="confirmModal" aria-hidden="true" aria-modal="true" role="dialog">
+<div class="overlay" id="confirmOverlay"></div>
+<div class="dialog">
+<div class="head"><div id="confirmTitle">Confirmar</div><button class="iconbtn" id="confirmClose" aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button></div>
+<div id="confirmBody" class="small">Tem certeza?</div>
+<hr>
+<div style="display:flex;gap:8px;justify-content:flex-end">
+<button class="btn ghost" id="btnCancelConfirm">Cancelar</button>
+<button class="btn" id="btnOkConfirm">Confirmar</button>
 </div>
 </div>
 </div>
-<div class="modal" id="modalConfirm">
-<div class="box">
-<h3 id="confirmTitle"></h3>
-<div class="body"><div id="confirmMsg"></div></div>
-<div class="foot">
-<button class="btn" id="confirmCancel">Cancelar</button>
-<button class="btn danger" id="confirmOk">Confirmar</button>
-</div>
-</div>
-</div>
-<div class="toast-area" id="toasts"></div>
+
+<div class="toast" aria-live="polite" aria-atomic="true" id="toast"></div>
+
 <script>
-const PAID=["paid","approved","completed","confirmed","paid_out","finished","success","settled","captured","accredited","credited","confirmed_payment"]
-const FAILED=["canceled","cancelled","refunded","chargeback","reversed","voided","failed","expired","denied"]
-const fmtBRL=v=>new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format((Number(v||0)/100)||0)
-const fmtDate=s=>s?new Date(s).toLocaleString("pt-BR"):"—"
-const el=q=>document.querySelector(q)
-const els=q=>Array.from(document.querySelectorAll(q))
-const toast=(t,m)=>{const n=document.createElement("div");n.className="toast";n.textContent=m;el("#toasts").appendChild(n);setTimeout(()=>n.remove(),3500)}
-const fetchJSON=async(u,o={})=>{const r=await fetch(u,{credentials:"same-origin",headers:{"Content-Type":"application/json"},...o});let j=null;try{j=await r.json()}catch(e){}if(!r.ok){throw j||{ok:false}}return j}
-const setSwitch=(e,v)=>{e.setAttribute("data-on",v?"true":"false")}
-const getSwitch=e=>e.getAttribute("data-on")==="true"
-let autoOverviewTimer=null,autoTxTimer=null,lastTouchEnd=0
-document.addEventListener("gesturestart",e=>e.preventDefault(),{passive:false})
-document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false})
-document.addEventListener("touchend",e=>{const now=Date.now();if(now-lastTouchEnd<=300)e.preventDefault();lastTouchEnd=now},{passive:false})
-els(".tab").forEach(t=>t.addEventListener("click",()=>{els(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");["overview","transactions","users","plans"].forEach(id=>el("#"+id).style.display="none");el("#"+t.dataset.tab).style.display="grid"}))
-el("#refreshOverview").addEventListener("click",()=>loadOverview())
-el("#autoOverview").addEventListener("click",()=>{const on=!getSwitch(el("#autoOverview"));setSwitch(el("#autoOverview"),on);if(on){autoOverviewTimer=setInterval(loadOverview,8000);loadOverview()}else{clearInterval(autoOverviewTimer)}})
-async function loadOverview(){try{const d=await fetchJSON("/admin/api/metrics");el("#revToday").textContent=fmtBRL(d.revenue_today_cents);el("#rev7d").textContent=fmtBRL(d.revenue_7d_cents);el("#rev30d").textContent=fmtBRL(d.revenue_30d_cents);el("#countToday").textContent=d.count_today;el("#count7d").textContent=d.count_7d;el("#count30d").textContent=d.count_30d;el("#txPending").textContent=(d.tx_counts.pending||0)+" pendentes";el("#txPaid").textContent=(d.tx_counts.paid||0)+" pagas";el("#txFailed").textContent=(d.tx_counts.failed||0)+" falhas"}catch(e){toast("err","Falha ao carregar métricas")}}
-let txState={page:1,size:20,status:"",plan:"",q:"",from:"",to:""}
-const txStatusSel=el("#txStatus")
-const txPlanSel=el("#txPlan")
-const txQ=el("#txQ")
-const txFrom=el("#txFrom")
-const txTo=el("#txTo")
-const txSize=el("#txSize")
-const txBody=el("#txBody")
-const txPageInfo=el("#txPageInfo")
-el("#applyTx").addEventListener("click",()=>{txState.page=1;applyTxFilters()})
-el("#resetTx").addEventListener("click",()=>{txQ.value="";txStatusSel.value="";txPlanSel.value="";txFrom.value="";txTo.value="";txSize.value="20";txState={page:1,size:20,status:"",plan:"",q:"",from:"",to:""};loadTx()})
-el("#txPrev").addEventListener("click",()=>{if(txState.page>1){txState.page--;loadTx()}})
-el("#txNext").addEventListener("click",()=>{txState.page++;loadTx()})
-el("#refreshTx").addEventListener("click",()=>loadTx())
-el("#autoTx").addEventListener("click",()=>{const on=!getSwitch(el("#autoTx"));setSwitch(el("#autoTx"),on);if(on){autoTxTimer=setInterval(loadTx,8000);loadTx()}else{clearInterval(autoTxTimer)}})
-function applyTxFilters(){txState.size=Number(txSize.value);txState.status=txStatusSel.value;txState.plan=txPlanSel.value;txState.q=txQ.value.trim();txState.from=txFrom.value;txState.to=txTo.value;loadTx()}
-function statusBadge(s){if(!s)return'<span class="badge neutral">—</span>';const cls=PAID.includes(s)?'ok':FAILED.includes(s)?'err':'neutral';return `<span class="badge ${cls}">${s}</span>`}
-async function loadTx(){try{const params=new URLSearchParams();params.set("page",String(txState.page));params.set("page_size",String(txState.size));if(txState.q)params.set("q",txState.q);if(txState.plan)params.set("plan",txState.plan);if(txState.status&&txState.status!=="pending"){params.set("status",txState.status)}if(txState.from)params.set("from",txState.from);if(txState.to)params.set("to",txState.to);const d=await fetchJSON(`/admin/api/transactions?${params.toString()}`);let items=d.items||[];if(txState.status==="pending"){items=items.filter(it=>!PAID.includes(it.payment_status)&&!FAILED.includes(it.payment_status))}txBody.innerHTML="";items.forEach(it=>{const tr=document.createElement("tr");tr.className="row";tr.innerHTML=`<td data-label="Data">${fmtDate(it.created_at)}</td><td data-label="Usuário">${it.username||"—"}</td><td data-label="Plano">${it.plan||"—"}</td><td data-label="Valor">${fmtBRL(it.amount_cents||0)}</td><td data-label="Status">${statusBadge(it.payment_status)}</td><td data-label="Ativada">${fmtDate(it.activated_at)}</td><td data-label="Falha">${fmtDate(it.failed_at)}</td><td data-label="Hash" class="small" style="max-width:200px;word-break:break-all">${it.hash||"—"}</td><td data-label="Ações"><div class="actions"><button class="btn" data-edit="${it.id}">Editar</button><button class="btn danger" data-del="${it.id}" data-hash="${it.hash||""}">Excluir</button></div></td>`;txBody.appendChild(tr)});const shownStart=(d.page-1)*d.page_size+1;const shownEnd=Math.min(d.page*d.page_size,d.total);txPageInfo.textContent=txState.status==="pending"?`Pendentes filtrados nesta página: ${items.length}`:(d.total?`Mostrando ${shownStart}–${shownEnd} de ${d.total}`:"Nenhum resultado");txState.total=d.total;els('[data-edit]').forEach(b=>b.onclick=()=>openEditTx(b.getAttribute('data-edit')));els('[data-del]').forEach(b=>b.onclick=()=>confirmDeleteTx(b.getAttribute('data-del'),b.getAttribute('data-hash')))}catch(e){toast("err","Falha ao carregar transações")}}
-let editTxId=null
-function openEditTx(id){editTxId=id;el("#modalTxStatus").value="";el("#modalTxCustom").value="";const row=el(`[data-del="${id}"]`)?.closest("tr");const h=row?row.children[7].textContent.trim():"";el("#modalTxHash").textContent=h?`Hash: ${h}`:"";openModal("modalTx")}
-el("#modalTxClose").addEventListener("click",()=>closeModal("modalTx"))
-el("#modalTxSave").addEventListener("click",async()=>{try{const s=el("#modalTxCustom").value.trim()||el("#modalTxStatus").value.trim();if(!s){toast("err","Informe um status");return}await fetchJSON(`/admin/api/transactions/${editTxId}`,{method:"PATCH",body:JSON.stringify({payment_status:s})});closeModal("modalTx");toast("ok","Transação atualizada");loadTx()}catch(e){toast("err","Falha ao atualizar transação")}})
-function confirmDeleteTx(id,hash){openConfirm("Excluir transação",`Deseja excluir a transação ${hash||id}?`,async()=>{try{await fetchJSON(`/admin/api/transactions/${id}`,{method:"DELETE"});toast("ok","Transação excluída");loadTx()}catch(e){toast("err","Falha ao excluir transação")}})}
-let uState={page:1,size:20,q:"",admin:"",disabled:""}
-const uQ=el("#uQ"),uAdmin=el("#uAdmin"),uDisabled=el("#uDisabled"),uSize=el("#uSize"),uBody=el("#uBody"),uPageInfo=el("#uPageInfo")
-el("#applyUsers").addEventListener("click",()=>{uState.page=1;applyUFilters()})
-el("#resetUsers").addEventListener("click",()=>{uQ.value="";uAdmin.value="";uDisabled.value="";uSize.value="20";uState={page:1,size:20,q:"",admin:"",disabled:""};loadUsers()})
-el("#uPrev").addEventListener("click",()=>{if(uState.page>1){uState.page--;loadUsers()}})
-el("#uNext").addEventListener("click",()=>{uState.page++;loadUsers()})
-el("#refreshUsers").addEventListener("click",()=>loadUsers())
-function applyUFilters(){uState.size=Number(uSize.value);uState.q=uQ.value.trim();uState.admin=uAdmin.value;uState.disabled=uDisabled.value;loadUsers()}
-async function loadUsers(){try{const params=new URLSearchParams();params.set("page",String(uState.page));params.set("page_size",String(uState.size));if(uState.q)params.set("q",uState.q);if(uState.admin)params.set("admin",uState.admin);if(uState.disabled)params.set("disabled",uState.disabled);const d=await fetchJSON(`/admin/api/users?${params.toString()}`);uBody.innerHTML="";d.items.forEach(u=>{const tr=document.createElement("tr");tr.className="row";tr.innerHTML=`<td data-label="Usuário">${u.username}</td><td data-label="Email">${u.email||"—"}</td><td data-label="Plano">${u.plans||"—"}</td><td data-label="Início">${fmtDate(u.plan_started_at)}</td><td data-label="Expira">${fmtDate(u.plan_expires_at)}</td><td data-label="Admin">${u.admin_permission==="yes"?'<span class="badge ok">yes</span>':'<span class="badge neutral">no</span>'}</td><td data-label="Desabilitado">${u.disabled?'<span class="badge err">true</span>':'<span class="badge neutral">false</span>'}</td><td data-label="Criado">${fmtDate(u.created_at)}</td><td data-label="Login">${fmtDate(u.last_login_at)}</td><td data-label="Ações"><div class="actions"><button class="btn" data-admin="${u.id}" data-val="${u.admin_permission==="yes"?"no":"yes"}">${u.admin_permission==="yes"?"Revogar":"Tornar admin"}</button><button class="btn" data-disable="${u.id}" data-val="${!u.disabled}">${u.disabled?"Reativar":"Desabilitar"}</button><button class="btn" data-logout="${u.id}">Forçar logout</button></div></td>`;uBody.appendChild(tr)});const shownStart=(d.page-1)*d.page_size+1;const shownEnd=Math.min(d.page*d.page_size,d.total);uPageInfo.textContent=d.total?`Mostrando ${shownStart}–${shownEnd} de ${d.total}`:"Nenhum resultado";els('[data-admin]').forEach(b=>b.onclick=()=>toggleAdmin(b.getAttribute("data-admin"),b.getAttribute("data-val")));els('[data-disable]').forEach(b=>b.onclick=()=>toggleDisable(b.getAttribute("data-disable"),b.getAttribute("data-val")==="true"));els('[data-logout]').forEach(b=>b.onclick=()=>forceLogout(b.getAttribute("data-logout")))}catch(e){toast("err","Falha ao carregar usuários")}}
-async function toggleAdmin(id,val){try{await fetchJSON(`/admin/api/users/${id}/set_admin`,{method:"POST",body:JSON.stringify({admin_permission:val})});toast("ok","Permissão atualizada");loadUsers()}catch(e){toast("err","Falha ao atualizar permissão")}}
-async function toggleDisable(id,val){try{await fetchJSON(`/admin/api/users/${id}/disable`,{method:"POST",body:JSON.stringify({disabled:val})});toast("ok","Status atualizado");loadUsers()}catch(e){toast("err","Falha ao atualizar status")}}
-async function forceLogout(id){try{await fetchJSON(`/admin/api/users/${id}/force_logout`,{method:"POST"});toast("ok","Logout forçado")}catch(e){toast("err","Falha ao forçar logout")}}
-let plansCache=null,plansDirty={}
-const plansForm=el("#plansForm")
-el("#refreshPlans").addEventListener("click",()=>loadPlans())
-el("#savePlans").addEventListener("click",()=>savePlans())
-function centsFromBRL(str){const n=String(str||"").replace(/[^\d,.-]/g,"").replace(/\./g,"").replace(",",".");const v=Number(n||0);return Math.round(v*100)}
-function brlFromCents(c){return fmtBRL(c)}
-function planCard(name,p){const wrap=document.createElement("div");wrap.className="card";wrap.innerHTML=`<div class="inline" style="justify-content:space-between"><div style="font-weight:700">${p.title}</div><span class="tag">${name}</span></div><hr class="sep"><table class="min"><tr><td class="small">Produto</td><td class="small" style="text-align:right">${p.product_hash}</td></tr><tr><td class="small">Oferta</td><td class="small" style="text-align:right">${p.offer_hash}</td></tr></table><div class="field currency" style="margin-top:10px"><label class="small">Preço</label><span>R$</span><input class="input" inputmode="decimal" value="${(p.amount_cents/100).toFixed(2).replace(".",",")}" data-plan="${name}" data-field="amount_cents"></div><div class="field" style="margin-top:10px"><label class="small">Ativo</label><div class="switch" data-plan="${name}" data-field="active" data-on="${p.active?'true':'false'}"><i></i></div></div>`;return wrap}
-async function loadPlans(){try{const d=await fetchJSON("/admin/api/plans");plansCache=d.plans;plansDirty={};plansForm.innerHTML="";Object.keys(d.plans).forEach(k=>{plansForm.appendChild(planCard(k,d.plans[k]))});els('#plansForm input[data-field="amount_cents"]').forEach(i=>i.addEventListener("input",()=>markPlanDirty(i.getAttribute("data-plan"))));els('#plansForm .switch[data-field="active"]').forEach(sw=>sw.addEventListener("click",()=>{const on=sw.getAttribute("data-on")==="true";sw.setAttribute("data-on",on?"false":"true");markPlanDirty(sw.getAttribute("data-plan"))}));setSaveEnabled()}catch(e){toast("err","Falha ao carregar planos")}}
-function markPlanDirty(name){plansDirty[name]=true;setSaveEnabled()}
-function setSaveEnabled(){el("#savePlans").disabled=Object.keys(plansDirty).length===0}
-async function savePlans(){try{const payload={};Object.keys(plansDirty).forEach(name=>{const priceEl=el(`#plansForm input[data-plan="${name}"][data-field="amount_cents"]`);const sw=el(`#plansForm .switch[data-plan="${name}"][data-field="active"]`);const cents=centsFromBRL(priceEl.value);const active=sw.getAttribute("data-on")==="true";payload[name]={amount_cents:cents,active:active}});await fetchJSON("/admin/api/plans",{method:"PUT",body:JSON.stringify(payload)});plansDirty={};setSaveEnabled();toast("ok","Planos atualizados");loadPlans()}catch(e){toast("err","Falha ao salvar planos")}}
-function openModal(id){el("#"+id).classList.add("open")}
-function closeModal(id){el("#"+id).classList.remove("open")}
-let confirmCb=null
-function openConfirm(title,msg,cb){el("#confirmTitle").textContent=title;el("#confirmMsg").textContent=msg;confirmCb=cb;openModal("modalConfirm")}
-el("#confirmCancel").addEventListener("click",()=>{confirmCb=null;closeModal("modalConfirm")})
-el("#confirmOk").addEventListener("click",async()=>{const cb=confirmCb;confirmCb=null;closeModal("modalConfirm");if(cb)await cb()})
-window.addEventListener("load",()=>{loadOverview();loadTx();loadUsers();loadPlans()})
+const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s))
+const fmtBRL=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'})
+const fmtDate=v=>v?new Date(v).toLocaleString('pt-BR'):'—'
+const text=(el,v)=>{if(!el)return;el.textContent=v??'—'}
+const toast=(msg,dur=2600)=>{const t=document.createElement('div');t.className='msg';t.textContent=msg;$('#toast').appendChild(t);setTimeout(()=>t.remove(),dur)}
+const setBadge=status=>{const s=(status||'').toLowerCase();const span=document.createElement('span');span.className='badge '+(s.includes('paid')||s.includes('approved')||s.includes('completed')||s.includes('confirmed')||s.includes('accredited')||s.includes('credited')?'paid':(s.includes('fail')||s.includes('cancel')||s.includes('chargeback')||s.includes('reverse')||s.includes('void')||s.includes('denied')||s.includes('expired')?'failed':'pending'));span.textContent=status||'pendente';return span}
+let autoTimer=null
+const startAuto=()=>{stopAuto();autoTimer=setInterval(()=>refreshActiveTab(),10000)}
+const stopAuto=()=>{if(autoTimer){clearInterval(autoTimer);autoTimer=null}}
+const closeSidebar=()=>$('#sidebar').classList.remove('open')
+const state={trans:{page:1,size:20,filters:{}},users:{page:1,size:20,filters:{}},plans:{data:{},dirty:{}}}
+const api={get:async(u)=>{const r=await fetch(u,{headers:{Accept:'application/json'}});if(!r.ok)throw new Error('Erro '+r.status);return r.json()},post:async(u,b)=>{const r=await fetch(u,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(b||{})});if(!r.ok)throw new Error('Erro '+r.status);return r.json()},patch:async(u,b)=>{const r=await fetch(u,{method:'PATCH',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(b||{})});if(!r.ok)throw new Error('Erro '+r.status);return r.json()},del:async(u)=>{const r=await fetch(u,{method:'DELETE',headers:{Accept:'application/json'}});if(!r.ok)throw new Error('Erro '+r.status);return r.json()}}
+const nav={show:(id)=>{$$('#nav-dashboard,#nav-trans,#nav-users,#nav-plans').forEach(b=>b.removeAttribute('aria-current'));$('#nav-'+id).setAttribute('aria-current','page');$$('[role="tabpanel"]').forEach(s=>s.classList.add('hidden'));$('#tab-'+id).classList.remove('hidden');closeSidebar();refreshActiveTab()}}
+const syncTime=()=>{const now=new Date();text($('#lastSync'),'Sincronizado às '+now.toLocaleTimeString('pt-BR'))}
+const loadMetrics=async()=>{text($('#kpiToday'),'—');text($('#kpi7d'),'—');text($('#kpi30d'),'—');const j=await api.get('/admin/api/metrics');text($('#kpiToday'),fmtBRL.format((j.revenue_today_cents||0)/100));text($('#kpi7d'),fmtBRL.format((j.revenue_7d_cents||0)/100));text($('#kpi30d'),fmtBRL.format((j.revenue_30d_cents||0)/100));text($('#kpiTodayCount'),(j.count_today||0)+' ativações hoje');text($('#kpi7dCount'),(j.count_7d||0)+' ativações/7d');text($('#kpi30dCount'),(j.count_30d||0)+' ativações/30d');text($('#kpiTx'),'Pagas: '+(j.tx_counts?.paid||0));text($('#kpiSplit'),'Pendentes: '+(j.tx_counts?.pending||0)+' · Falhas: '+(j.tx_counts?.failed||0));const pills=$('#aggPills');pills.innerHTML='';['pending','paid','failed'].forEach(k=>{const v=j.tx_counts?.[k]||0;const p=document.createElement('span');p.className='pill';p.textContent=(k==='pending'?'Pendentes':k==='paid'?'Pagas':'Falhas')+': '+v;pills.appendChild(p)});syncTime()}
+const readTransFilters=()=>{const f={};const s=$('#fStatus').value.trim();if(s){if(s==='pending')f.status='';else f.status=s}const p=$('#fPlan').value.trim();if(p)f.plan=p;const d1=$('#fFrom').value;if(d1)f.from=new Date(d1).toISOString();const d2=$('#fTo').value;if(d2)f.to=new Date(d2).toISOString();const q=$('#fQ').value.trim();if(q)f.q=q;state.trans.size=parseInt($('#fPageSize').value,10)||20;state.trans.filters=f}
+const loadTrans=async()=>{readTransFilters();const page=state.trans.page;const size=state.trans.size;const f=state.trans.filters;const params=new URLSearchParams();if(f.status!==undefined){if(f.status)params.set('status',f.status)}if(f.plan)params.set('plan',f.plan);if(f.from)params.set('from',f.from);if(f.to)params.set('to',f.to);if(f.q)params.set('q',f.q);params.set('page',String(page));params.set('page_size',String(size));const j=await api.get('/admin/api/transactions?'+params.toString());const tbody=$('#tblTrans');tbody.innerHTML='';if((j.items||[]).length===0){const tr=document.createElement('tr');const td=document.createElement('td');td.colSpan=8;td.className='small';td.textContent='Nenhum resultado';tr.appendChild(td);tbody.appendChild(tr)}(j.items||[]).forEach(it=>{const tr=document.createElement('tr');const td1=document.createElement('td');td1.textContent=fmtDate(it.created_at);const td2=document.createElement('td');td2.textContent=it.username||'—';const td3=document.createElement('td');td3.textContent=it.plan||'—';const td4=document.createElement('td');td4.textContent=fmtBRL.format((it.amount_cents||0)/100);const td5=document.createElement('td');const hspan=document.createElement('span');hspan.textContent=(it.hash||'').slice(0,10)+'…';const copyBtn=document.createElement('button');copyBtn.className='iconbtn';copyBtn.setAttribute('aria-label','Copiar hash');copyBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none"><path d="M8 8h8v12H8zM12 4h6v4" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';copyBtn.onclick=()=>{navigator.clipboard.writeText(it.hash||'');toast('Hash copiado')};const hv=document.createElement('div');hv.style.display='flex';hv.style.alignItems='center';hv.style.gap='6px';hv.append(hspan,copyBtn);td5.appendChild(hv);const td6=document.createElement('td');td6.appendChild(setBadge(it.payment_status||'pendente'));const td7=document.createElement('td');td7.textContent=it.activated_at?fmtDate(it.activated_at):'—';const td8=document.createElement('td');const aP=document.createElement('button');aP.className='iconbtn success';aP.innerHTML='<svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';aP.title='Marcar como pago';aP.onclick=async()=>{await api.patch('/admin/api/transactions/'+it.id,{payment_status:'paid'});toast('Status atualizado');loadTrans();loadMetrics()};const aF=document.createElement('button');aF.className='iconbtn warn';aF.innerHTML='<svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M10.3 4.7 3.7 17.3A2 2 0 0 0 5.5 20h13a2 2 0 0 0 1.8-2.7L13.7 4.7a2 2 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';aF.title='Marcar como falhou';aF.onclick=async()=>{await api.patch('/admin/api/transactions/'+it.id,{payment_status:'failed'});toast('Status atualizado');loadTrans();loadMetrics()};const aC=document.createElement('button');aC.className='iconbtn';aC.innerHTML='<svg viewBox="0 0 24 24" fill="none"><path d="M4 7h10m-4 5h8m-6 5h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';aC.title='Definir status';aC.onclick=()=>openConfirm('Definir status','Informe o novo status para a transação '+(it.hash||''),async(val)=>{if(!val)return;await api.patch('/admin/api/transactions/'+it.id,{payment_status:String(val).toLowerCase()});toast('Status atualizado');loadTrans();loadMetrics()},true);const aD=document.createElement('button');aD.className='iconbtn danger';aD.innerHTML='<svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M9 11v6M15 11v6M6 7l1 14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';aD.title='Excluir';aD.onclick=()=>openConfirm('Excluir transação','Esta ação não pode ser desfeita. Deseja excluir?',async()=>{await api.del('/admin/api/transactions/'+it.id);toast('Transação excluída');loadTrans();loadMetrics()});const ra=document.createElement('div');ra.className='rowactions';ra.append(aP,aF,aC,aD);td8.appendChild(ra);tr.append(td1,td2,td3,td4,td5,td6,td7,td8);tbody.appendChild(tr)});text($('#pgInfoTrans'),'Página '+j.page+' de '+Math.max(1,Math.ceil((j.total||0)/j.page_size)));$('#prevTrans').disabled=j.page<=1;$('#nextTrans').disabled=(j.page||1)>=Math.ceil((j.total||0)/j.page_size)}
+const resetTrans=()=>{$('#fStatus').value='';$('#fPlan').value='';$('#fFrom').value='';$('#fTo').value='';$('#fQ').value='';$('#fPageSize').value='20';state.trans.page=1;loadTrans()}
+$('#btnSearchTrans').onclick=()=>{state.trans.page=1;loadTrans()}
+$('#btnResetTrans').onclick=resetTrans
+$('#prevTrans').onclick=()=>{if(state.trans.page>1){state.trans.page--;loadTrans()}}
+$('#nextTrans').onclick=()=>{state.trans.page++;loadTrans()}
+const readUserFilters=()=>{const f={};const q=$('#uQ').value.trim();if(q)f.q=q;const a=$('#uAdmin').value;if(a)f.admin=a;const d=$('#uDisabled').value;if(d)f.disabled=d;state.users.size=parseInt($('#uPageSize').value,10)||20;state.users.filters=f}
+const loadUsers=async()=>{readUserFilters();const page=state.users.page;const size=state.users.size;const f=state.users.filters;const params=new URLSearchParams();if(f.q)params.set('q',f.q);if(f.admin)params.set('admin',f.admin);if(f.disabled)params.set('disabled',f.disabled);params.set('page',String(page));params.set('page_size',String(size));const j=await api.get('/admin/api/users?'+params.toString());const tbody=$('#tblUsers');tbody.innerHTML='';if((j.items||[]).length===0){const tr=document.createElement('tr');const td=document.createElement('td');td.colSpan=9;td.className='small';td.textContent='Nenhum resultado';tr.appendChild(td);tbody.appendChild(tr)}(j.items||[]).forEach(u=>{const tr=document.createElement('tr');const td1=document.createElement('td');td1.textContent=fmtDate(u.created_at);const td2=document.createElement('td');td2.textContent=u.username||'—';const td3=document.createElement('td');td3.textContent=u.email||'—';const td4=document.createElement('td');td4.textContent=(u.plans||'padrao');const td5=document.createElement('td');td5.textContent=u.plan_expires_at?fmtDate(u.plan_expires_at):'—';const td6=document.createElement('td');const bA=document.createElement('span');bA.className='badge '+(u.admin_permission==='yes'?'paid':'pending');bA.textContent=u.admin_permission==='yes'?'admin':'não';td6.appendChild(bA);const td7=document.createElement('td');const bS=document.createElement('span');bS.className='badge '+(u.disabled?'failed':'paid');bS.textContent=u.disabled?'desativado':'ativo';td7.appendChild(bS);const td8=document.createElement('td');td8.textContent=u.last_login_at?fmtDate(u.last_login_at):'—';const td9=document.createElement('td');const mkAdmin=document.createElement('button');mkAdmin.className='iconbtn';mkAdmin.innerHTML='<svg viewBox="0 0 24 24" fill="none"><path d="M12 3l3 7h7l-5.5 4.2L18 21l-6-4-6 4 1.5-6.8L2 10h7l3-7z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>';mkAdmin.title=u.admin_permission==='yes'?'Remover admin':'Tornar admin';mkAdmin.onclick=async()=>{await api.post('/admin/api/users/'+u.id+'/set_admin',{admin_permission:u.admin_permission==='yes'?'no':'yes'});toast('Permissão atualizada');loadUsers()};const toggleDis=document.createElement('button');toggleDis.className='iconbtn warn';toggleDis.innerHTML='<svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M10.3 4.7 3.7 17.3A2 2 0 0 0 5.5 20h13a2 2 0 0 0 1.8-2.7L13.7 4.7a2 2 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';toggleDis.title=u.disabled?'Habilitar usuário':'Desabilitar usuário';toggleDis.onclick=async()=>{await api.post('/admin/api/users/'+u.id+'/disable',{disabled:!u.disabled});toast('Status do usuário atualizado');loadUsers()};const forceOut=document.createElement('button');forceOut.className='iconbtn danger';forceOut.innerHTML='<svg viewBox="0 0 24 24" fill="none"><path d="M8 12h8M12 16l4-4-4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';forceOut.title='Forçar logout';forceOut.onclick=async()=>{await api.post('/admin/api/users/'+u.id+'/force_logout',{});toast('Logout forçado')};const ra=document.createElement('div');ra.className='rowactions';ra.append(mkAdmin,toggleDis,forceOut);td9.appendChild(ra);tr.append(td1,td2,td3,td4,td5,td6,td7,td8,td9);tbody.appendChild(tr)});text($('#pgInfoUsers'),'Página '+j.page+' de '+Math.max(1,Math.ceil((j.total||0)/j.page_size)));$('#prevUsers').disabled=j.page<=1;$('#nextUsers').disabled=(j.page||1)>=Math.ceil((j.total||0)/j.page_size)}
+$('#btnSearchUsers').onclick=()=>{state.users.page=1;loadUsers()}
+$('#btnResetUsers').onclick=()=>{$('#uQ').value='';$('#uAdmin').value='';$('#uDisabled').value='';$('#uPageSize').value='20';state.users.page=1;loadUsers()}
+$('#prevUsers').onclick=()=>{if(state.users.page>1){state.users.page--;loadUsers()}}
+$('#nextUsers').onclick=()=>{state.users.page++;loadUsers()}
+const renderPlans=async()=>{const j=await api.get('/admin/api/plans');state.plans.data=j.plans||{};const grid=$('#plansGrid');grid.innerHTML='';Object.entries(state.plans.data).forEach(([name,p])=>{const card=document.createElement('div');card.className='card';const title=document.createElement('div');title.style.display='flex';title.style.justifyContent='space-between';title.style.alignItems='center';const h=document.createElement('h3');h.style.margin='0';h.textContent=name;const togg=document.createElement('label');togg.className='switch';const inp=document.createElement('input');inp.type='checkbox';inp.checked=!!p.active;const slider=document.createElement('span');slider.className='slider';togg.append(inp,slider);title.append(h,togg);const fwrap=document.createElement('div');fwrap.className='grid cols-2';const f1=document.createElement('div');f1.className='field';const l1=document.createElement('label');l1.textContent='Preço (R$)';const i1=document.createElement('input');i1.type='text';i1.inputMode='decimal';i1.className='input';i1.value=((p.amount_cents||0)/100).toFixed(2).replace('.',',');f1.append(l1,i1);const f2=document.createElement('div');f2.className='field';const l2=document.createElement('label');l2.textContent='Título';const i2=document.createElement('input');i2.type='text';i2.className='input';i2.value=p.title||'';i2.disabled=true;f2.append(l2,i2);const f3=document.createElement('div');f3.className='field';const l3=document.createElement('label');l3.textContent='Product Hash';const i3=document.createElement('input');i3.type='text';i3.className='input';i3.value=p.product_hash||'';i3.disabled=true;f3.append(l3,i3);const f4=document.createElement('div');f4.className='field';const l4=document.createElement('label');l4.textContent='Offer Hash';const i4=document.createElement('input');i4.type='text';i4.className='input';i4.value=p.offer_hash||'';i4.disabled=true;f4.append(l4,i4);fwrap.append(f1,f2,f3,f4);card.append(title,document.createElement('hr'),fwrap);grid.appendChild(card);const setDirty=()=>{state.plans.dirty[name]={amount_cents:toCents(i1.value),active:inp.checked}};inp.onchange=setDirty;i1.oninput=setDirty})}
+const toCents=v=>{const s=String(v||'').trim().replace(/\./g,'').replace(',','.');const n=Number(s);if(!isFinite(n))return 0;return Math.round(n*100)}
+$('#btnSavePlans').onclick=async()=>{if(!Object.keys(state.plans.dirty).length){toast('Nada para salvar');return}const put=await fetch('/admin/api/plans',{method:'PUT',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(state.plans.dirty)});if(!put.ok){toast('Falha ao salvar');return}await put.json();state.plans.dirty={};toast('Planos atualizados');renderPlans();loadMetrics()}
+$('#btnReloadPlans').onclick=()=>renderPlans()
+const openConfirm=(title,body,ok,needInput)=>{const m=$('#confirmModal');text($('#confirmTitle'),title||'Confirmar');const bodyEl=$('#confirmBody');bodyEl.innerHTML='';if(needInput){const w=document.createElement('div');w.style.display='grid';w.style.gap='8px';const p=document.createElement('div');p.className='small';p.textContent=body||'';const inp=document.createElement('input');inp.type='text';inp.className='input';inp.placeholder='Novo valor';w.append(p,inp);bodyEl.append(w);m.dataset.valueTarget='1';m.dataset.inputId='confirmInput';inp.id='confirmInput';setTimeout(()=>inp.focus(),30)}else{bodyEl.textContent=body||'Tem certeza?';delete m.dataset.valueTarget}m.classList.add('open');m.setAttribute('aria-hidden','false');const cleanup=()=>{m.classList.remove('open');m.setAttribute('aria-hidden','true')};$('#btnCancelConfirm').onclick=cleanup;$('#confirmClose').onclick=cleanup;$('#confirmOverlay').onclick=cleanup;$('#btnOkConfirm').onclick=async()=>{const value=m.dataset.valueTarget?$('#confirmInput').value:null;cleanup();if(typeof ok==='function')await ok(value)}}
+const refreshActiveTab=()=>{const active=$$('.nav button[aria-current="page"]')[0]?.id||'';if(active==='nav-dashboard'){loadMetrics()}else if(active==='nav-trans'){loadTrans()}else if(active==='nav-users'){loadUsers()}else if(active==='nav-plans'){renderPlans()}}
+$('#nav-dashboard').onclick=()=>{nav.show('dashboard')}
+$('#nav-trans').onclick=()=>{nav.show('trans')}
+$('#nav-users').onclick=()=>{nav.show('users')}
+$('#nav-plans').onclick=()=>{nav.show('plans')}
+$('#btnRefresh').onclick=()=>refreshActiveTab()
+$('#goTrans').onclick=()=>{$('#nav-trans').click()}
+$('#goUsers').onclick=()=>{$('#nav-users').click()}
+$('#goPlans').onclick=()=>{$('#nav-plans').click()}
+$('#btnMenu').onclick=()=>$('#sidebar').classList.toggle('open')
+$('#autoTick').onchange=e=>{if(e.target.checked)startAuto();else stopAuto()}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stopAuto();else if($('#autoTick').checked)startAuto()})
+window.addEventListener('keydown',e=>{if(e.key==='Escape')$('#sidebar').classList.remove('open')})
+loadMetrics().then(()=>syncTime())
+renderPlans()
+loadTrans()
+loadUsers()
+startAuto()
 </script>
 </body>
 </html>
