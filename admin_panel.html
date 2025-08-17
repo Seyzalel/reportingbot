@@ -2,299 +2,348 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Painel Administrativo — Reporting Bot</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<title>Painel Administrador</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#080c1a;--card:#0e142a;--muted:#9aa3c7;--ink:#eef1ff;--line:#1d2646;--brand:#6366f1;--brand2:#8b5cf6;--ok:#22c55e;--warn:#f59e0b;--err:#ef4444;--pad:16px;--rad:16px}
-*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#ffffff;--muted:#f4f6f8;--text:#0f172a;--sub:#475569;--line:#e5e7eb;--brand:#0ea5e9;--brand-2:#0284c7;--ok:#10b981;--warn:#f59e0b;--err:#ef4444;--card:#ffffff;--shadow:0 2px 10px rgba(0,0,0,.06);--radius:12px}
+*{box-sizing:border-box}
 html,body{height:100%}
-body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(1000px 620px at -15% -10%,#3b82f626,transparent),radial-gradient(920px 520px at 115% 30%,#a855f725,transparent),linear-gradient(180deg,#070b17,#0a1022);color:var(--ink)}
-a{color:inherit;text-decoration:none}
-.container{max-width:1320px;margin:0 auto;padding:clamp(12px,2vw,24px)}
-.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.brand{display:flex;align-items:center;gap:12px}
-.brand-badge{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,var(--brand),var(--brand2));box-shadow:0 22px 48px -18px rgba(99,102,241,.55)}
-.brand-badge i{color:#fff}
-.brand-title{font-weight:900;letter-spacing:.2px;font-size:clamp(1rem,2vw,1.25rem)}
-.actions{display:flex;align-items:center;gap:10px}
-.btn{appearance:none;border:1px solid var(--line);background:rgba(255,255,255,.02);color:var(--ink);font-weight:800;border-radius:12px;padding:10px 14px;cursor:pointer;transition:.15s;display:inline-flex;gap:8px;align-items:center}
-.btn:hover{filter:brightness(1.05)}
-.btn:focus{outline:2px solid rgba(99,102,241,.5);outline-offset:2px}
-.btn-primary{border-color:transparent;background:linear-gradient(90deg,var(--brand),var(--brand2));box-shadow:0 14px 36px -18px rgba(99,102,241,.6)}
-.btn-danger{border-color:rgba(239,68,68,.35);background:linear-gradient(90deg,#ef4444,#f97316)}
-.nav{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px}
-.tab{border:1px solid var(--line);background:rgba(255,255,255,.02);padding:10px 12px;border-radius:12px;font-weight:900;cursor:pointer}
-.tab.active{background:linear-gradient(90deg,rgba(99,102,241,.25),rgba(139,92,246,.25));border-color:transparent}
-.grid{display:grid;gap:14px}
-.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-@media(max-width:1100px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:620px){.cards{grid-template-columns:1fr}}
-.card{background:linear-gradient(180deg,rgba(17,24,39,.4),rgba(2,6,23,.35));border:1px solid var(--line);border-radius:var(--rad);padding:var(--pad)}
-.card h3{font-size:1rem;margin-bottom:10px;font-weight:900}
-.kpi{display:flex;align-items:center;justify-content:space-between;min-height:92px}
-.kpi .meta{color:var(--muted);font-size:.9rem}
-.kpi .val{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:900;margin-top:2px}
-.icon-grad{background:linear-gradient(90deg,var(--brand),var(--brand2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-size:clamp(1.2rem,3vw,1.6rem)}
-.split{display:grid;grid-template-columns:2fr 1fr;gap:14px}
-@media(max-width:1000px){.split{grid-template-columns:1fr}}
-.panel{display:grid;gap:14px}
-.filters{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px}
-@media(max-width:1100px){.filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.input,select{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--ink);font-weight:700}
-.input:focus,select:focus{outline:2px solid rgba(99,102,241,.4);outline-offset:2px}
-.table{display:grid;gap:10px}
-.thead{color:var(--muted);font-size:.85rem}
-.tr{display:grid;grid-template-columns:26px 170px 170px 140px 120px 140px 160px 1fr 230px;gap:8px;align-items:center}
-@media(max-width:1280px){.tr{grid-template-columns:26px 150px 150px 120px 110px 120px 140px 1fr 200px}}
-@media(max-width:980px){.tr{grid-template-columns:26px 150px 120px 110px 100px 110px 120px 1fr 160px}}
-.row{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:10px}
-.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-weight:900;font-size:.8rem}
-.b-ok{background:rgba(34,197,94,.18)}
-.b-warn{background:rgba(245,158,11,.2)}
-.b-err{background:rgba(239,68,68,.2)}
-.b-info{background:rgba(99,102,241,.25)}
-.pager{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:12px}
-.controls{display:flex;gap:8px;flex-wrap:wrap}
-.table-actions{display:flex;gap:8px;flex-wrap:wrap}
-.toast{position:fixed;left:50%;top:18px;transform:translateX(-50%) translateY(-18px);opacity:0;background:rgba(10,16,32,.98);color:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 16px;z-index:1000;transition:.25s;font-weight:800}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(2,6,23,.6);z-index:1100}
-.modal.show{display:grid}
-.modal-card{background:linear-gradient(180deg,rgba(17,24,39,.95),rgba(2,6,23,.95));border:1px solid var(--line);border-radius:16px;padding:18px;max-width:460px;width:92%}
-.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:12px}
-.segment{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.switch{position:relative;display:inline-block;width:52px;height:28px}
-.switch input{opacity:0;width:0;height:0}
-.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#334;transition:.2s;border-radius:999px;border:1px solid var(--line)}
-.slider:before{position:absolute;content:"";height:22px;width:22px;left:2px;bottom:2px;background:white;transition:.2s;border-radius:50%}
-.switch input:checked + .slider{background:linear-gradient(90deg,var(--brand),var(--brand2))}
-.switch input:checked + .slider:before{transform:translateX(24px)}
-.plan-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-@media(max-width:980px){.plan-grid{grid-template-columns:1fr}}
-.plan-card{display:grid;gap:10px}
-.line{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:10px 0}
-.small{font-size:.9rem;color:var(--muted)}
-.skeleton{position:relative;overflow:hidden;background:rgba(255,255,255,.04)}
-.skeleton:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);animation:shimmer 1.2s infinite}
-@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
-@media(max-width:860px){
-.thead{display:none}
-.tr{display:none}
-.cards-list{display:grid;gap:10px}
-.card-row{border:1px solid var(--line);border-radius:12px;padding:12px;background:rgba(255,255,255,.03);display:grid;gap:8px}
-.card-row .line-kv{display:flex;align-items:center;justify-content:space-between}
-.card-row .k{color:var(--muted);font-weight:800}
-.card-row .v{font-weight:900}
-.card-row .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 "Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;overflow-x:hidden;touch-action:manipulation}
+.container{display:grid;grid-template-rows:auto 1fr auto;min-height:100dvh}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:16px;padding:12px 20px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.9);backdrop-filter:saturate(180%) blur(8px)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;letter-spacing:.2px}
+.top-actions{margin-left:auto;display:flex;align-items:center;gap:12px}
+.user-pill{padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--sub)}
+.btn{display:inline-grid;place-items:center;gap:8px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--text);cursor:pointer;transition:.15s;user-select:none;min-width:40px}
+.btn:hover{box-shadow:var(--shadow);transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn.primary{border-color:transparent;background:var(--brand);color:#fff}
+.btn.primary:hover{background:var(--brand-2)}
+.btn.danger{border-color:transparent;background:var(--err);color:#fff}
+.btn.ghost{background:transparent}
+.tabs{display:flex;gap:6px;padding:12px 20px;border-bottom:1px solid var(--line);overflow:auto;scrollbar-width:none;-ms-overflow-style:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:10px 12px;border-radius:10px;cursor:pointer;color:var(--sub);white-space:nowrap}
+.tab.active{background:var(--muted);color:var(--text);font-weight:600}
+.content{padding:clamp(12px,2vw,24px);max-width:1200px;margin:0 auto;width:100%}
+.grid{display:grid;gap:16px}
+.metrics{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+.kpi{display:flex;flex-direction:column;gap:8px}
+.kpi .label{color:var(--sub);font-size:12px}
+.kpi .value{font-size:22px;font-weight:700}
+.kpi .sub{color:var(--sub);font-size:12px}
+.section{display:flex;align-items:center;justify-content:space-between;margin:8px 0 16px}
+.section h2{margin:0;font-size:16px}
+.filters{display:flex;flex-wrap:wrap;gap:10px}
+.input,select{height:38px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--text);min-width:0}
+.input::placeholder{color:#9aa3af}
+.input:focus,select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(14,165,233,.15)}
+.switch{position:relative;width:42px;height:24px;border-radius:999px;background:#e5e7eb;cursor:pointer;display:inline-block;vertical-align:middle}
+.switch[data-on="true"]{background:var(--brand)}
+.switch i{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+.switch[data-on="true"] i{left:21px}
+.table-wrap{width:100%;overflow:visible}
+.table{width:100%;border-collapse:separate;border-spacing:0 10px}
+.table thead th{font-size:12px;color:var(--sub);text-align:left;padding:0 12px}
+.row{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+.row td{padding:12px;vertical-align:top;word-break:break-word;overflow-wrap:anywhere}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;border:1px solid}
+.badge.ok{color:var(--ok);border-color:var(--ok);background:rgba(16,185,129,.06)}
+.badge.err{color:var(--err);border-color:var(--err);background:rgba(239,68,68,.06)}
+.badge.neutral{color:var(--sub);border-color:var(--line);background:#fff}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.pagination{display:flex;align-items:center;gap:8px;justify-content:flex-end;padding-top:8px}
+.modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.4);z-index:50;padding:20px}
+.modal.open{display:grid}
+.modal .box{width:min(520px,92vw);background:#fff;border-radius:14px;border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.15);padding:16px}
+.modal .box h3{margin:0 0 8px 0;font-size:16px}
+.modal .body{display:grid;gap:10px;margin:10px 0}
+.modal .foot{display:flex;gap:10px;justify-content:flex-end}
+.inline{display:flex;align-items:center;gap:8px}
+.help{font-size:12px;color:var(--sub)}
+.toast-area{position:fixed;right:16px;bottom:16px;display:grid;gap:8px;z-index:60}
+.toast{background:#111827;color:#fff;padding:10px 12px;border-radius:10px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;opacity:.98}
+hr.sep{border:none;height:1px;background:var(--line);margin:6px 0 12px}
+.small{font-size:12px;color:var(--sub)}
+table.min{width:100%;border-collapse:collapse}
+table.min td{padding:6px 0}
+.field{display:grid;gap:6px}
+.currency{position:relative}
+.currency input{padding-left:34px}
+.currency span{position:absolute;left:10px;top:9px;color:var(--sub);font-size:12px}
+.tag{display:inline-block;background:var(--muted);border:1px solid var(--line);padding:3px 8px;border-radius:999px;font-size:12px;color:var(--sub)}
+.footer{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 16px;border-top:1px solid var(--line);background:#fff}
+.footer .mark{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff}
+.footer .copy{font-size:13px;color:var(--sub)}
+@media (max-width:1100px){.metrics{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:900px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){
+body{font-size:13px}
+.metrics{grid-template-columns:1fr}
+.filters{flex-direction:column;align-items:stretch}
+.top-actions{display:none}
+.row td{padding:10px}
+.kpi .value{font-size:20px}
+.table thead{display:none}
+.table{border-spacing:0 8px}
+.row{display:block}
+.row td{display:grid;grid-template-columns:110px 1fr;gap:6px;align-items:center}
+.row td::before{content:attr(data-label);font-size:12px;color:var(--sub)}
 }
 </style>
 </head>
 <body>
 <div class="container">
 <div class="topbar">
-<div class="brand"><div class="brand-badge"><i class="fa-solid fa-gauge-high"></i></div><div class="brand-title">Painel Administrativo</div></div>
-<div class="actions"><a class="btn" href="/"><i class="fa-solid fa-grid-2"></i> Dashboard</a><a class="btn btn-danger" href="/logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</a></div>
+<div class="brand">Admin</div>
+<div class="tabs" id="tabs">
+<div class="tab active" data-tab="overview">Visão Geral</div>
+<div class="tab" data-tab="transactions">Transações</div>
+<div class="tab" data-tab="users">Usuários</div>
+<div class="tab" data-tab="plans">Planos</div>
 </div>
-<div class="nav">
-<button class="tab active" data-tab="dashboard">Visão geral</button>
-<button class="tab" data-tab="transactions">Transações</button>
-<button class="tab" data-tab="users">Usuários</button>
-<button class="tab" data-tab="plans">Planos</button>
+<div class="top-actions">
+<div class="user-pill">Olá, {{ username }}</div>
+<a class="btn" href="/logout">Sair</a>
 </div>
-<div class="grid panel" id="view-dashboard">
-<div class="cards">
-<div class="card kpi"><div><div class="meta">Lucro de hoje</div><div class="val" id="rev-today">R$ 0,00</div></div><i class="fa-solid fa-sack-dollar icon-grad"></i></div>
-<div class="card kpi"><div><div class="meta">Últimos 7 dias</div><div class="val" id="rev-7d">R$ 0,00</div></div><i class="fa-solid fa-chart-line icon-grad"></i></div>
-<div class="card kpi"><div><div class="meta">Últimos 30 dias</div><div class="val" id="rev-30d">R$ 0,00</div></div><i class="fa-solid fa-chart-area icon-grad"></i></div>
-<div class="card kpi"><div><div class="meta">Pedidos hoje</div><div class="val" id="cnt-today">0</div></div><i class="fa-solid fa-receipt icon-grad"></i></div>
 </div>
-<div class="split">
-<div class="card" style="min-height:320px;display:grid;grid-template-rows:auto 1fr">
-<h3>Status das transações</h3>
-<canvas id="chart-status"></canvas>
+<div class="content">
+<div id="overview" class="grid">
+<div class="section"><h2>Métricas</h2><div class="inline"><button class="btn" id="refreshOverview">Atualizar</button><label class="inline small">Auto</label><div class="switch" id="autoOverview" data-on="false"><i></i></div></div></div>
+<div class="grid metrics">
+<div class="card kpi"><div class="label">Receita Hoje</div><div class="value" id="revToday">R$ 0,00</div><div class="sub"><span id="countToday">0</span> ativações</div></div>
+<div class="card kpi"><div class="label">Receita 7 dias</div><div class="value" id="rev7d">R$ 0,00</div><div class="sub"><span id="count7d">0</span> ativações</div></div>
+<div class="card kpi"><div class="label">Receita 30 dias</div><div class="value" id="rev30d">R$ 0,00</div><div class="sub"><span id="count30d">0</span> ativações</div></div>
+<div class="card kpi"><div class="label">Transações</div><div class="value"><span class="tag" id="txPending">0 pendentes</span> <span class="tag" id="txPaid">0 pagas</span> <span class="tag" id="txFailed">0 falhas</span></div></div>
 </div>
+</div>
+<div id="transactions" class="grid" style="display:none">
+<div class="section"><h2>Transações</h2><div class="inline"><button class="btn" id="refreshTx">Atualizar</button><label class="inline small">Auto</label><div class="switch" id="autoTx" data-on="false"><i></i></div></div></div>
 <div class="card">
-<h3>Controles</h3>
-<div class="segment" style="margin-bottom:8px"><button class="btn" id="refresh-metrics"><i class="fa-solid fa-rotate"></i> Atualizar</button><label class="segment"><span class="small">Auto</span><label class="switch"><input type="checkbox" id="auto-metrics"><span class="slider"></span></label></label></div>
-<div class="line"></div>
-<div class="segment" style="justify-content:space-between">
-<div><div class="small">Transações pagas</div><div class="val" id="stat-paid" style="font-size:1.2rem">0</div></div>
-<div><div class="small">Pendentes</div><div class="val" id="stat-pending" style="font-size:1.2rem">0</div></div>
-<div><div class="small">Falhas</div><div class="val" id="stat-failed" style="font-size:1.2rem">0</div></div>
-</div>
-</div>
-</div>
-</div>
-<div class="grid panel" id="view-transactions" style="display:none">
-<div class="card">
-<h3>Filtros</h3>
-<div class="filters" style="margin-top:8px">
-<input class="input" id="tx-q" placeholder="Buscar por hash ou usuário">
-<select id="tx-status">
-<option value="">Status</option>
-<option value="waiting_payment">waiting_payment</option>
-<option value="paid">paid</option>
-<option value="approved">approved</option>
-<option value="confirmed">confirmed</option>
-<option value="success">success</option>
-<option value="expired">expired</option>
-<option value="canceled">canceled</option>
-<option value="failed">failed</option>
+<div class="filters">
+<input class="input" id="txQ" placeholder="Buscar por hash ou usuário">
+<select id="txStatus">
+<option value="">Status: Todos</option>
+<option value="paid">Pagas</option>
+<option value="failed">Falhas</option>
+<option value="pending">Pendentes</option>
 </select>
-<select id="tx-plan">
-<option value="">Plano</option>
+<select id="txPlan">
+<option value="">Plano: Todos</option>
 <option>Essencial</option>
 <option>Profissional</option>
 <option>Vitalício</option>
 </select>
-<input class="input" type="datetime-local" id="tx-from">
-<input class="input" type="datetime-local" id="tx-to">
-<select id="tx-pagesize">
-<option value="10">10</option>
-<option value="20" selected>20</option>
-<option value="50">50</option>
-<option value="100">100</option>
+<input class="input" id="txFrom" type="datetime-local" placeholder="De">
+<input class="input" id="txTo" type="datetime-local" placeholder="Até">
+<select id="txSize">
+<option value="10">10 por página</option>
+<option value="20" selected>20 por página</option>
+<option value="50">50 por página</option>
+<option value="100">100 por página</option>
 </select>
-<button class="btn btn-primary" id="tx-apply"><i class="fa-solid fa-filter"></i> Aplicar</button>
-<button class="btn" id="tx-export"><i class="fa-solid fa-file-arrow-down"></i> CSV</button>
+<button class="btn primary" id="applyTx">Aplicar</button>
+<button class="btn" id="resetTx">Limpar</button>
+</div>
+<hr class="sep">
+<div class="table-wrap">
+<table class="table">
+<thead><tr><th>Data</th><th>Usuário</th><th>Plano</th><th>Valor</th><th>Status</th><th>Ativada</th><th>Falha</th><th>Hash</th><th>Ações</th></tr></thead>
+<tbody id="txBody"></tbody>
+</table>
+</div>
+<div class="pagination">
+<button class="btn" id="txPrev">Anterior</button>
+<div class="small" id="txPageInfo"></div>
+<button class="btn" id="txNext">Próxima</button>
 </div>
 </div>
+</div>
+<div id="users" class="grid" style="display:none">
+<div class="section"><h2>Usuários</h2><div class="inline"><button class="btn" id="refreshUsers">Atualizar</button></div></div>
 <div class="card">
-<div class="thead tr" style="padding:0 8px 6px 8px"><div></div><div>Hash</div><div>Usuário</div><div>Plano</div><div>Valor</div><div>Status</div><div>Criada</div><div>Atualizada</div><div>Ações</div></div>
-<div id="tx-rows" class="table"></div>
-<div id="tx-cards" class="cards-list" style="display:none"></div>
-<div class="pager">
-<div class="controls">
-<label class="segment"><input type="checkbox" id="tx-select-all"> Selecionar tudo</label>
-<select id="tx-bulk-action">
-<option value="">Ação em lote</option>
-<option value="mark-paid">Marcar como pago</option>
-<option value="mark-waiting">Marcar como waiting_payment</option>
-<option value="mark-failed">Marcar como failed</option>
-<option value="delete">Excluir</option>
+<div class="filters">
+<input class="input" id="uQ" placeholder="Buscar por nome ou e-mail">
+<select id="uAdmin">
+<option value="">Admin: Todos</option>
+<option value="yes">Somente admin</option>
+<option value="no">Somente não admin</option>
 </select>
-<button class="btn" id="tx-bulk-apply"><i class="fa-solid fa-bolt"></i> Executar</button>
-</div>
-<div class="controls">
-<button class="btn" id="tx-prev"><i class="fa-solid fa-angle-left"></i></button>
-<div class="badge b-info" id="tx-page">1/1</div>
-<button class="btn" id="tx-next"><i class="fa-solid fa-angle-right"></i></button>
-</div>
-</div>
-</div>
-</div>
-<div class="grid panel" id="view-users" style="display:none">
-<div class="card">
-<h3>Filtros</h3>
-<div class="filters" style="margin-top:8px">
-<input class="input" id="usr-q" placeholder="Buscar por usuário ou e-mail">
-<select id="usr-admin">
-<option value="">Admin</option>
-<option value="yes">yes</option>
-<option value="no">no</option>
-</select>
-<select id="usr-disabled">
-<option value="">Status</option>
+<select id="uDisabled">
+<option value="">Status: Todos</option>
 <option value="false">Ativos</option>
-<option value="true">Desativados</option>
+<option value="true">Desabilitados</option>
 </select>
-<select id="usr-pagesize">
-<option value="10">10</option>
-<option value="20" selected>20</option>
-<option value="50">50</option>
-<option value="100">100</option>
+<select id="uSize">
+<option value="10">10 por página</option>
+<option value="20" selected>20 por página</option>
+<option value="50">50 por página</option>
+<option value="100">100 por página</option>
 </select>
-<button class="btn btn-primary" id="usr-apply"><i class="fa-solid fa-filter"></i> Aplicar</button>
-<button class="btn" id="usr-export"><i class="fa-solid fa-file-arrow-down"></i> CSV</button>
+<button class="btn primary" id="applyUsers">Aplicar</button>
+<button class="btn" id="resetUsers">Limpar</button>
+</div>
+<hr class="sep">
+<div class="table-wrap">
+<table class="table">
+<thead><tr><th>Usuário</th><th>Email</th><th>Plano</th><th>Início</th><th>Expira</th><th>Admin</th><th>Desabilitado</th><th>Criado</th><th>Login</th><th>Ações</th></tr></thead>
+<tbody id="uBody"></tbody>
+</table>
+</div>
+<div class="pagination">
+<button class="btn" id="uPrev">Anterior</button>
+<div class="small" id="uPageInfo"></div>
+<button class="btn" id="uNext">Próxima</button>
 </div>
 </div>
+</div>
+<div id="plans" class="grid" style="display:none">
+<div class="section"><h2>Planos</h2><div class="inline"><button class="btn" id="refreshPlans">Atualizar</button></div></div>
 <div class="card">
-<div class="thead tr" style="grid-template-columns:170px 220px 120px 160px 160px 110px 110px 220px;gap:8px;padding:0 8px 6px 8px">
-<div>Usuário</div><div>E-mail</div><div>Plano</div><div>Início</div><div>Expira</div><div>Admin</div><div>Status</div><div>Ações</div>
-</div>
-<div id="usr-rows" class="table"></div>
-<div id="usr-cards" class="cards-list" style="display:none"></div>
-<div class="pager">
-<div></div>
-<div class="controls">
-<button class="btn" id="usr-prev"><i class="fa-solid fa-angle-left"></i></button>
-<div class="badge b-info" id="usr-page">1/1</div>
-<button class="btn" id="usr-next"><i class="fa-solid fa-angle-right"></i></button>
+<div id="plansForm" class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr))"></div>
+<hr class="sep">
+<div class="inline" style="justify-content:flex-end"><button class="btn primary" id="savePlans" disabled>Salvar alterações</button></div>
 </div>
 </div>
 </div>
+<footer class="footer">
+<div class="mark">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.82L18.18 22 12 18.77 5.82 22 7 14.09l-5-4.82 6.91-1.01L12 2z" fill="currentColor"/></svg>
 </div>
-<div class="grid panel" id="view-plans" style="display:none">
-<div class="card">
-<h3>Gerenciar planos</h3>
-<div class="plan-grid" id="plans-grid"></div>
-<div class="segment" style="justify-content:flex-end;margin-top:10px"><button class="btn btn-primary" id="plans-save"><i class="fa-solid fa-floppy-disk"></i> Salvar alterações</button></div>
+<div class="copy">© 2025 Seyzalel — Todos os direitos reservados</div>
+</footer>
+</div>
+<div class="modal" id="modalTx">
+<div class="box">
+<h3>Editar Transação</h3>
+<div class="body">
+<div class="small" id="modalTxHash"></div>
+<div class="field">
+<label class="small">Status do pagamento</label>
+<select id="modalTxStatus">
+<option value="">Selecionar</option>
+<option value="paid">paid</option>
+<option value="approved">approved</option>
+<option value="completed">completed</option>
+<option value="confirmed">confirmed</option>
+<option value="paid_out">paid_out</option>
+<option value="finished">finished</option>
+<option value="success">success</option>
+<option value="settled">settled</option>
+<option value="captured">captured</option>
+<option value="accredited">accredited</option>
+<option value="credited">credited</option>
+<option value="confirmed_payment">confirmed_payment</option>
+<option value="canceled">canceled</option>
+<option value="cancelled">cancelled</option>
+<option value="refunded">refunded</option>
+<option value="chargeback">chargeback</option>
+<option value="reversed">reversed</option>
+<option value="voided">voided</option>
+<option value="failed">failed</option>
+<option value="expired">expired</option>
+<option value="denied">denied</option>
+</select>
+</div>
+<div class="field">
+<label class="small">Ou digite um status</label>
+<input class="input" id="modalTxCustom" placeholder="ex.: paid">
+</div>
+</div>
+<div class="foot">
+<button class="btn" id="modalTxClose">Cancelar</button>
+<button class="btn primary" id="modalTxSave">Salvar</button>
 </div>
 </div>
 </div>
-<div class="toast" id="toast"></div>
-<div class="modal" id="modal">
-<div class="modal-card">
-<div id="modal-text" style="font-weight:900;margin-bottom:8px">Confirmar ação?</div>
-<div class="modal-actions"><button class="btn" id="modal-cancel">Cancelar</button><button class="btn btn-danger" id="modal-ok">Confirmar</button></div>
+<div class="modal" id="modalConfirm">
+<div class="box">
+<h3 id="confirmTitle"></h3>
+<div class="body"><div id="confirmMsg"></div></div>
+<div class="foot">
+<button class="btn" id="confirmCancel">Cancelar</button>
+<button class="btn danger" id="confirmOk">Confirmar</button>
 </div>
 </div>
+</div>
+<div class="toast-area" id="toasts"></div>
 <script>
-const fmtBRL=v=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format((v||0)/100);
-const fmtDate=s=>s?new Date(s).toLocaleString('pt-BR'):'—';
-const toastEl=document.getElementById('toast');
-function toast(t){toastEl.textContent=t;toastEl.classList.add('show');setTimeout(()=>toastEl.classList.remove('show'),1600)}
-const modal=document.getElementById('modal');const modalText=document.getElementById('modal-text');const modalOk=document.getElementById('modal-ok');const modalCancel=document.getElementById('modal-cancel');
-function confirmDialog(txt){return new Promise(res=>{modalText.textContent=txt;modal.classList.add('show');const yes=()=>{cleanup();res(true)};const no=()=>{cleanup();res(false)};function cleanup(){modal.classList.remove('show');modalOk.removeEventListener('click',yes);modalCancel.removeEventListener('click',no)};modalOk.addEventListener('click',yes);modalCancel.addEventListener('click',no)})}
-function qs(s){return document.querySelector(s)}function qsa(s){return Array.from(document.querySelectorAll(s))}
-const tabs=qsa('.tab');const panels=['dashboard','transactions','users','plans'];tabs.forEach(b=>b.addEventListener('click',()=>{tabs.forEach(x=>x.classList.remove('active'));b.classList.add('active');panels.forEach(v=>qs('#view-'+v).style.display='none');qs('#view-'+b.dataset.tab).style.display='grid';localStorage.setItem('admin_active_tab',b.dataset.tab)}));const savedTab=localStorage.getItem('admin_active_tab');if(savedTab&&panels.includes(savedTab)){qsa('.tab').forEach(x=>x.classList.remove('active'));qs('.tab[data-tab="'+savedTab+'"]').classList.add('active');panels.forEach(v=>qs('#view-'+v).style.display='none');qs('#view-'+savedTab).style.display='grid'}
-let chartStatus=null;
-async function loadMetrics(){const r=await fetch('/admin/api/metrics');const j=await r.json();if(!j.ok){toast('Falha ao carregar métricas');return}qs('#rev-today').textContent=fmtBRL(j.revenue_today_cents);qs('#rev-7d').textContent=fmtBRL(j.revenue_7d_cents);qs('#rev-30d').textContent=fmtBRL(j.revenue_30d_cents);qs('#cnt-today').textContent=j.count_today;qs('#stat-paid').textContent=j.tx_counts.paid;qs('#stat-pending').textContent=j.tx_counts.pending;qs('#stat-failed').textContent=j.tx_counts.failed;const ctx=qs('#chart-status');const data={labels:['Pagas','Pendentes','Falhas'],datasets:[{data:[j.tx_counts.paid,j.tx_counts.pending,j.tx_counts.failed]}]};if(chartStatus){chartStatus.data=data;chartStatus.update()}else{chartStatus=new Chart(ctx,{type:'doughnut',data,options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#dbe2ff',font:{weight:800}}}},animation:false}})}}
-qs('#refresh-metrics').addEventListener('click',loadMetrics);
-const autoMetrics=qs('#auto-metrics');let autoTimer=null;if(localStorage.getItem('admin_auto_metrics')==='1'){autoMetrics.checked=true;autoTimer=setInterval(loadMetrics,5000)}autoMetrics.addEventListener('change',()=>{if(autoMetrics.checked){localStorage.setItem('admin_auto_metrics','1');autoTimer=setInterval(loadMetrics,5000)}else{localStorage.removeItem('admin_auto_metrics');clearInterval(autoTimer)}});
-function isMobile(){return window.matchMedia('(max-width: 860px)').matches}
-let txPage=1,txTotal=1;
-function txSkeleton(){const rows=qs('#tx-rows');rows.innerHTML='';for(let i=0;i<5;i++){const el=document.createElement('div');el.className='tr row skeleton';el.style.height='48px';rows.appendChild(el)}const cards=qs('#tx-cards');cards.innerHTML='';for(let i=0;i<4;i++){const c=document.createElement('div');c.className='card-row skeleton';c.style.height='96px';cards.appendChild(c)}}
-function badgeStatus(s){const st=(s||'').toLowerCase();const ok=['paid','success','approved','confirmed','completed','paid_out','finished','settled','captured','accredited','credited','confirmed_payment'];const bad=['expired','canceled','cancelled','refunded','chargeback','reversed','voided','failed','denied'];if(ok.includes(st))return `<span class="badge b-ok">${st}</span>`;if(bad.includes(st))return `<span class="badge b-err">${st}</span>`;return `<span class="badge b-warn">${st||'waiting'}</span>`}
-async function loadTransactions(){txSkeleton();const q=encodeURIComponent(qs('#tx-q').value.trim());const st=encodeURIComponent(qs('#tx-status').value);const plan=encodeURIComponent(qs('#tx-plan').value);const from=qs('#tx-from').value?new Date(qs('#tx-from').value).toISOString():'';const to=qs('#tx-to').value?new Date(qs('#tx-to').value).toISOString():'';const size=parseInt(qs('#tx-pagesize').value,10)||20;const params=new URLSearchParams();params.set('page',String(txPage));params.set('page_size',String(size));if(q)params.set('q',q);if(st)params.set('status',st);if(plan)params.set('plan',plan);if(from)params.set('from',from);if(to)params.set('to',to);const r=await fetch('/admin/api/transactions?'+params.toString());const j=await r.json();if(!j.ok){toast('Falha ao carregar transações');return}const rows=qs('#tx-rows');const cards=qs('#tx-cards');rows.innerHTML='';cards.innerHTML='';const mobile=isMobile();qs('.thead').style.display=mobile?'none':'grid';rows.style.display=mobile?'none':'grid';cards.style.display=mobile?'grid':'none';j.items.forEach(it=>{if(!mobile){const el=document.createElement('div');el.className='tr row';el.innerHTML=`<input type="checkbox" class="tx-check" data-id="${it.id}"><div>${it.hash||'—'}</div><div>${it.username||'—'}</div><div>${it.plan||'—'}</div><div>${fmtBRL(it.amount_cents)}</div><div>${badgeStatus(it.payment_status)}</div><div>${fmtDate(it.created_at)}</div><div>${fmtDate(it.updated_at)}</div><div class="table-actions"><button class="btn" data-act="paid" data-id="${it.id}"><i class="fa-solid fa-check"></i></button><button class="btn" data-act="waiting_payment" data-id="${it.id}"><i class="fa-solid fa-hourglass-half"></i></button><button class="btn" data-act="failed" data-id="${it.id}"><i class="fa-solid fa-xmark"></i></button><button class="btn btn-danger" data-act="delete" data-id="${it.id}"><i class="fa-solid fa-trash"></i></button></div>`;rows.appendChild(el)}else{const el=document.createElement('div');el.className='card-row';el.innerHTML=`<div class="line-kv"><div class="k">Hash</div><div class="v">${it.hash||'—'}</div></div><div class="line-kv"><div class="k">Usuário</div><div class="v">${it.username||'—'}</div></div><div class="line-kv"><div class="k">Plano</div><div class="v">${it.plan||'—'}</div></div><div class="line-kv"><div class="k">Valor</div><div class="v">${fmtBRL(it.amount_cents)}</div></div><div class="line-kv"><div class="k">Status</div><div class="v">${badgeStatus(it.payment_status)}</div></div><div class="line-kv"><div class="k">Criada</div><div class="v">${fmtDate(it.created_at)}</div></div><div class="line-kv"><div class="k">Atualizada</div><div class="v">${fmtDate(it.updated_at)}</div></div><div class="actions"><button class="btn" data-act="paid" data-id="${it.id}"><i class="fa-solid fa-check"></i></button><button class="btn" data-act="waiting_payment" data-id="${it.id}"><i class="fa-solid fa-hourglass-half"></i></button><button class="btn" data-act="failed" data-id="${it.id}"><i class="fa-solid fa-xmark"></i></button><button class="btn btn-danger" data-act="delete" data-id="${it.id}"><i class="fa-solid fa-trash"></i></button></div>`;cards.appendChild(el)}});txTotal=Math.max(1,Math.ceil(j.total/(parseInt(qs('#tx-pagesize').value,10)||20)));qs('#tx-page').textContent=txPage+'/'+txTotal;qs('#tx-select-all').checked=false}
-qs('#tx-apply').addEventListener('click',()=>{txPage=1;loadTransactions()});
-['tx-q','tx-from','tx-to'].forEach(id=>qs('#'+id).addEventListener('keydown',e=>{if(e.key==='Enter'){txPage=1;loadTransactions()}}));
-qs('#tx-prev').addEventListener('click',()=>{if(txPage>1){txPage--;loadTransactions()}});
-qs('#tx-next').addEventListener('click',()=>{if(txPage<txTotal){txPage++;loadTransactions()}});
-function txActTarget(e){const b=e.target.closest('button');if(!b)return null;const id=b.dataset.id;const act=b.dataset.act;return{id,act}}
-qs('#tx-rows').addEventListener('click',async e=>{const t=txActTarget(e);if(!t)return;await handleTxAction(t.id,t.act)});
-qs('#tx-cards').addEventListener('click',async e=>{const t=txActTarget(e);if(!t)return;await handleTxAction(t.id,t.act)});
-async function handleTxAction(id,act){if(act==='delete'){if(!(await confirmDialog('Excluir esta transação?')))return;const r=await fetch('/admin/api/transactions/'+id,{method:'DELETE'});const j=await r.json();if(j.ok){toast('Excluída');loadTransactions();loadMetrics()}else toast('Falha ao excluir')}else{const body={payment_status:act};const r=await fetch('/admin/api/transactions/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const j=await r.json();if(j.ok){toast('Atualizada');loadTransactions();loadMetrics()}else toast('Falha ao atualizar')}}
-qs('#tx-select-all').addEventListener('change',e=>{qsa('.tx-check').forEach(c=>c.checked=e.target.checked)});
-qs('#tx-bulk-apply').addEventListener('click',async()=>{const ids=qsa('.tx-check:checked').map(x=>x.dataset.id);const act=qs('#tx-bulk-action').value;if(!ids.length){toast('Nenhuma seleção');return}if(!act){toast('Escolha uma ação');return}if(!(await confirmDialog('Aplicar em lote?')))return;for(const id of ids){if(act==='delete'){await fetch('/admin/api/transactions/'+id,{method:'DELETE'})}else{await fetch('/admin/api/transactions/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({payment_status:act.replace('mark-','')})})}}toast('Concluído');loadTransactions();loadMetrics()});
-qs('#tx-export').addEventListener('click',async()=>{const size=parseInt(qs('#tx-pagesize').value,10)||20;let page=1;let csv='hash,usuario,plano,valor_centavos,status,criada,atualizada\n';for(;;){const params=new URLSearchParams();params.set('page',String(page));params.set('page_size',String(size));const r=await fetch('/admin/api/transactions?'+params.toString());const j=await r.json();if(!j.ok)break;j.items.forEach(it=>{csv+=`${it.hash||''},${it.username||''},${it.plan||''},${it.amount_cents||0},${(it.payment_status||'').replace(/,/g,';')},${it.created_at||''},${it.updated_at||''}\n`});if(page>=Math.max(1,Math.ceil(j.total/size)))break;page++}const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='transacoes.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url)});
-let usrPage=1,usrTotal=1;
-function usrSkeleton(){const rows=qs('#usr-rows');rows.innerHTML='';for(let i=0;i<5;i++){const el=document.createElement('div');el.className='tr row skeleton';el.style.height='52px';rows.appendChild(el)}const cards=qs('#usr-cards');cards.innerHTML='';for(let i=0;i<4;i++){const c=document.createElement('div');c.className='card-row skeleton';c.style.height='120px';cards.appendChild(c)}}
-async function loadUsers(){usrSkeleton();const q=encodeURIComponent(qs('#usr-q').value.trim());const adm=qs('#usr-admin').value;const dis=qs('#usr-disabled').value;const size=parseInt(qs('#usr-pagesize').value,10)||20;const params=new URLSearchParams();params.set('page',String(usrPage));params.set('page_size',String(size));if(q)params.set('q',q);if(adm)params.set('admin',adm);if(dis)params.set('disabled',dis);const r=await fetch('/admin/api/users?'+params.toString());const j=await r.json();if(!j.ok){toast('Falha ao carregar usuários');return}const rows=qs('#usr-rows');const cards=qs('#usr-cards');rows.innerHTML='';cards.innerHTML='';const mobile=isMobile();rows.style.display=mobile?'none':'grid';cards.style.display=mobile?'grid':'none';if(!mobile){j.items.forEach(u=>{const el=document.createElement('div');el.className='tr row';el.style.gridTemplateColumns='170px 220px 120px 160px 160px 110px 110px 220px';el.innerHTML=`<div>${u.username||'—'}</div><div>${u.email||'—'}</div><div>${u.plans||'—'}</div><div>${fmtDate(u.plan_started_at)}</div><div>${fmtDate(u.plan_expires_at)}</div><div>${u.admin_permission==='yes'?'<span class="badge b-ok">yes</span>':'<span class="badge b-warn">no</span>'}</div><div>${u.disabled?'<span class="badge b-err">off</span>':'<span class="badge b-ok">on</span>'}</div><div class="table-actions"><button class="btn" data-act="admin-yes" data-id="${u.id}"><i class="fa-solid fa-user-shield"></i></button><button class="btn" data-act="admin-no" data-id="${u.id}"><i class="fa-solid fa-user-slash"></i></button><button class="btn" data-act="disable" data-id="${u.id}" data-val="${!u.disabled}">${u.disabled?'<i class="fa-solid fa-toggle-on"></i>':'<i class="fa-solid fa-toggle-off"></i>'}</button><button class="btn btn-danger" data-act="force-logout" data-id="${u.id}"><i class="fa-solid fa-arrow-right-from-bracket"></i></button></div>`;rows.appendChild(el)})}else{j.items.forEach(u=>{const el=document.createElement('div');el.className='card-row';el.innerHTML=`<div class="line-kv"><div class="k">Usuário</div><div class="v">${u.username||'—'}</div></div><div class="line-kv"><div class="k">E-mail</div><div class="v">${u.email||'—'}</div></div><div class="line-kv"><div class="k">Plano</div><div class="v">${u.plans||'—'}</div></div><div class="line-kv"><div class="k">Início</div><div class="v">${fmtDate(u.plan_started_at)}</div></div><div class="line-kv"><div class="k">Expira</div><div class="v">${fmtDate(u.plan_expires_at)}</div></div><div class="line-kv"><div class="k">Admin</div><div class="v">${u.admin_permission==='yes'?'<span class="badge b-ok">yes</span>':'<span class="badge b-warn">no</span>'}</div></div><div class="line-kv"><div class="k">Status</div><div class="v">${u.disabled?'<span class="badge b-err">off</span>':'<span class="badge b-ok">on</span>'}</div></div><div class="actions"><button class="btn" data-act="admin-yes" data-id="${u.id}"><i class="fa-solid fa-user-shield"></i></button><button class="btn" data-act="admin-no" data-id="${u.id}"><i class="fa-solid fa-user-slash"></i></button><button class="btn" data-act="disable" data-id="${u.id}" data-val="${!u.disabled}">${u.disabled?'<i class="fa-solid fa-toggle-on"></i>':'<i class="fa-solid fa-toggle-off"></i>'}</button><button class="btn btn-danger" data-act="force-logout" data-id="${u.id}"><i class="fa-solid fa-arrow-right-from-bracket"></i></button></div>`;cards.appendChild(el)})}
-usrTotal=Math.max(1,Math.ceil(j.total/(parseInt(qs('#usr-pagesize').value,10)||20)));qs('#usr-page').textContent=usrPage+'/'+usrTotal}
-qs('#usr-apply').addEventListener('click',()=>{usrPage=1;loadUsers()});
-qs('#usr-q').addEventListener('keydown',e=>{if(e.key==='Enter'){usrPage=1;loadUsers()}});
-qs('#usr-prev').addEventListener('click',()=>{if(usrPage>1){usrPage--;loadUsers()}});
-qs('#usr-next').addEventListener('click',()=>{if(usrPage<usrTotal){usrPage++;loadUsers()}});
-function usrActTarget(e){const b=e.target.closest('button');if(!b)return null;return{act:b.dataset.act,id:b.dataset.id,val:b.dataset.val==='true'}}
-qs('#usr-rows').addEventListener('click',async e=>{const t=usrActTarget(e);if(!t)return;await handleUserAction(t)});
-qs('#usr-cards').addEventListener('click',async e=>{const t=usrActTarget(e);if(!t)return;await handleUserAction(t)});
-async function handleUserAction(t){if(t.act==='admin-yes'){const r=await fetch('/admin/api/users/'+t.id+'/set_admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_permission:'yes'})});const j=await r.json();if(j.ok){toast('Administrador concedido');loadUsers()}else toast('Falha')}else if(t.act==='admin-no'){const r=await fetch('/admin/api/users/'+t.id+'/set_admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_permission:'no'})});const j=await r.json();if(j.ok){toast('Administrador removido');loadUsers()}else toast('Falha')}else if(t.act==='disable'){const r=await fetch('/admin/api/users/'+t.id+'/disable',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({disabled:t.val})});const j=await r.json();if(j.ok){toast(t.val?'Desativado':'Reativado');loadUsers()}else toast('Falha')}else if(t.act==='force-logout'){if(!(await confirmDialog('Forçar logout deste usuário?')))return;const r=await fetch('/admin/api/users/'+t.id+'/force_logout',{method:'POST'});const j=await r.json();if(j.ok){toast('Logout forçado');loadUsers()}else toast('Falha')}}
-qs('#usr-export').addEventListener('click',async()=>{const size=parseInt(qs('#usr-pagesize').value,10)||20;let page=1;let csv='usuario,email,plano,inicio,expira,admin,disabled,criado,ultimo_login\n';for(;;){const params=new URLSearchParams();params.set('page',String(page));params.set('page_size',String(size));const r=await fetch('/admin/api/users?'+params.toString());const j=await r.json();if(!j.ok)break;j.items.forEach(u=>{csv+=`${u.username||''},${u.email||''},${u.plans||''},${u.plan_started_at||''},${u.plan_expires_at||''},${u.admin_permission||''},${u.disabled?'true':'false'},${u.created_at||''},${u.last_login_at||''}\n`});if(page>=Math.max(1,Math.ceil(j.total/size)))break;page++}const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='usuarios.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url)});
-let plansCache={};
-function centsFromInput(v){const t=String(v).replace(/\./g,'').replace(',','.').replace(/[^\d.]/g,'');const n=parseFloat(t||'0');return Math.round(n*100)}
-function moneyMask(el){el.addEventListener('input',()=>{let v=el.value.replace(/[^\d]/g,'');if(v.length<3)v=v.padStart(3,'0');const int=v.slice(0,-2);const dec=v.slice(-2);el.value=new Intl.NumberFormat('pt-BR').format(parseInt(int,10))+','+dec})}
-async function loadPlans(){const r=await fetch('/admin/api/plans');const j=await r.json();if(!j.ok){toast('Falha ao carregar planos');return}plansCache=j.plans;const grid=qs('#plans-grid');grid.innerHTML='';Object.keys(plansCache).forEach(name=>{const p=plansCache[name];const el=document.createElement('div');el.className='card plan-card';el.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between"><div style="font-weight:900">${p.title||name}</div><span class="badge b-info">${name}</span></div><div class="small">Preço</div><input class="input money" id="money-${name}" value="${new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format((p.amount_cents||0)/100)}"><div class="small">Ativo</div><label class="switch"><input type="checkbox" id="active-${name}" ${p.active?'checked':''}><span class="slider"></span></label>`;grid.appendChild(el)});qsa('.money').forEach(moneyMask)}
-qs('#plans-save').addEventListener('click',async()=>{const payload={};Object.keys(plansCache).forEach(name=>{const priceEl=qs('#money-'+CSS.escape(name));const actEl=qs('#active-'+CSS.escape(name));payload[name]={amount_cents:centsFromInput(priceEl.value),active:!!actEl.checked}});const r=await fetch('/admin/api/plans',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const j=await r.json();if(j.ok){toast('Planos atualizados');loadPlans()}else toast('Falha ao salvar')});
-function rememberSizes(){const t=localStorage.getItem('admin_tx_size');if(t)qs('#tx-pagesize').value=t;qs('#tx-pagesize').addEventListener('change',e=>localStorage.setItem('admin_tx_size',e.target.value));const u=localStorage.getItem('admin_usr_size');if(u)qs('#usr-pagesize').value=u;qs('#usr-pagesize').addEventListener('change',e=>localStorage.setItem('admin_usr_size',e.target.value))}
-function init(){rememberSizes();loadMetrics();loadTransactions();loadUsers();loadPlans()}
-init();
-window.addEventListener('resize',()=>{loadTransactions();loadUsers()});
+const PAID=["paid","approved","completed","confirmed","paid_out","finished","success","settled","captured","accredited","credited","confirmed_payment"]
+const FAILED=["canceled","cancelled","refunded","chargeback","reversed","voided","failed","expired","denied"]
+const fmtBRL=v=>new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format((Number(v||0)/100)||0)
+const fmtDate=s=>s?new Date(s).toLocaleString("pt-BR"):"—"
+const el=q=>document.querySelector(q)
+const els=q=>Array.from(document.querySelectorAll(q))
+const toast=(t,m)=>{const n=document.createElement("div");n.className="toast";n.textContent=m;el("#toasts").appendChild(n);setTimeout(()=>n.remove(),3500)}
+const fetchJSON=async(u,o={})=>{const r=await fetch(u,{credentials:"same-origin",headers:{"Content-Type":"application/json"},...o});let j=null;try{j=await r.json()}catch(e){}if(!r.ok){throw j||{ok:false}}return j}
+const setSwitch=(e,v)=>{e.setAttribute("data-on",v?"true":"false")}
+const getSwitch=e=>e.getAttribute("data-on")==="true"
+let autoOverviewTimer=null,autoTxTimer=null,lastTouchEnd=0
+document.addEventListener("gesturestart",e=>e.preventDefault(),{passive:false})
+document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false})
+document.addEventListener("touchend",e=>{const now=Date.now();if(now-lastTouchEnd<=300)e.preventDefault();lastTouchEnd=now},{passive:false})
+els(".tab").forEach(t=>t.addEventListener("click",()=>{els(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");["overview","transactions","users","plans"].forEach(id=>el("#"+id).style.display="none");el("#"+t.dataset.tab).style.display="grid"}))
+el("#refreshOverview").addEventListener("click",()=>loadOverview())
+el("#autoOverview").addEventListener("click",()=>{const on=!getSwitch(el("#autoOverview"));setSwitch(el("#autoOverview"),on);if(on){autoOverviewTimer=setInterval(loadOverview,8000);loadOverview()}else{clearInterval(autoOverviewTimer)}})
+async function loadOverview(){try{const d=await fetchJSON("/admin/api/metrics");el("#revToday").textContent=fmtBRL(d.revenue_today_cents);el("#rev7d").textContent=fmtBRL(d.revenue_7d_cents);el("#rev30d").textContent=fmtBRL(d.revenue_30d_cents);el("#countToday").textContent=d.count_today;el("#count7d").textContent=d.count_7d;el("#count30d").textContent=d.count_30d;el("#txPending").textContent=(d.tx_counts.pending||0)+" pendentes";el("#txPaid").textContent=(d.tx_counts.paid||0)+" pagas";el("#txFailed").textContent=(d.tx_counts.failed||0)+" falhas"}catch(e){toast("err","Falha ao carregar métricas")}}
+let txState={page:1,size:20,status:"",plan:"",q:"",from:"",to:""}
+const txStatusSel=el("#txStatus")
+const txPlanSel=el("#txPlan")
+const txQ=el("#txQ")
+const txFrom=el("#txFrom")
+const txTo=el("#txTo")
+const txSize=el("#txSize")
+const txBody=el("#txBody")
+const txPageInfo=el("#txPageInfo")
+el("#applyTx").addEventListener("click",()=>{txState.page=1;applyTxFilters()})
+el("#resetTx").addEventListener("click",()=>{txQ.value="";txStatusSel.value="";txPlanSel.value="";txFrom.value="";txTo.value="";txSize.value="20";txState={page:1,size:20,status:"",plan:"",q:"",from:"",to:""};loadTx()})
+el("#txPrev").addEventListener("click",()=>{if(txState.page>1){txState.page--;loadTx()}})
+el("#txNext").addEventListener("click",()=>{txState.page++;loadTx()})
+el("#refreshTx").addEventListener("click",()=>loadTx())
+el("#autoTx").addEventListener("click",()=>{const on=!getSwitch(el("#autoTx"));setSwitch(el("#autoTx"),on);if(on){autoTxTimer=setInterval(loadTx,8000);loadTx()}else{clearInterval(autoTxTimer)}})
+function applyTxFilters(){txState.size=Number(txSize.value);txState.status=txStatusSel.value;txState.plan=txPlanSel.value;txState.q=txQ.value.trim();txState.from=txFrom.value;txState.to=txTo.value;loadTx()}
+function statusBadge(s){if(!s)return'<span class="badge neutral">—</span>';const cls=PAID.includes(s)?'ok':FAILED.includes(s)?'err':'neutral';return `<span class="badge ${cls}">${s}</span>`}
+async function loadTx(){try{const params=new URLSearchParams();params.set("page",String(txState.page));params.set("page_size",String(txState.size));if(txState.q)params.set("q",txState.q);if(txState.plan)params.set("plan",txState.plan);if(txState.status&&txState.status!=="pending"){params.set("status",txState.status)}if(txState.from)params.set("from",txState.from);if(txState.to)params.set("to",txState.to);const d=await fetchJSON(`/admin/api/transactions?${params.toString()}`);let items=d.items||[];if(txState.status==="pending"){items=items.filter(it=>!PAID.includes(it.payment_status)&&!FAILED.includes(it.payment_status))}txBody.innerHTML="";items.forEach(it=>{const tr=document.createElement("tr");tr.className="row";tr.innerHTML=`<td data-label="Data">${fmtDate(it.created_at)}</td><td data-label="Usuário">${it.username||"—"}</td><td data-label="Plano">${it.plan||"—"}</td><td data-label="Valor">${fmtBRL(it.amount_cents||0)}</td><td data-label="Status">${statusBadge(it.payment_status)}</td><td data-label="Ativada">${fmtDate(it.activated_at)}</td><td data-label="Falha">${fmtDate(it.failed_at)}</td><td data-label="Hash" class="small" style="max-width:200px;word-break:break-all">${it.hash||"—"}</td><td data-label="Ações"><div class="actions"><button class="btn" data-edit="${it.id}">Editar</button><button class="btn danger" data-del="${it.id}" data-hash="${it.hash||""}">Excluir</button></div></td>`;txBody.appendChild(tr)});const shownStart=(d.page-1)*d.page_size+1;const shownEnd=Math.min(d.page*d.page_size,d.total);txPageInfo.textContent=txState.status==="pending"?`Pendentes filtrados nesta página: ${items.length}`:(d.total?`Mostrando ${shownStart}–${shownEnd} de ${d.total}`:"Nenhum resultado");txState.total=d.total;els('[data-edit]').forEach(b=>b.onclick=()=>openEditTx(b.getAttribute('data-edit')));els('[data-del]').forEach(b=>b.onclick=()=>confirmDeleteTx(b.getAttribute('data-del'),b.getAttribute('data-hash')))}catch(e){toast("err","Falha ao carregar transações")}}
+let editTxId=null
+function openEditTx(id){editTxId=id;el("#modalTxStatus").value="";el("#modalTxCustom").value="";const row=el(`[data-del="${id}"]`)?.closest("tr");const h=row?row.children[7].textContent.trim():"";el("#modalTxHash").textContent=h?`Hash: ${h}`:"";openModal("modalTx")}
+el("#modalTxClose").addEventListener("click",()=>closeModal("modalTx"))
+el("#modalTxSave").addEventListener("click",async()=>{try{const s=el("#modalTxCustom").value.trim()||el("#modalTxStatus").value.trim();if(!s){toast("err","Informe um status");return}await fetchJSON(`/admin/api/transactions/${editTxId}`,{method:"PATCH",body:JSON.stringify({payment_status:s})});closeModal("modalTx");toast("ok","Transação atualizada");loadTx()}catch(e){toast("err","Falha ao atualizar transação")}})
+function confirmDeleteTx(id,hash){openConfirm("Excluir transação",`Deseja excluir a transação ${hash||id}?`,async()=>{try{await fetchJSON(`/admin/api/transactions/${id}`,{method:"DELETE"});toast("ok","Transação excluída");loadTx()}catch(e){toast("err","Falha ao excluir transação")}})}
+let uState={page:1,size:20,q:"",admin:"",disabled:""}
+const uQ=el("#uQ"),uAdmin=el("#uAdmin"),uDisabled=el("#uDisabled"),uSize=el("#uSize"),uBody=el("#uBody"),uPageInfo=el("#uPageInfo")
+el("#applyUsers").addEventListener("click",()=>{uState.page=1;applyUFilters()})
+el("#resetUsers").addEventListener("click",()=>{uQ.value="";uAdmin.value="";uDisabled.value="";uSize.value="20";uState={page:1,size:20,q:"",admin:"",disabled:""};loadUsers()})
+el("#uPrev").addEventListener("click",()=>{if(uState.page>1){uState.page--;loadUsers()}})
+el("#uNext").addEventListener("click",()=>{uState.page++;loadUsers()})
+el("#refreshUsers").addEventListener("click",()=>loadUsers())
+function applyUFilters(){uState.size=Number(uSize.value);uState.q=uQ.value.trim();uState.admin=uAdmin.value;uState.disabled=uDisabled.value;loadUsers()}
+async function loadUsers(){try{const params=new URLSearchParams();params.set("page",String(uState.page));params.set("page_size",String(uState.size));if(uState.q)params.set("q",uState.q);if(uState.admin)params.set("admin",uState.admin);if(uState.disabled)params.set("disabled",uState.disabled);const d=await fetchJSON(`/admin/api/users?${params.toString()}`);uBody.innerHTML="";d.items.forEach(u=>{const tr=document.createElement("tr");tr.className="row";tr.innerHTML=`<td data-label="Usuário">${u.username}</td><td data-label="Email">${u.email||"—"}</td><td data-label="Plano">${u.plans||"—"}</td><td data-label="Início">${fmtDate(u.plan_started_at)}</td><td data-label="Expira">${fmtDate(u.plan_expires_at)}</td><td data-label="Admin">${u.admin_permission==="yes"?'<span class="badge ok">yes</span>':'<span class="badge neutral">no</span>'}</td><td data-label="Desabilitado">${u.disabled?'<span class="badge err">true</span>':'<span class="badge neutral">false</span>'}</td><td data-label="Criado">${fmtDate(u.created_at)}</td><td data-label="Login">${fmtDate(u.last_login_at)}</td><td data-label="Ações"><div class="actions"><button class="btn" data-admin="${u.id}" data-val="${u.admin_permission==="yes"?"no":"yes"}">${u.admin_permission==="yes"?"Revogar":"Tornar admin"}</button><button class="btn" data-disable="${u.id}" data-val="${!u.disabled}">${u.disabled?"Reativar":"Desabilitar"}</button><button class="btn" data-logout="${u.id}">Forçar logout</button></div></td>`;uBody.appendChild(tr)});const shownStart=(d.page-1)*d.page_size+1;const shownEnd=Math.min(d.page*d.page_size,d.total);uPageInfo.textContent=d.total?`Mostrando ${shownStart}–${shownEnd} de ${d.total}`:"Nenhum resultado";els('[data-admin]').forEach(b=>b.onclick=()=>toggleAdmin(b.getAttribute("data-admin"),b.getAttribute("data-val")));els('[data-disable]').forEach(b=>b.onclick=()=>toggleDisable(b.getAttribute("data-disable"),b.getAttribute("data-val")==="true"));els('[data-logout]').forEach(b=>b.onclick=()=>forceLogout(b.getAttribute("data-logout")))}catch(e){toast("err","Falha ao carregar usuários")}}
+async function toggleAdmin(id,val){try{await fetchJSON(`/admin/api/users/${id}/set_admin`,{method:"POST",body:JSON.stringify({admin_permission:val})});toast("ok","Permissão atualizada");loadUsers()}catch(e){toast("err","Falha ao atualizar permissão")}}
+async function toggleDisable(id,val){try{await fetchJSON(`/admin/api/users/${id}/disable`,{method:"POST",body:JSON.stringify({disabled:val})});toast("ok","Status atualizado");loadUsers()}catch(e){toast("err","Falha ao atualizar status")}}
+async function forceLogout(id){try{await fetchJSON(`/admin/api/users/${id}/force_logout`,{method:"POST"});toast("ok","Logout forçado")}catch(e){toast("err","Falha ao forçar logout")}}
+let plansCache=null,plansDirty={}
+const plansForm=el("#plansForm")
+el("#refreshPlans").addEventListener("click",()=>loadPlans())
+el("#savePlans").addEventListener("click",()=>savePlans())
+function centsFromBRL(str){const n=String(str||"").replace(/[^\d,.-]/g,"").replace(/\./g,"").replace(",",".");const v=Number(n||0);return Math.round(v*100)}
+function brlFromCents(c){return fmtBRL(c)}
+function planCard(name,p){const wrap=document.createElement("div");wrap.className="card";wrap.innerHTML=`<div class="inline" style="justify-content:space-between"><div style="font-weight:700">${p.title}</div><span class="tag">${name}</span></div><hr class="sep"><table class="min"><tr><td class="small">Produto</td><td class="small" style="text-align:right">${p.product_hash}</td></tr><tr><td class="small">Oferta</td><td class="small" style="text-align:right">${p.offer_hash}</td></tr></table><div class="field currency" style="margin-top:10px"><label class="small">Preço</label><span>R$</span><input class="input" inputmode="decimal" value="${(p.amount_cents/100).toFixed(2).replace(".",",")}" data-plan="${name}" data-field="amount_cents"></div><div class="field" style="margin-top:10px"><label class="small">Ativo</label><div class="switch" data-plan="${name}" data-field="active" data-on="${p.active?'true':'false'}"><i></i></div></div>`;return wrap}
+async function loadPlans(){try{const d=await fetchJSON("/admin/api/plans");plansCache=d.plans;plansDirty={};plansForm.innerHTML="";Object.keys(d.plans).forEach(k=>{plansForm.appendChild(planCard(k,d.plans[k]))});els('#plansForm input[data-field="amount_cents"]').forEach(i=>i.addEventListener("input",()=>markPlanDirty(i.getAttribute("data-plan"))));els('#plansForm .switch[data-field="active"]').forEach(sw=>sw.addEventListener("click",()=>{const on=sw.getAttribute("data-on")==="true";sw.setAttribute("data-on",on?"false":"true");markPlanDirty(sw.getAttribute("data-plan"))}));setSaveEnabled()}catch(e){toast("err","Falha ao carregar planos")}}
+function markPlanDirty(name){plansDirty[name]=true;setSaveEnabled()}
+function setSaveEnabled(){el("#savePlans").disabled=Object.keys(plansDirty).length===0}
+async function savePlans(){try{const payload={};Object.keys(plansDirty).forEach(name=>{const priceEl=el(`#plansForm input[data-plan="${name}"][data-field="amount_cents"]`);const sw=el(`#plansForm .switch[data-plan="${name}"][data-field="active"]`);const cents=centsFromBRL(priceEl.value);const active=sw.getAttribute("data-on")==="true";payload[name]={amount_cents:cents,active:active}});await fetchJSON("/admin/api/plans",{method:"PUT",body:JSON.stringify(payload)});plansDirty={};setSaveEnabled();toast("ok","Planos atualizados");loadPlans()}catch(e){toast("err","Falha ao salvar planos")}}
+function openModal(id){el("#"+id).classList.add("open")}
+function closeModal(id){el("#"+id).classList.remove("open")}
+let confirmCb=null
+function openConfirm(title,msg,cb){el("#confirmTitle").textContent=title;el("#confirmMsg").textContent=msg;confirmCb=cb;openModal("modalConfirm")}
+el("#confirmCancel").addEventListener("click",()=>{confirmCb=null;closeModal("modalConfirm")})
+el("#confirmOk").addEventListener("click",async()=>{const cb=confirmCb;confirmCb=null;closeModal("modalConfirm");if(cb)await cb()})
+window.addEventListener("load",()=>{loadOverview();loadTx();loadUsers();loadPlans()})
 </script>
 </body>
 </html>
