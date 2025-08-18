@@ -18,6 +18,7 @@ from pymongo import MongoClient, ASCENDING, errors
 from werkzeug.security import generate_password_hash, check_password_hash
 from bson.objectid import ObjectId
 from werkzeug.exceptions import HTTPException
+from admin import admin_bp
 
 logging.basicConfig(level=logging.INFO)
 
@@ -62,6 +63,11 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = bool(int(os.environ.get('SESSION_COOKIE_SECURE', '0')))
 app.config['SESSION_COOKIE_NAME'] = 'rb_session'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=15)
+app.config['users'] = users
+app.config['transactions'] = transactions
+app.config['usage'] = usage
+app.config['settings'] = settings
+app.register_blueprint(admin_bp)
 
 USERNAME_RE = re.compile(r'^[A-Za-z0-9._]{3,32}$')
 EMAIL_RE = re.compile(r'^[^\s@]+@[^\s@]+\.[^\s@]+$')
@@ -86,10 +92,6 @@ USER_SCHEMA_VERSION = 1
 def is_logged_in():
     return 'user_id' in session
 
-def admin_allowed():
-    u = get_user()
-    return bool(u and (u.get('admin_permission') == 'yes'))
-
 def login_required(fn):
     @wraps(fn)
     def _wrap(*args, **kwargs):
@@ -97,18 +99,6 @@ def login_required(fn):
             if request.path.startswith('/api/'):
                 return jsonify(ok=False, error='unauthorized'), 401
             return redirect(url_for('login'))
-        return fn(*args, **kwargs)
-    return _wrap
-
-def admin_required(fn):
-    @wraps(fn)
-    def _wrap(*args, **kwargs):
-        if not is_logged_in():
-            if request.path.startswith('/admin/api') or request.path.startswith('/api/'):
-                return jsonify(ok=False, error='unauthorized'), 401
-            return redirect(url_for('login'))
-        if not admin_allowed():
-            return jsonify(ok=False, error='forbidden'), 403
         return fn(*args, **kwargs)
     return _wrap
 
@@ -622,237 +612,6 @@ def api_usage_consume():
         return jsonify(ok=False, error='Limite diário excedido', remaining=max(0, int(limit) - used_now)), 400
     except Exception:
         logging.exception('usage_consume_error')
-        return jsonify(ok=False, error='internal_error'), 500
-
-@app.route('/admin_panel', methods=['GET'])
-@login_required
-def admin_panel():
-    try:
-        if not admin_allowed():
-            return jsonify(ok=False, error='forbidden'), 403
-        u = get_user()
-        if u:
-            apply_user_migrations(u)
-        return render_template('admin_panel.html', username=session.get('username'))
-    except Exception:
-        logging.exception('admin_panel_error')
-        return jsonify(ok=False, error='internal_error'), 500
-
-@app.route('/admin/api/metrics', methods=['GET'])
-@admin_required
-def admin_metrics():
-    try:
-        now = datetime.utcnow()
-        def sum_range(start_dt):
-            pipe = [
-                {'$match': {'activated_at': {'$gte': start_dt, '$lte': now}}},
-                {'$group': {'_id': None, 'total': {'$sum': '$amount_cents'}, 'count': {'$sum': 1}}}
-            ]
-            agg = list(transactions.aggregate(pipe))
-            if agg:
-                return int(agg[0].get('total', 0)), int(agg[0].get('count', 0))
-            return 0, 0
-        start_today = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        t_total, t_count = sum_range(start_today)
-        d7 = now - timedelta(days=7)
-        d7_total, d7_count = sum_range(d7)
-        d30 = now - timedelta(days=30)
-        d30_total, d30_count = sum_range(d30)
-        pending = transactions.count_documents({'payment_status': {'$nin': list(PAID_STATUSES | FAILED_STATUSES)}})
-        paid = transactions.count_documents({'payment_status': {'$in': list(PAID_STATUSES)}})
-        failed = transactions.count_documents({'payment_status': {'$in': list(FAILED_STATUSES)}})
-        return jsonify(ok=True, revenue_today_cents=t_total, revenue_7d_cents=d7_total, revenue_30d_cents=d30_total, count_today=t_count, count_7d=d7_count, count_30d=d30_count, tx_counts={'pending': pending, 'paid': paid, 'failed': failed})
-    except Exception:
-        logging.exception('admin_metrics_error')
-        return jsonify(ok=False, error='internal_error'), 500
-
-@app.route('/admin/api/transactions', methods=['GET'])
-@admin_required
-def admin_list_transactions():
-    try:
-        q = {}
-        status = (request.args.get('status') or '').strip().lower()
-        text = (request.args.get('q') or '').strip()
-        plan = (request.args.get('plan') or '').strip()
-        date_from = request.args.get('from')
-        date_to = request.args.get('to')
-        if status:
-            q['payment_status'] = status
-        if plan:
-            q['plan'] = plan
-        if date_from:
-            try:
-                dtf = datetime.fromisoformat(date_from)
-                q['created_at'] = q.get('created_at', {})
-                q['created_at']['$gte'] = dtf
-            except Exception:
-                pass
-        if date_to:
-            try:
-                dtt = datetime.fromisoformat(date_to)
-                q['created_at'] = q.get('created_at', {})
-                q['created_at']['$lte'] = dtt
-            except Exception:
-                pass
-        if text:
-            q['$or'] = [{'hash': {'$regex': text, '$options': 'i'}}, {'username': {'$regex': text, '$options': 'i'}}]
-        page = max(1, int(request.args.get('page', '1')))
-        size = max(1, min(100, int(request.args.get('page_size', '20'))))
-        skip = (page - 1) * size
-        total = transactions.count_documents(q)
-        cur = transactions.find(q).sort('created_at', -1).skip(skip).limit(size)
-        items = []
-        for t in cur:
-            items.append({
-                'id': str(t.get('_id')),
-                'user_id': t.get('user_id'),
-                'username': t.get('username'),
-                'plan': t.get('plan'),
-                'amount_cents': t.get('amount_cents'),
-                'hash': t.get('hash'),
-                'payment_status': t.get('payment_status'),
-                'created_at': t.get('created_at').isoformat() if t.get('created_at') else None,
-                'updated_at': t.get('updated_at').isoformat() if t.get('updated_at') else None,
-                'activated_at': t.get('activated_at').isoformat() if t.get('activated_at') else None,
-                'failed_at': t.get('failed_at').isoformat() if t.get('failed_at') else None
-            })
-        return jsonify(ok=True, total=total, page=page, page_size=size, items=items)
-    except Exception:
-        logging.exception('admin_list_transactions_error')
-        return jsonify(ok=False, error='internal_error'), 500
-
-@app.route('/admin/api/transactions/<tid>', methods=['DELETE', 'PATCH'])
-@admin_required
-def admin_tx_modify(tid):
-    try:
-        try:
-            oid = ObjectId(tid)
-        except Exception:
-            return jsonify(ok=False, error='invalid_id'), 400
-        if request.method == 'DELETE':
-            transactions.delete_one({'_id': oid})
-            return jsonify(ok=True)
-        data = request.get_json(silent=True) or {}
-        updates = {}
-        ps = data.get('payment_status')
-        if isinstance(ps, str) and ps:
-            updates['payment_status'] = ps.lower()
-            updates['updated_at'] = datetime.utcnow()
-        if not updates:
-            return jsonify(ok=False, error='no_updates'), 400
-        tx = transactions.find_one({'_id': oid})
-        if not tx:
-            return jsonify(ok=False, error='not_found'), 404
-        transactions.update_one({'_id': oid}, {'$set': updates})
-        tx = transactions.find_one({'_id': oid})
-        if tx.get('payment_status') in PAID_STATUSES:
-            try_activation(tx)
-        return jsonify(ok=True)
-    except Exception:
-        logging.exception('admin_tx_modify_error')
-        return jsonify(ok=False, error='internal_error'), 500
-
-@app.route('/admin/api/users', methods=['GET'])
-@admin_required
-def admin_users_list():
-    try:
-        text = (request.args.get('q') or '').strip()
-        adm = request.args.get('admin')
-        disabled = request.args.get('disabled')
-        q = {}
-        if text:
-            q['$or'] = [{'username': {'$regex': text, '$options': 'i'}}, {'email': {'$regex': text, '$options': 'i'}}]
-        if adm in ('yes', 'no'):
-            q['admin_permission'] = adm
-        if disabled in ('true', 'false'):
-            q['disabled'] = (disabled == 'true')
-        page = max(1, int(request.args.get('page', '1')))
-        size = max(1, min(100, int(request.args.get('page_size', '20'))))
-        skip = (page - 1) * size
-        total = users.count_documents(q)
-        cur = users.find(q).sort('created_at', -1).skip(skip).limit(size)
-        items = []
-        for u in cur:
-            items.append({
-                'id': str(u.get('_id')),
-                'username': u.get('username'),
-                'email': u.get('email'),
-                'plans': u.get('plans'),
-                'plan_started_at': u.get('plan_started_at').isoformat() if u.get('plan_started_at') else None,
-                'plan_expires_at': u.get('plan_expires_at').isoformat() if u.get('plan_expires_at') else None,
-                'admin_permission': u.get('admin_permission'),
-                'disabled': bool(u.get('disabled')),
-                'created_at': u.get('created_at').isoformat() if u.get('created_at') else None,
-                'last_login_at': u.get('last_login_at').isoformat() if u.get('last_login_at') else None
-            })
-        return jsonify(ok=True, total=total, page=page, page_size=size, items=items)
-    except Exception:
-        logging.exception('admin_users_list_error')
-        return jsonify(ok=False, error='internal_error'), 500
-
-@app.route('/admin/api/users/<uid>/set_admin', methods=['POST'])
-@admin_required
-def admin_user_set_admin(uid):
-    try:
-        data = request.get_json(silent=True) or {}
-        val = data.get('admin_permission')
-        if val not in ('yes', 'no'):
-            return jsonify(ok=False, error='invalid_value'), 400
-        try:
-            oid = ObjectId(uid)
-        except Exception:
-            return jsonify(ok=False, error='invalid_id'), 400
-        users.update_one({'_id': oid}, {'$set': {'admin_permission': val}})
-        return jsonify(ok=True)
-    except Exception:
-        logging.exception('admin_user_set_admin_error')
-        return jsonify(ok=False, error='internal_error'), 500
-
-@app.route('/admin/api/users/<uid>/disable', methods=['POST'])
-@admin_required
-def admin_user_disable(uid):
-    try:
-        data = request.get_json(silent=True) or {}
-        if 'disabled' not in data:
-            return jsonify(ok=False, error='invalid_value'), 400
-        try:
-            oid = ObjectId(uid)
-        except Exception:
-            return jsonify(ok=False, error='invalid_id'), 400
-        users.update_one({'_id': oid}, {'$set': {'disabled': bool(data.get('disabled'))}})
-        return jsonify(ok=True)
-    except Exception:
-        logging.exception('admin_user_disable_error')
-        return jsonify(ok=False, error='internal_error'), 500
-
-@app.route('/admin/api/users/<uid>/force_logout', methods=['POST'])
-@admin_required
-def admin_user_force_logout(uid):
-    try:
-        try:
-            oid = ObjectId(uid)
-        except Exception:
-            return jsonify(ok=False, error='invalid_id'), 400
-        users.update_one({'_id': oid}, {'$set': {'force_logout_at': datetime.utcnow()}})
-        return jsonify(ok=True)
-    except Exception:
-        logging.exception('admin_user_force_logout_error')
-        return jsonify(ok=False, error='internal_error'), 500
-
-@app.route('/admin/api/plans', methods=['GET', 'PUT'])
-@admin_required
-def admin_plans():
-    try:
-        if request.method == 'GET':
-            plans = get_plans()
-            return jsonify(ok=True, plans=plans)
-        data = request.get_json(silent=True) or {}
-        if not isinstance(data, dict) or not data:
-            return jsonify(ok=False, error='invalid_payload'), 400
-        updated = save_plans(data)
-        return jsonify(ok=True, plans=updated)
-    except Exception:
-        logging.exception('admin_plans_error')
         return jsonify(ok=False, error='internal_error'), 500
 
 if __name__ == '__main__':
