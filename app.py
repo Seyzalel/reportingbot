@@ -280,6 +280,10 @@ def handle_exceptions(e):
     logging.exception('unhandled_exception')
     return jsonify(ok=False, error='internal_error'), 500
 
+@app.route('/')
+def landing_page():
+    return render_template('landing_page.html')
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
@@ -343,7 +347,7 @@ def register():
         logging.exception('register_error')
         return jsonify(ok=False, error='internal_error'), 500
 
-@app.route('/')
+@app.route('/dashboard')
 @login_required
 def dashboard():
     try:
