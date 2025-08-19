@@ -31,6 +31,7 @@ users = db['users']
 transactions = db['transactions']
 usage = db['usage']
 settings = db['settings']
+orders = db['orders']
 
 def safe_create_index(coll, keys, **kwargs):
     try:
@@ -52,6 +53,7 @@ def ensure_indexes():
     safe_create_index(transactions, [('user_id', ASCENDING)], name='user_id_1')
     safe_create_index(usage, [('user_id', ASCENDING), ('date', ASCENDING)], name='user_id_date_1', unique=True)
     safe_create_index(settings, [('key', ASCENDING)], name='key_1', unique=True)
+    safe_create_index(orders, [('user_id', ASCENDING), ('created_at', ASCENDING)], name='user_id_created_at_1')
 
 ensure_indexes()
 
@@ -67,6 +69,7 @@ app.config['users'] = users
 app.config['transactions'] = transactions
 app.config['usage'] = usage
 app.config['settings'] = settings
+app.config['orders'] = orders
 app.register_blueprint(admin_bp)
 
 USERNAME_RE = re.compile(r'^[A-Za-z0-9._]{3,32}$')
@@ -612,6 +615,101 @@ def api_usage_consume():
         return jsonify(ok=False, error='Limite diário excedido', remaining=max(0, int(limit) - used_now)), 400
     except Exception:
         logging.exception('usage_consume_error')
+        return jsonify(ok=False, error='internal_error'), 500
+
+@app.route('/api/orders/create', methods=['POST'])
+@login_required
+def api_orders_create():
+    try:
+        u = get_user()
+        if not u:
+            return jsonify(ok=False), 401
+        u = apply_user_migrations(u)
+        code, exp = normalize_plan(u)
+        if code == 'padrao':
+            return jsonify(ok=False, error='Plano insuficiente'), 403
+        data = request.get_json(silent=True) or request.form
+        platform = str(data.get('platform', '')).strip().lower()
+        url = str(data.get('url', '')).strip()
+        try:
+            reports = int(str(data.get('reports', '0')))
+        except Exception:
+            return jsonify(ok=False, error='Parâmetro inválido'), 400
+        try:
+            proxies = int(str(data.get('proxies', '0')))
+        except Exception:
+            return jsonify(ok=False, error='Parâmetro inválido'), 400
+        if platform not in ('instagram', 'facebook', 'tiktok'):
+            return jsonify(ok=False, error='Plataforma inválida'), 400
+        if not url:
+            return jsonify(ok=False, error='URL inválida'), 400
+        if proxies < 0 or proxies > 1065:
+            return jsonify(ok=False, error='Quantidade de proxies inválida'), 400
+        ranges = {'essencial': (100, 500), 'profissional': (100, 5000), 'vitalicio': (100, 15950)}
+        if code not in ranges:
+            return jsonify(ok=False, error='Plano insuficiente'), 403
+        rmin, rmax = ranges[code]
+        if reports < rmin or reports > rmax:
+            return jsonify(ok=False, error=f'Quantidade permitida para o seu plano: {rmin}-{rmax}'), 400
+        limit = plan_meta(code)
+        if limit is not None:
+            today = date_key_utc()
+            base = {'user_id': str(u['_id']), 'date': today}
+            guard = {'$expr': {'$lte': [{'$add': [{'$ifNull': ['$used', 0]}, 1]}, int(limit)]}}
+            res = usage.update_one({**base, **guard}, {'$inc': {'used': 1}}, upsert=False)
+            if res.matched_count != 1:
+                try:
+                    usage.insert_one({**base, 'used': 1})
+                    remaining = max(0, int(limit) - 1)
+                except errors.DuplicateKeyError:
+                    res2 = usage.update_one({**base, **guard}, {'$inc': {'used': 1}}, upsert=False)
+                    if res2.matched_count != 1:
+                        rec = usage.find_one(base) or {'used': 0}
+                        used_now = int(rec.get('used', 0))
+                        return jsonify(ok=False, error='Limite diário excedido', remaining=max(0, int(limit) - used_now)), 400
+                    rec = usage.find_one(base) or {'used': 0}
+                    remaining = max(0, int(limit) - int(rec.get('used', 0)))
+            else:
+                rec = usage.find_one(base) or {'used': 0}
+                remaining = max(0, int(limit) - int(rec.get('used', 0)))
+        else:
+            remaining = None
+        doc = {
+            'user_id': str(u['_id']),
+            'username': u.get('username'),
+            'platform': platform,
+            'url': url,
+            'reports': int(reports),
+            'proxies': int(proxies),
+            'created_at': datetime.utcnow()
+        }
+        ins = orders.insert_one(doc)
+        return jsonify(ok=True, order_id=str(ins.inserted_id), remaining_today=remaining)
+    except Exception:
+        logging.exception('orders_create_error')
+        return jsonify(ok=False, error='internal_error'), 500
+
+@app.route('/api/orders/list', methods=['GET'])
+@login_required
+def api_orders_list():
+    try:
+        u = get_user()
+        if not u:
+            return jsonify(ok=False), 401
+        cur = orders.find({'user_id': str(u['_id'])}).sort([('created_at', -1)]).limit(20)
+        out = []
+        for d in cur:
+            out.append({
+                'id': str(d.get('_id')),
+                'platform': d.get('platform'),
+                'url': d.get('url'),
+                'reports': int(d.get('reports', 0)),
+                'proxies': int(d.get('proxies', 0)),
+                'created_at': (d.get('created_at').isoformat() if isinstance(d.get('created_at'), datetime) else None)
+            })
+        return jsonify(ok=True, items=out)
+    except Exception:
+        logging.exception('orders_list_error')
         return jsonify(ok=False, error='internal_error'), 500
 
 if __name__ == '__main__':
