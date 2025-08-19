@@ -2,6 +2,9 @@ from flask import Blueprint, request, session, redirect, url_for, render_templat
 from datetime import datetime, timedelta
 from bson.objectid import ObjectId
 from functools import wraps
+import hashlib
+import hmac
+import json
 
 admin_bp = Blueprint("admin", __name__)
 
@@ -111,25 +114,97 @@ def save_plans(payload):
     current_app.config['settings'].update_one({'key': 'plans'}, {'$set': {'key': 'plans', 'value': base, 'updated_at': datetime.utcnow()}}, upsert=True)
     return base
 
+def build_receipt_payload(tx, user_doc):
+    now = datetime.utcnow()
+    plans_catalog = get_plans()
+    plan_name = tx.get('plan')
+    plan_cfg = plans_catalog.get(plan_name) or PLANS_DEFAULT.get(plan_name) or {}
+    code = PLAN_CODES.get(plan_name)
+    activated_at = tx.get('activated_at')
+    user_plan_expires = None
+    if user_doc and isinstance(user_doc.get('plan_expires_at'), datetime):
+        user_plan_expires = user_doc.get('plan_expires_at')
+    period_days = 30 if code in ('essencial', 'profissional') else None
+    receipt = {
+        'receipt_id': 'rcpt_' + str(tx.get('_id')),
+        'issued_at': now.isoformat(),
+        'currency': 'BRL',
+        'user': {
+            'id': str(user_doc.get('_id')) if user_doc and user_doc.get('_id') else None,
+            'username': user_doc.get('username') if user_doc else None,
+            'email': user_doc.get('email') if user_doc else None,
+            'created_at': user_doc.get('created_at').isoformat() if user_doc and user_doc.get('created_at') else None,
+            'last_login_at': user_doc.get('last_login_at').isoformat() if user_doc and user_doc.get('last_login_at') else None,
+            'disabled': bool(user_doc.get('disabled')) if user_doc else None,
+            'admin_permission': user_doc.get('admin_permission') if user_doc else None
+        },
+        'transaction': {
+            'id': str(tx.get('_id')) if tx.get('_id') else None,
+            'user_id': tx.get('user_id'),
+            'username': tx.get('username'),
+            'hash': tx.get('hash'),
+            'plan_name': plan_name,
+            'amount_cents': tx.get('amount_cents'),
+            'payment_status': tx.get('payment_status'),
+            'created_at': tx.get('created_at').isoformat() if tx.get('created_at') else None,
+            'updated_at': tx.get('updated_at').isoformat() if tx.get('updated_at') else None,
+            'activated_at': activated_at.isoformat() if activated_at else None,
+            'failed_at': tx.get('failed_at').isoformat() if tx.get('failed_at') else None
+        },
+        'plan': {
+            'code': code,
+            'title': plan_cfg.get('title'),
+            'product_hash': plan_cfg.get('product_hash'),
+            'offer_hash': plan_cfg.get('offer_hash'),
+            'period_days': period_days
+        },
+        'service_delivery': {
+            'granted': True if activated_at else False,
+            'granted_at': activated_at.isoformat() if activated_at else None,
+            'expires_at': user_plan_expires.isoformat() if user_plan_expires else None,
+            'access_level': code
+        }
+    }
+    key = (current_app.config.get('RECEIPT_SECRET') or current_app.config.get('SECRET_KEY') or '').encode()
+    payload_for_sig = json.dumps(receipt, sort_keys=True, separators=(',', ':')).encode()
+    sig = hmac.new(key, payload_for_sig, hashlib.sha256).hexdigest() if key else hashlib.sha256(payload_for_sig).hexdigest()
+    receipt['signature'] = sig
+    return receipt
+
+def ensure_receipt(tx):
+    if not tx or (tx.get('payment_status') or '').lower() not in PAID_STATUSES:
+        return
+    if tx.get('receipt'):
+        return
+    uid = tx.get('user_id')
+    user_doc = None
+    try:
+        if uid:
+            user_doc = current_app.config['users'].find_one({'_id': ObjectId(uid)})
+    except Exception:
+        user_doc = None
+    rec = build_receipt_payload(tx, user_doc)
+    current_app.config['transactions'].update_one({'_id': tx['_id']}, {'$set': {'receipt': rec, 'receipt_issued_at': datetime.utcnow()}})
+
 def try_activation(tx):
     st = (tx.get('payment_status') or '').lower()
     if st not in PAID_STATUSES:
         return
     res = current_app.config['transactions'].update_one({'_id': tx['_id'], 'activated_at': {'$exists': False}}, {'$set': {'activated_at': datetime.utcnow()}})
-    if not res.modified_count:
-        return
+    activated_now = bool(res.modified_count)
     uid = tx.get('user_id')
     plan_name = tx.get('plan')
     code = PLAN_CODES.get(plan_name)
-    if not uid or not code:
-        return
     exp = None
-    if code in ('essencial', 'profissional'):
-        exp = datetime.utcnow() + timedelta(days=30)
-    try:
-        current_app.config['users'].update_one({'_id': ObjectId(uid)}, {'$set': {'plans': code, 'plan_started_at': datetime.utcnow(), 'plan_expires_at': exp}})
-    except Exception:
-        pass
+    if activated_now and uid and code:
+        if code in ('essencial', 'profissional'):
+            exp = datetime.utcnow() + timedelta(days=30)
+        try:
+            current_app.config['users'].update_one({'_id': ObjectId(uid)}, {'$set': {'plans': code, 'plan_started_at': datetime.utcnow(), 'plan_expires_at': exp}})
+        except Exception:
+            pass
+    tx = current_app.config['transactions'].find_one({'_id': tx['_id']})
+    ensure_receipt(tx)
 
 @admin_bp.route('/admin_panel', methods=['GET'])
 @login_required
@@ -219,7 +294,9 @@ def admin_list_transactions():
                 'created_at': t.get('created_at').isoformat() if t.get('created_at') else None,
                 'updated_at': t.get('updated_at').isoformat() if t.get('updated_at') else None,
                 'activated_at': t.get('activated_at').isoformat() if t.get('activated_at') else None,
-                'failed_at': t.get('failed_at').isoformat() if t.get('failed_at') else None
+                'failed_at': t.get('failed_at').isoformat() if t.get('failed_at') else None,
+                'has_receipt': bool(t.get('receipt')),
+                'receipt_id': (t.get('receipt') or {}).get('receipt_id') if t.get('receipt') else None
             })
         return jsonify(ok=True, total=total, page=page, page_size=size, items=items)
     except Exception:
@@ -252,6 +329,27 @@ def admin_tx_modify(tid):
         if tx.get('payment_status') in PAID_STATUSES:
             try_activation(tx)
         return jsonify(ok=True)
+    except Exception:
+        return jsonify(ok=False, error='internal_error'), 500
+
+@admin_bp.route('/admin/api/transactions/<tid>/receipt', methods=['GET'])
+@admin_required
+def admin_tx_receipt(tid):
+    try:
+        try:
+            oid = ObjectId(tid)
+        except Exception:
+            return jsonify(ok=False, error='invalid_id'), 400
+        tx = current_app.config['transactions'].find_one({'_id': oid})
+        if not tx:
+            return jsonify(ok=False, error='not_found'), 404
+        st = (tx.get('payment_status') or '').lower()
+        if st not in PAID_STATUSES:
+            return jsonify(ok=False, error='not_paid'), 400
+        if not tx.get('receipt'):
+            ensure_receipt(tx)
+            tx = current_app.config['transactions'].find_one({'_id': oid})
+        return jsonify(ok=True, receipt=tx.get('receipt'))
     except Exception:
         return jsonify(ok=False, error='internal_error'), 500
 
