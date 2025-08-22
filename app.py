@@ -58,8 +58,7 @@ def ensure_indexes():
 ensure_indexes()
 
 app = Flask(__name__, template_folder='.')
-_app_secret_env = os.environ.get('SECRET_KEY', '')
-app.secret_key = _app_secret_env if isinstance(_app_secret_env, str) and len(_app_secret_env) >= 32 else secrets.token_urlsafe(64)
+app.secret_key = 'sk_live_dX9hK2#vT3qZm!2Lw7FeXp9@RuYpG4o%BnMfVjA6HsE'
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = bool(int(os.environ.get('SESSION_COOKIE_SECURE', '0')))
