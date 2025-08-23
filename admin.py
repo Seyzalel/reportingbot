@@ -125,6 +125,24 @@ def build_receipt_payload(tx, user_doc):
     if user_doc and isinstance(user_doc.get('plan_expires_at'), datetime):
         user_plan_expires = user_doc.get('plan_expires_at')
     period_days = 30 if code in ('essencial', 'profissional') else None
+    cust_name = None
+    cust_document = None
+    c = tx.get('customer')
+    if isinstance(c, dict):
+        cust_name = c.get('name') or cust_name
+        cust_document = c.get('document') or c.get('cpf') or cust_document
+    rl = tx.get('raw_last')
+    if isinstance(rl, dict):
+        c2 = rl.get('customer')
+        if isinstance(c2, dict):
+            cust_name = cust_name or c2.get('name')
+            cust_document = cust_document or c2.get('document') or c2.get('cpf')
+        pix = rl.get('pix')
+        if isinstance(pix, dict):
+            c3 = pix.get('customer') or pix.get('payer')
+            if isinstance(c3, dict):
+                cust_name = cust_name or c3.get('name')
+                cust_document = cust_document or c3.get('document') or c3.get('cpf')
     receipt = {
         'receipt_id': 'rcpt_' + str(tx.get('_id')),
         'issued_at': now.isoformat(),
@@ -163,6 +181,10 @@ def build_receipt_payload(tx, user_doc):
             'granted_at': activated_at.isoformat() if activated_at else None,
             'expires_at': user_plan_expires.isoformat() if user_plan_expires else None,
             'access_level': code
+        },
+        'customer': {
+            'name': cust_name,
+            'document': cust_document
         }
     }
     key = (current_app.config.get('RECEIPT_SECRET') or current_app.config.get('SECRET_KEY') or '').encode()
@@ -387,6 +409,16 @@ def admin_users_list():
                 'last_login_at': u.get('last_login_at').isoformat() if u.get('last_login_at') else None
             })
         return jsonify(ok=True, total=total, page=page, page_size=size, items=items)
+    except Exception:
+        return jsonify(ok=False, error='internal_error'), 500
+
+@admin_bp.route('/admin/api/users/summary', methods=['GET'])
+@admin_required
+def admin_users_summary():
+    try:
+        total = current_app.config['users'].count_documents({})
+        total_subscribers = current_app.config['users'].count_documents({'plans': {'$in': ['essencial', 'profissional', 'vitalicio']}})
+        return jsonify(ok=True, total=total, subscribers=total_subscribers)
     except Exception:
         return jsonify(ok=False, error='internal_error'), 500
 
