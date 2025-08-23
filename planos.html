@@ -98,63 +98,76 @@ footer::before{content:"";position:absolute;inset:0 6% auto 6%;height:1px;backgr
 @media (max-width:560px){.modal .panel{padding:16px;border-radius:18px}}
 .tilt{will-change:transform}
 .body-modal-open{overflow:hidden}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
+{% set E = plans['Essencial'] %}
+{% set P = plans['Profissional'] %}
+{% set V = plans['Vitalício'] %}
+{% set E_price = ('R$' ~ ('%.2f' % (E['amount_cents']/100.0))).replace('.', ',') %}
+{% set P_price = ('R$' ~ ('%.2f' % (P['amount_cents']/100.0))).replace('.', ',') %}
+{% set V_price = ('R$' ~ ('%.2f' % (V['amount_cents']/100.0))).replace('.', ',') %}
 <div class="container">
 <header>
 <div class="brand"><div class="brand-badge"><i class="fa-solid fa-robot"></i></div><div class="brand-title">Reporting Bot</div></div>
 <p class="tagline">Escolha o plano ideal.
 Planos mensais de 30 dias e opção vitalícia. Pagamento exclusivo via Pix, suporte rápido por chat</p>
-<div class="ribbon"><i class="fa-solid fa-bolt"></i><span>Ativação imediata</span><span style="display:inline-flex;align-items:center;gap:.45rem;padding:.3rem .6rem;border:1px solid rgba(16,185,129,.25);border-radius:999px;background:rgba(16,185,129,.12);color:var(--success);font-weight:900"><i class="fa-brands fa-pix"></i> Pagamento via Pix</span></div>
+<div class="ribbon"><i class="fa-solid fa-bolt"></i><span>Ativação imediata</span><span style="display:inline-flex;align-items:center;gap:.45rem;padding:.3rem .6rem;border:1px solid rgba(16,185,129,.25);border-radius:999px;background:rgba(16,185,129,.12);color:var(--success);font-weight:900"><i class="fa-solid fa-qrcode"></i> Pagamento via Pix</span></div>
 </header>
 <section class="grid">
-<article class="card tilt" data-plan="Essencial" data-price="R$35" data-period="30 dias">
+{% if E.active %}
+<article class="card tilt" data-plan="Essencial" data-price="{{ E_price }}" data-period="30 dias">
 <div class="period-chip"><i class="fa-solid fa-rotate"></i> Mensal (30 dias)</div>
 <div class="head"><div class="icon"><i class="fa-regular fa-gem"></i></div><div class="title">Essencial</div></div>
-<div class="price"><div class="amount">R$35</div><div class="period">/ mês • 30 dias</div></div>
+<div class="price"><div class="amount">{{ E_price }}</div><div class="period">/ mês • 30 dias</div></div>
 <div class="quota">Indicado para remover contas de até 300 seguidores</div>
 <div class="features">
-<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Permite denunciar até 5 contas por dia</span></div>
-<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Intervalo mínimo de 1 hora para repetir a mesma conta</span></div>
-<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Limite de até 500 denúncias por conta</span></div>
-<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Suporte por chat</span></div>
-<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Fila de processamento padrão</span></div>
+<div class="feature"><i class="fa-solid fa-circle-check"></i><span>Permite denunciar até 5 contas por dia</span></div>
+<div class="feature"><i class="fa-solid fa-circle-check"></i><span>Intervalo mínimo de 1 hora para repetir a mesma conta</span></div>
+<div class="feature"><i class="fa-solid fa-circle-check"></i><span>Limite de até 500 denúncias por conta</span></div>
+<div class="feature"><i class="fa-solid fa-circle-check"></i><span>Suporte por WhatsApp</span></div>
+<div class="feature"><i class="fa-solid fa-circle-check"></i><span>Fila de processamento padrão</span></div>
 </div>
-<div class="payline"><i class="fa-brands fa-pix"></i><span>Pagamento via Pix</span></div>
+<div class="payline"><i class="fa-solid fa-qrcode"></i><span>Pagamento via Pix</span></div>
 <div class="actions"><button class="btn select">Assinar Essencial</button><div class="note">QR Code Pix emitido na confirmação</div></div>
 </article>
-<article class="card tilt" data-plan="Profissional" data-price="R$45,50" data-period="30 dias">
+{% endif %}
+{% if P.active %}
+<article class="card tilt" data-plan="Profissional" data-price="{{ P_price }}" data-period="30 dias">
 <div class="badge">Mais popular</div>
 <div class="period-chip"><i class="fa-solid fa-rotate"></i> Mensal (30 dias)</div>
 <div class="head"><div class="icon"><i class="fa-solid fa-rocket"></i></div><div class="title">Profissional</div></div>
-<div class="price"><div class="amount">R$45,50</div><div class="period">/ mês • 30 dias</div></div>
+<div class="price"><div class="amount">{{ P_price }}</div><div class="period">/ mês • 30 dias</div></div>
 <div class="quota">Exigente para remover contas de até 10.000 seguidores e não verificadas</div>
 <div class="features">
-<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Permite denunciar até 15 contas por dia</span></div>
-<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Permite repetir a mesma conta</span></div>
-<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Limite de até 5.000 denúncias por conta</span></div>
-<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Suporte por chat</span></div>
-<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Processamento de fila prioritário</span></div>
+<div class="feature"><i class="fa-solid fa-circle-check"></i><span>Permite denunciar até 15 contas por dia</span></div>
+<div class="feature"><i class="fa-solid fa-circle-check"></i><span>Permite repetir a mesma conta</span></div>
+<div class="feature"><i class="fa-solid fa-circle-check"></i><span>Limite de até 5.000 denúncias por conta</span></div>
+<div class="feature"><i class="fa-solid fa-circle-check"></i><span>Suporte por WhatsApp</span></div>
+<div class="feature"><i class="fa-solid fa-circle-check"></i><span>Processamento de fila prioritário</span></div>
 </div>
-<div class="payline"><i class="fa-brands fa-pix"></i><span>Pagamento via Pix</span></div>
+<div class="payline"><i class="fa-solid fa-qrcode"></i><span>Pagamento via Pix</span></div>
 <div class="actions"><button class="btn select">Assinar Profissional</button><div class="note">QR Code Pix emitido na confirmação</div></div>
 </article>
-<article class="card tilt" data-plan="Vitalício" data-price="R$119" data-period="Acesso permanente">
+{% endif %}
+{% if V.active %}
+<article class="card tilt" data-plan="Vitalício" data-price="{{ V_price }}" data-period="Acesso permanente">
 <div class="badge">Melhor valor</div>
 <div class="head"><div class="icon"><i class="fa-solid fa-infinity"></i></div><div class="title">Vitalício</div></div>
-<div class="price"><div class="amount">R$119</div><div class="period">• acesso permanente</div></div>
+<div class="price"><div class="amount">{{ V_price }}</div><div class="period">• acesso permanente</div></div>
 <div class="quota">Ideal para remover contas sem limites de seguidores e verificadas por assinatura</div>
 <div class="features">
-<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Sem renovação: acesso vitalício</span></div>
-<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Permite repetir a mesma conta</span></div>
-<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Limite de até 15.950 denúncias por conta</span></div>
-<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Suporte por chat</span></div>
-<div class="feature"><i class="fa-solid fa-check-circle"></i><span>Recursos ilimitados, sucesso garantido e maior prioridade</span></div>
+<div class="feature"><i class="fa-solid fa-circle-check"></i><span>Sem renovação: acesso vitalício</span></div>
+<div class="feature"><i class="fa-solid fa-circle-check"></i><span>Permite repetir a mesma conta</span></div>
+<div class="feature"><i class="fa-solid fa-circle-check"></i><span>Limite de até 15.950 denúncias por conta</span></div>
+<div class="feature"><i class="fa-solid fa-circle-check"></i><span>Suporte por WhatsApp</span></div>
+<div class="feature"><i class="fa-solid fa-circle-check"></i><span>Recursos ilimitados, sucesso garantido e maior prioridade</span></div>
 </div>
-<div class="payline"><i class="fa-brands fa-pix"></i><span>Pagamento via Pix</span></div>
+<div class="payline"><i class="fa-solid fa-qrcode"></i><span>Pagamento via Pix</span></div>
 <div class="actions"><button class="btn select">Assinar Vitalício</button><div class="note">Pagamento único com Pix</div></div>
 </article>
+{% endif %}
 </section>
 <section class="compare">
 <table class="table">
@@ -174,12 +187,12 @@ Planos mensais de 30 dias e opção vitalícia. Pagamento exclusivo via Pix, sup
 </section>
 </div>
 <div id="toast" class="toast" aria-live="polite"><i class="fa-solid fa-circle-check" style="color:#10b981"></i><span id="toast-text">Plano selecionado</span></div>
-<div id="confetti" class="confetti"></div>
+<div id="confetti" class="confetti" aria-hidden="true"></div>
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="dlg-title">
 <div class="overlay" id="overlay"></div>
 <div class="panel">
 <div class="head">
-<div class="hleft"><div class="hicon"><i class="fa-brands fa-pix"></i></div><div class="htitle" id="dlg-title">Finalizar assinatura</div></div>
+<div class="hleft"><div class="hicon"><i class="fa-solid fa-qrcode"></i></div><div class="htitle" id="dlg-title">Finalizar assinatura</div></div>
 <button class="close" id="closeModal" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
 </div>
 <div class="row" style="margin-top:10px">
@@ -188,8 +201,8 @@ Planos mensais de 30 dias e opção vitalícia. Pagamento exclusivo via Pix, sup
 </div>
 <form class="form" id="pix-form" action="/pixPayment" method="post" novalidate>
 <input type="hidden" name="plan" id="f-plan">
-<div class="input"><label for="f-name">Nome completo</label><input id="f-name" name="name" type="text" placeholder="Digite seu nome completo" required aria-describedby="e-name" aria-invalid="false"><div class="err" id="e-name">Informe seu nome completo</div></div>
-<div class="input"><label for="f-cpf">CPF (apenas números)</label><input id="f-cpf" name="cpf" inputmode="numeric" pattern="^\d{11}$" maxlength="11" placeholder="Somente números" required aria-describedby="e-cpf e-cpf-invalid" aria-invalid="false"><div class="err" id="e-cpf">Informe um CPF com 11 dígitos</div><div class="err" id="e-cpf-invalid">CPF inválido. Verifique os dígitos.</div></div>
+<div class="input"><label for="f-name">Nome completo</label><input id="f-name" name="name" type="text" placeholder="Digite seu nome completo" required aria-describedby="e-name" aria-invalid="false" autocomplete="name"><div class="err" id="e-name">Informe seu nome completo</div></div>
+<div class="input"><label for="f-cpf">CPF (apenas números)</label><input id="f-cpf" name="cpf" inputmode="numeric" pattern="^\d{11}$" maxlength="11" placeholder="Somente números" required aria-describedby="e-cpf e-cpf-invalid" aria-invalid="false" autocomplete="off"><div class="err" id="e-cpf">Informe um CPF com 11 dígitos</div><div class="err" id="e-cpf-invalid">CPF inválido. Verifique os dígitos.</div></div>
 <div class="actions-modal"><button type="button" class="btn btn-ghost" id="cancel">Cancelar</button><button type="submit" class="btn btn-primary" id="submitBtn">Continuar para Pix</button></div>
 </form>
 <div class="policy" id="policy">
@@ -205,7 +218,7 @@ Planos mensais de 30 dias e opção vitalícia. Pagamento exclusivo via Pix, sup
 </div>
 <footer>Reporting Bot © 2025 • Todos os direitos reservados</footer>
 <script>
-const cards=document.querySelectorAll('.card .select');const toast=document.getElementById('toast');const toastText=document.getElementById('toast-text');const confetti=document.getElementById('confetti');const modal=document.getElementById('modal');const overlay=document.getElementById('overlay');const closeModalBtn=document.getElementById('closeModal');const cancelBtn=document.getElementById('cancel');const form=document.getElementById('pix-form');const fPlan=document.getElementById('f-plan');const fName=document.getElementById('f-name');const fCpf=document.getElementById('f-cpf');const mPlan=document.getElementById('m-plan');const mPrice=document.getElementById('m-price');const submitBtn=document.getElementById('submitBtn');const main=document.querySelector('.container');let lastFocus=null;function showToast(msg){toastText.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1600)}function burstConfetti(x,y){const n=28;for(let i=0;i<n;i++){const p=document.createElement('span');p.style.position='absolute';p.style.left=x+'px';p.style.top=y+'px';p.style.width='10px';p.style.height='10px';p.style.borderRadius='2px';p.style.background=`hsl(${Math.floor(Math.random()*360)} 90% 60%)`;p.style.transform=`translateY(-20vh)`;p.style.animation='fall 1.2s ease forwards';p.style.filter='drop-shadow(0 6px 6px rgba(0,0,0,.2))';p.style.left=`calc(${x}px + ${Math.random()*80-40}px)`;confetti.appendChild(p);setTimeout(()=>confetti.removeChild(p),1300)}}function cpfIsValid(c){const s=(c||'').replace(/\D+/g,'');if(s.length!==11)return false;if(/^(\d)\1+$/.test(s))return false;let sum=0;for(let i=0;i<9;i++)sum+=parseInt(s[i],10)*(10-i);let dv1=(sum*10)%11;dv1=dv1===10?0:dv1;if(dv1!==parseInt(s[9],10))return false;sum=0;for(let i=0;i<10;i++)sum+=parseInt(s[i],10)*(11-i);let dv2=(sum*10)%11;dv2=dv2===10?0:dv2;return dv2===parseInt(s[10],10)}function nameIsValid(n){const p=String(n||'').trim().split(/\s+/).filter(x=>x.length>=2);return p.length>=2}function setFieldState(input,ok,errIds){input.classList.remove('valid','invalid');input.setAttribute('aria-invalid',String(!ok));errIds.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none'});if(ok){input.classList.add('valid')}else{input.classList.add('invalid')}}function validate(){let ok=true;const name=String(fName.value||'').trim();const cpf=String(fCpf.value||'').replace(/\D+/g,'');let nameOk=nameIsValid(name);let cpfLenOk=cpf.length===11;let cpfOk=cpfLenOk&&cpfIsValid(cpf);document.getElementById('e-name').style.display=nameOk?'none':'block';document.getElementById('e-cpf').style.display=cpfLenOk?'none':'block';document.getElementById('e-cpf-invalid').style.display=cpfLenOk&&!cpfOk?'block':'none';setFieldState(fName,nameOk,['e-name']);setFieldState(fCpf,cpfOk,['e-cpf','e-cpf-invalid']);if(!nameOk)ok=false;if(!cpfOk)ok=false;return ok}function openModal(plan,price){lastFocus=document.activeElement;mPlan.textContent=plan;mPrice.textContent=price;fPlan.value=plan;modal.classList.add('show');document.body.classList.add('body-modal-open');if(main)main.setAttribute('inert','');setTimeout(()=>fName.focus(),50)}function closeModal(){modal.classList.remove('show');document.body.classList.remove('body-modal-open');if(main)main.removeAttribute('inert');if(lastFocus&&lastFocus.focus)lastFocus.focus()}cards.forEach(b=>{b.addEventListener('click',e=>{const card=e.currentTarget.closest('.card');card.style.animation='pulse .6s ease';setTimeout(()=>card.style.animation='',620);const plan=card.getAttribute('data-plan');const price=card.getAttribute('data-price');const period=card.getAttribute('data-period');showToast(`${plan} selecionado (${price} • ${period} • Pix)`);const r=card.getBoundingClientRect();burstConfetti(r.left+r.width/2, r.top+window.scrollY+40);openModal(plan,price)})});overlay.addEventListener('click',closeModal);closeModalBtn.addEventListener('click',closeModal);cancelBtn.addEventListener('click',closeModal);document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('show'))closeModal()});const tilts=document.querySelectorAll('.tilt');tilts.forEach(card=>{card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect();const x=e.clientX-r.left;const y=e.clientY-r.top;const rx=((y-r.height/2)/r.height)*6;const ry=((x-r.width/2)/r.width)*-6;card.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`});card.addEventListener('mouseleave',()=>{card.style.transform='rotateX(0) rotateY(0)'})});function onlyDigits(s){return String(s||'').replace(/\D+/g,'')}fCpf.addEventListener('input',e=>{const d=onlyDigits(e.target.value).slice(0,11);e.target.value=d;validate()});fName.addEventListener('input',()=>validate());function handleTabTrap(e){if(!modal.classList.contains('show'))return;const focusables=modal.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');const f=Array.from(focusables).filter(el=>!el.hasAttribute('disabled')&&el.tabIndex!==-1);if(f.length===0)return;const first=f[0];const last=f[f.length-1];if(e.key==='Tab'){if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}}document.addEventListener('keydown',handleTabTrap);function validateAndSubmit(){if(!validate())return;submitBtn.disabled=true;fCpf.value=onlyDigits(fCpf.value);form.submit()}form.addEventListener('submit',e=>{e.preventDefault();validateAndSubmit()})
+const cards=document.querySelectorAll('.card .select');const toast=document.getElementById('toast');const toastText=document.getElementById('toast-text');const confetti=document.getElementById('confetti');const modal=document.getElementById('modal');const overlay=document.getElementById('overlay');const closeModalBtn=document.getElementById('closeModal');const cancelBtn=document.getElementById('cancel');const form=document.getElementById('pix-form');const fPlan=document.getElementById('f-plan');const fName=document.getElementById('f-name');const fCpf=document.getElementById('f-cpf');const mPlan=document.getElementById('m-plan');const mPrice=document.getElementById('m-price');const submitBtn=document.getElementById('submitBtn');const main=document.querySelector('.container');let lastFocus=null;const reduceMotion=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;function showToast(msg){toastText.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1600)}function burstConfetti(x,y){if(reduceMotion)return;const n=28;for(let i=0;i<n;i++){const p=document.createElement('span');p.style.position='absolute';p.style.left=x+'px';p.style.top=y+'px';p.style.width='10px';p.style.height='10px';p.style.borderRadius='2px';p.style.background=`hsl(${Math.floor(Math.random()*360)} 90% 60%)`;p.style.transform=`translateY(-20vh)`;p.style.animation='fall 1.2s ease forwards';p.style.filter='drop-shadow(0 6px 6px rgba(0,0,0,.2))';p.style.left=`calc(${x}px + ${Math.random()*80-40}px)`;confetti.appendChild(p);setTimeout(()=>confetti.removeChild(p),1300)}}function cpfIsValid(c){const s=(c||'').replace(/\D+/g,'');if(s.length!==11)return false;if(/^(\d)\1+$/.test(s))return false;let sum=0;for(let i=0;i<9;i++)sum+=parseInt(s[i],10)*(10-i);let dv1=(sum*10)%11;dv1=dv1===10?0:dv1;if(dv1!==parseInt(s[9],10))return false;sum=0;for(let i=0;i<10;i++)sum+=parseInt(s[i],10)*(11-i);let dv2=(sum*10)%11;dv2=dv2===10?0:dv2;return dv2===parseInt(s[10],10)}function nameIsValid(n){const p=String(n||'').trim().split(/\s+/).filter(x=>x.length>=2);return p.length>=2}function setFieldState(input,ok,errIds){input.classList.remove('valid','invalid');input.setAttribute('aria-invalid',String(!ok));errIds.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none'});if(ok){input.classList.add('valid')}else{input.classList.add('invalid')}}function validate(){let ok=true;const name=String(fName.value||'').trim();const cpf=String(fCpf.value||'').replace(/\D+/g,'');let nameOk=nameIsValid(name);let cpfLenOk=cpf.length===11;let cpfOk=cpfLenOk&&cpfIsValid(cpf);document.getElementById('e-name').style.display=nameOk?'none':'block';document.getElementById('e-cpf').style.display=cpfLenOk?'none':'block';document.getElementById('e-cpf-invalid').style.display=cpfLenOk&&!cpfOk?'block':'none';setFieldState(fName,nameOk,['e-name']);setFieldState(fCpf,cpfOk,['e-cpf','e-cpf-invalid']);if(!nameOk)ok=false;if(!cpfOk)ok=false;return ok}function openModal(plan,price){lastFocus=document.activeElement;mPlan.textContent=plan;mPrice.textContent=price;fPlan.value=plan;modal.classList.add('show');document.body.classList.add('body-modal-open');if(main)main.setAttribute('inert','');setTimeout(()=>fName.focus(),50)}function closeModal(){modal.classList.remove('show');document.body.classList.remove('body-modal-open');if(main)main.removeAttribute('inert');if(lastFocus&&lastFocus.focus)lastFocus.focus()}cards.forEach(b=>{b.addEventListener('click',e=>{const card=e.currentTarget.closest('.card');card.style.animation='pulse .6s ease';setTimeout(()=>card.style.animation='',620);const plan=card.getAttribute('data-plan');const price=card.getAttribute('data-price');const period=card.getAttribute('data-period');showToast(`${plan} selecionado (${price} • ${period} • Pix)`);const r=card.getBoundingClientRect();burstConfetti(r.left+r.width/2, r.top+window.scrollY+40);openModal(plan,price)})});overlay.addEventListener('click',closeModal);closeModalBtn.addEventListener('click',closeModal);cancelBtn.addEventListener('click',closeModal);document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('show'))closeModal()});const tilts=document.querySelectorAll('.tilt');tilts.forEach(card=>{if(reduceMotion)return;card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect();const x=e.clientX-r.left;const y=e.clientY-r.top;const rx=((y-r.height/2)/r.height)*6;const ry=((x-r.width/2)/r.width)*-6;card.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`});card.addEventListener('mouseleave',()=>{card.style.transform='rotateX(0) rotateY(0)'})});function onlyDigits(s){return String(s||'').replace(/\D+/g,'')}fCpf.addEventListener('input',e=>{const d=onlyDigits(e.target.value).slice(0,11);e.target.value=d;validate()});fName.addEventListener('input',()=>validate());function handleTabTrap(e){if(!modal.classList.contains('show'))return;const focusables=modal.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');const f=Array.from(focusables).filter(el=>!el.hasAttribute('disabled')&&el.tabIndex!==-1);if(f.length===0)return;const first=f[0];const last=f[f.length-1];if(e.key==='Tab'){if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}}document.addEventListener('keydown',handleTabTrap);function validateAndSubmit(){if(!validate())return;submitBtn.disabled=true;fCpf.value=onlyDigits(fCpf.value);form.submit()}form.addEventListener('submit',e=>{e.preventDefault();validateAndSubmit()});window.addEventListener('pageshow',()=>{submitBtn.disabled=false})
 </script>
 </body>
 </html>
