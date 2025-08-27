@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -9,11 +10,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
-:root{--primary:#6366f1;--primary-dark:#4f46e5;--secondary:#8b5cf6;--accent:#ec4899;--ok:#10b981;--warn:#f59e0b;--err:#ef4444;--paper:rgba(255,255,255,.92);--ink:#0f172a;--muted:#667085;--line:#e5e7eb;--bg1:#f8fafc;--bg2:#eef2f7}
+:root{--primary:#6366f1;--primary-dark:#4f46e5;--secondary:#8b5cf6;--accent:#ec4899;--ok:#10b981;--warn:#f59e0b;--err:#ef4444;--paper:rgba(255,255,255,.94);--paper2:rgba(255,255,255,.88);--ink:#0f172a;--muted:#667085;--line:#e5e7eb;--bg1:#f8fafc;--bg2:#eef2f7}
 *{box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
 body{min-height:100vh;display:flex;flex-direction:column;color:var(--ink);background:radial-gradient(1200px 600px at -10% 0,#e9d5ff26,transparent),radial-gradient(1200px 600px at 110% 40%,#93c5fd2a,transparent),linear-gradient(135deg,var(--bg1),var(--bg2))}
-.container{max-width:1180px;margin:0 auto;padding:32px 16px}
-header{display:flex;flex-direction:column;align-items:center;gap:10px;margin:10px 0 18px;position:relative}
+.container{max-width:1180px;margin:0 auto;padding:28px 16px}
+header{display:flex;flex-direction:column;align-items:center;gap:10px;margin:6px 0 16px;position:relative}
 header::after{content:"";position:absolute;inset:auto 6% -10px 6%;height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent)}
 .brand{display:flex;align-items:center;justify-content:center;gap:12px}
 .brand-badge{width:72px;height:72px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,var(--primary),var(--secondary));box-shadow:0 22px 48px -18px rgba(99,102,241,.5)}
@@ -21,8 +22,8 @@ header::after{content:"";position:absolute;inset:auto 6% -10px 6%;height:1px;bac
 .brand-title{font-weight:900;letter-spacing:-.2px;font-size:1.7rem;background:linear-gradient(90deg,var(--primary),var(--secondary),var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .tag{display:inline-flex;gap:8px;align-items:center;margin-top:4px;padding:7px 12px;border-radius:999px;border:1px solid rgba(79,70,229,.25);background:rgba(79,70,229,.12);color:var(--primary);font-weight:900;font-size:.95rem}
 .tag i{font-size:1rem}
-.wrap{display:grid;grid-template-columns:1.25fr .75fr;gap:18px;margin-top:14px}
-@media (max-width:980px){.wrap{grid-template-columns:1fr}}
+.wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;margin-top:16px;align-items:start}
+@media (max-width:980px){.wrap{grid-template-columns:1fr;gap:14px}}
 .card{position:relative;border:1px solid var(--line);background:var(--paper);backdrop-filter:blur(10px);border-radius:22px;padding:18px;box-shadow:0 30px 70px -20px rgba(2,6,23,.15);overflow:hidden}
 .card::before{content:"";position:absolute;inset:-1;border-radius:24px;background:conic-gradient(from 0deg,transparent,rgba(99,102,241,.18),transparent 30%);filter:blur(6px);z-index:-1;animation:spin 7s linear infinite}
 .title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
@@ -35,14 +36,14 @@ header::after{content:"";position:absolute;inset:auto 6% -10px 6%;height:1px;bac
 @media (max-width:720px){.summary{grid-template-columns:1fr}}
 .kv{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff}
 .kv .k{color:var(--muted);font-weight:800}
-.kv .v{font-weight:900}
-.qr-wrap{display:grid;grid-template-columns:280px 1fr;gap:18px;margin-top:12px;align-items:start}
+.kv .v{font-weight:900;word-break:break-all}
+.qr-wrap{display:grid;grid-template-columns:300px 1fr;gap:18px;margin-top:12px;align-items:start}
 @media (max-width:980px){.qr-wrap{grid-template-columns:1fr}}
 .qr-box{display:grid;place-items:center;border:1px dashed var(--line);border-radius:16px;background:#fff;padding:14px}
-.qr-box img{width:240px;height:240px;border-radius:12px}
+.qr-box img{width:min(260px,70vw);height:auto;aspect-ratio:1/1;border-radius:12px;display:block}
 .copycol{display:flex;gap:10px;margin-top:10px}
-.copycol input{flex:1;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-weight:900}
-.btn{border:none;border-radius:12px;padding:12px 14px;font-weight:900;cursor:pointer;transition:transform .12s,filter .12s}
+.copycol input{flex:1;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-weight:900;white-space:nowrap;overflow:auto}
+.btn{border:none;border-radius:12px;padding:12px 14px;font-weight:900;cursor:pointer;transition:transform .12s,filter .12s;display:inline-flex;align-items:center;gap:8px}
 .btn:active{transform:translateY(1px)}
 .btn-primary{color:#fff;background:linear-gradient(90deg,var(--primary),var(--secondary));box-shadow:0 18px 36px -14px rgba(99,102,241,.5)}
 .btn-ghost{background:#fff;border:1px solid var(--line);font-weight:900}
@@ -53,18 +54,26 @@ header::after{content:"";position:absolute;inset:auto 6% -10px 6%;height:1px;bac
 .num{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;font-weight:900;font-size:.9rem}
 .text{flex:1}
 .timer{display:flex;align-items:center;gap:12px;margin:10px 0}
-.ring{--p:0;position:relative;width:52px;height:52px;border-radius:50%;background:conic-gradient(var(--primary) calc(var(--p)*1%),#e5e7eb 0)}
-.ring:after{content:"";position:absolute;inset:5px;border-radius:50%;background:#fff}
+.ring{--p:0;position:relative;width:56px;height:56px;border-radius:50%;background:conic-gradient(var(--primary) calc(var(--p)*1%),#e5e7eb 0)}
+.ring:after{content:"";position:absolute;inset:6px;border-radius:50%;background:#fff}
 .tval{font-weight:900}
 .badge{display:inline-flex;gap:8px;align-items:center;padding:7px 12px;border-radius:999px;background:rgba(16,185,129,.12);color:var(--ok);font-weight:900;border:1px solid rgba(16,185,129,.25)}
-.warn{background:rgba(245,158,11,.12);color:var(--warn);border-color:rgba(245,158,11,.25)}
+.warn{background:rgba(245,158,11,.12)!important;color:var(--warn)!important;border-color:rgba(245,158,11,.25)!important}
 .toast{position:fixed;left:50%;top:18px;transform:translateX(-50%) translateY(-18px);opacity:0;z-index:80;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 20px 50px -20px rgba(2,6,23,.25);padding:12px 16px;font-weight:900;display:flex;align-items:center;gap:10px;transition:opacity .25s,transform .25s}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .confetti{position:fixed;inset:0;pointer-events:none;z-index:70}
 .tips{margin-top:10px;display:grid;gap:8px}
 .tips .kv{background:rgba(99,102,241,.05)}
-.cta{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap}
+.cta{margin-top:10px;display:grid;gap:10px}
 .note{font-size:.95rem;color:var(--muted)}
+.side{display:grid;gap:14px}
+.promo{border:1px solid var(--line);background:var(--paper2);backdrop-filter:blur(10px);border-radius:20px;padding:16px;box-shadow:0 26px 60px -22px rgba(2,6,23,.12)}
+.promo h3{font-size:1.05rem;font-weight:900;display:flex;align-items:center;gap:8px}
+.promo .list{display:grid;gap:8px;margin-top:10px}
+.promo .item{display:flex;gap:10px;align-items:flex-start}
+.promo .item i{color:var(--ok);min-width:20px}
+.secure{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.secure .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:800;color:#0f172a}
 footer{text-align:center;margin-top:auto;background:#fff;border-top:1px solid var(--line);padding:22px 12px;color:var(--muted);font-size:.95rem}
 @keyframes spin{to{transform:rotate(1turn)}}
 @keyframes fall{0%{transform:translateY(-20vh) rotate(0)}100%{transform:translateY(105vh) rotate(720deg)}}
@@ -80,7 +89,7 @@ footer{text-align:center;margin-top:auto;background:#fff;border-top:1px solid va
 <div class="card">
 <div class="title">
 <div class="title-left"><div class="icon"><i class="fa-solid fa-bolt"></i></div><div class="t1">Finalize seu pagamento</div></div>
-<div class="status" id="status-badge"><i class="fa-solid fa-circle"></i> Aguardando pagamento</div>
+<div class="status" id="status-badge" role="status" aria-live="polite"><i class="fa-solid fa-circle"></i> Aguardando pagamento</div>
 </div>
 <div class="summary">
 <div class="kv"><div class="k">Plano</div><div class="v" id="sum-plan">{{ plan }}</div></div>
@@ -91,7 +100,7 @@ footer{text-align:center;margin-top:auto;background:#fff;border-top:1px solid va
 <div>
 <div class="qr-box"><img id="qr" alt="QR Code Pix" src="data:image/png;base64,{{ qr_b64 }}"></div>
 <div class="copycol"><input id="copiacola" readonly value="{{ emv }}"><button class="btn btn-primary" id="btn-copy"><i class="fa-solid fa-copy"></i> Copiar código</button></div>
-<div class="actions"><button class="btn btn-primary" id="btn-paid"><i class="fa-solid fa-check"></i> Já paguei</button></div>
+<div class="actions"><div class="badge"><i class="fa-solid fa-wand-magic-sparkles"></i> Confirmação automática</div></div>
 </div>
 <div class="howto">
 <div class="badge"><i class="fa-solid fa-bolt"></i> Pagamento instantâneo</div>
@@ -105,32 +114,23 @@ footer{text-align:center;margin-top:auto;background:#fff;border-top:1px solid va
 <div class="tips">
 <div class="kv"><div class="k">Método</div><div class="v">Pix QR Code ou Pix Copia e Cola</div></div>
 <div class="kv"><div class="k">Confirmação</div><div class="v">Detecção automática em segundos</div></div>
-<div class="kv"><div class="k">Suporte</div><div class="v">Chat rápido</div></div>
+<div class="kv"><div class="k">Suporte</div><div class="v">WhatsApp</div></div>
 <div class="kv"><div class="k">Cobrança</div><div class="v">Sem renovação automática</div></div>
 </div>
-<div class="cta"><div class="note">Se preferir, clique em <b>Já paguei</b> após concluir no aplicativo do banco.</div></div>
+<div class="cta"><div class="note">Mantenha esta página aberta. A confirmação acontece automaticamente após o pagamento.</div></div>
 </div>
+</div>
+<div class="side">
+<div class="promo"><h3><i class="fa-solid fa-shield-halved"></i> Pagamento seguro</h3><div class="list"><div class="item"><i class="fa-solid fa-circle-check"></i><div>Ativação imediata após confirmação</div></div><div class="item"><i class="fa-solid fa-circle-check"></i><div>Dados validados diretamente pelo banco</div></div><div class="item"><i class="fa-solid fa-circle-check"></i><div>Sem renovação automática ou taxas ocultas</div></div></div><div class="secure"><div class="pill"><i class="fa-solid fa-lock"></i> Conexão criptografada</div><div class="pill"><i class="fa-solid fa-bolt"></i> Pix instantâneo</div><div class="pill"><i class="fa-solid fa-headset"></i> Suporte dedicado</div></div></div>
+<div class="promo"><h3><i class="fa-solid fa-gift"></i> Dicas para pagar mais rápido</h3><div class="list"><div class="item"><i class="fa-solid fa-circle-check"></i><div>Use o <b>Copia e Cola</b> para evitar erros de digitação</div></div><div class="item"><i class="fa-solid fa-circle-check"></i><div>Após o pagamento, aguarde a detecção automática</div></div></div></div>
 </div>
 </section>
 </div>
-<div id="toast" class="toast"><i class="fa-solid fa-circle-check" style="color:#10b981"></i><span id="toast-text">Copiado</span></div>
+<div id="toast" class="toast" aria-live="polite"><i class="fa-solid fa-circle-check" style="color:#10b981"></i><span id="toast-text">Copiado</span></div>
 <div id="confetti" class="confetti"></div>
 <footer><p>Reporting Bot © 2025 — Todos os direitos reservados</p></footer>
 <script>
-const page=document.getElementById("page");const PLAN=page.dataset.plan||"—";const AMOUNT=page.dataset.amount||"—";const HASH=page.dataset.hash||"";let STATUS=(page.dataset.status||"waiting_payment").toLowerCase();const PIXURL=page.dataset.pixurl||"";const badge=document.getElementById("status-badge");const ttlEl=document.getElementById("ttl");const ring=document.getElementById("ring");const toastEl=document.getElementById("toast");const toastText=document.getElementById("toast-text");const confetti=document.querySelector(".confetti");const copyBtn=document.getElementById("btn-copy");const openBtn=document.getElementById("btn-open");const paidBtn=document.getElementById("btn-paid");const input=document.getElementById("copiacola");document.getElementById("sum-plan").textContent=PLAN;document.getElementById("sum-amount").textContent=AMOUNT;document.getElementById("sum-hash").textContent=HASH;
-function showToast(m){toastText.textContent=m;toastEl.classList.add("show");setTimeout(()=>toastEl.classList.remove("show"),1600)}
-function burst(x,y){for(let i=0;i<28;i++){const p=document.createElement("span");p.style.position="absolute";p.style.left=x+"px";p.style.top=y+"px";p.style.width="10px";p.style.height="10px";p.style.borderRadius="2px";p.style.background=`hsl(${Math.floor(Math.random()*360)} 90% 60%)`;p.style.transform=`translateY(-20vh)`;p.style.animation="fall 1.2s ease forwards";p.style.filter="drop-shadow(0 6px 6px rgba(0,0,0,.2))";p.style.left=`calc(${x}px + ${Math.random()*80-40}px)`;confetti.appendChild(p);setTimeout(()=>confetti.removeChild(p),1300)}}
-function setBadge(s){const st=(s||"").toLowerCase();const paidSet=["paid","success","approved","confirmed","completed","paid_out","finished","settled","captured","accredited","credited","confirmed_payment"];const failSet=["expired","canceled","cancelled","refunded","chargeback","reversed","voided","failed","denied"];if(paidSet.includes(st)){badge.innerHTML='<i class="fa-solid fa-circle-check"></i> Pagamento identificado';badge.style.background="rgba(16,185,129,.12)";badge.style.color="#10b981";badge.style.borderColor="rgba(16,185,129,.25)";return"paid"}if(failSet.includes(st)){badge.innerHTML='<i class="fa-solid fa-circle-exclamation"></i> Tempo esgotado';badge.classList.add("warn");return"expired"}badge.classList.remove("warn");badge.innerHTML='<i class="fa-solid fa-circle"></i> Aguardando pagamento';badge.style.background="rgba(99,102,241,.12)";badge.style.color="var(--primary)";badge.style.borderColor="rgba(99,102,241,.25)";return"waiting"}
-function normalizeUrl(u){if(!u)return"";if(/^https?:\/\//i.test(u))return u;return"https://"+u}
-async function checkStatus(){try{const r=await fetch(`/pix/status?hash=${encodeURIComponent(HASH)}`,{cache:"no-store"});const j=await r.json();if(j&&j.ok){STATUS=(j.status||"").toLowerCase();const m=setBadge(STATUS);if(m==="paid"){showToast("Pagamento confirmado");burst(innerWidth/2,120);setTimeout(()=>{location.replace("/")},2500)}}else{showToast("Tente novamente")}}catch(e){}}
-copyBtn.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(input.value||"");showToast("Código Pix copiado")}catch(e){showToast("Falha ao copiar")}});
-openBtn.addEventListener("click",()=>{const u=normalizeUrl(PIXURL);if(u)window.open(u,"_blank");else showToast("Abra o app do seu banco e use Pix Copia e Cola ou QR Code")});
-paidBtn.addEventListener("click",checkStatus);
-let ttl=15*60;setBadge(STATUS);
-const tick=setInterval(()=>{ttl=Math.max(0,ttl-1);const m=String(Math.floor(ttl/60)).padStart(2,"0");const s=String(ttl%60).padStart(2,"0");ttlEl.textContent=`${m}:${s}`;ring.style.setProperty("--p",((900-ttl)/900)*100);if(ttl===0){clearInterval(tick);setBadge("expired")}},1000);
-let poller=setInterval(checkStatus,1000);
-document.addEventListener("visibilitychange",()=>{if(document.hidden){clearInterval(poller)}else{checkStatus();poller=setInterval(checkStatus,1000)}});
-window.addEventListener("pageshow",()=>{checkStatus()});
+const page=document.getElementById("page");const PLAN=page.dataset.plan||"—";const AMOUNT=page.dataset.amount||"—";const HASH=page.dataset.hash||"";let STATUS=(page.dataset.status||"waiting_payment").toLowerCase();const PIXURL=page.dataset.pixurl||"";const badge=document.getElementById("status-badge");const ttlEl=document.getElementById("ttl");const ring=document.getElementById("ring");const toastEl=document.getElementById("toast");const toastText=document.getElementById("toast-text");const confetti=document.querySelector(".confetti");const copyBtn=document.getElementById("btn-copy");const input=document.getElementById("copiacola");document.getElementById("sum-plan").textContent=PLAN;document.getElementById("sum-amount").textContent=AMOUNT;document.getElementById("sum-hash").textContent=HASH;function showToast(m){toastText.textContent=m;toastEl.classList.add("show");setTimeout(()=>toastEl.classList.remove("show"),1600)}function burst(x,y){for(let i=0;i<28;i++){const p=document.createElement("span");p.style.position="absolute";p.style.left=x+"px";p.style.top=y+"px";p.style.width="10px";p.style.height="10px";p.style.borderRadius="2px";p.style.background=`hsl(${Math.floor(Math.random()*360)} 90% 60%)`;p.style.transform=`translateY(-20vh)`;p.style.animation="fall 1.2s ease forwards";p.style.filter="drop-shadow(0 6px 6px rgba(0,0,0,.2))";p.style.left=`calc(${x}px + ${Math.random()*80-40}px)`;confetti.appendChild(p);setTimeout(()=>confetti.removeChild(p),1300)}}function setBadge(s){const st=(s||"").toLowerCase();const paidSet=["paid","success","approved","confirmed","completed","paid_out","finished","settled","captured","accredited","credited","confirmed_payment"];const failSet=["expired","canceled","cancelled","refunded","chargeback","reversed","voided","failed","denied"];badge.classList.remove("warn");if(paidSet.includes(st)){badge.innerHTML='<i class="fa-solid fa-circle-check"></i> Pagamento identificado';badge.style.background="rgba(16,185,129,.12)";badge.style.color="#10b981";badge.style.borderColor="rgba(16,185,129,.25)";return"paid"}if(failSet.includes(st)){badge.innerHTML='<i class="fa-solid fa-circle-exclamation"></i> Tempo esgotado';badge.classList.add("warn");return"expired"}badge.innerHTML='<i class="fa-solid fa-circle"></i> Aguardando pagamento';badge.style.background="rgba(99,102,241,.12)";badge.style.color="var(--primary)";badge.style.borderColor="rgba(99,102,241,.25)";return"waiting"}function normalizeUrl(u){if(!u)return"";if(/^https?:\/\//i.test(u))return u;return"https://"+u}async function checkStatus(){if(!HASH)return;try{const r=await fetch(`/pix/status?hash=${encodeURIComponent(HASH)}`,{cache:"no-store"});const j=await r.json();if(j&&j.ok){STATUS=(j.status||"").toLowerCase();const m=setBadge(STATUS);if(m==="paid"){try{showToast("Pagamento confirmado");burst(innerWidth/2,120)}catch(e){}clearInterval(poller);clearInterval(tick);setTimeout(()=>{location.replace("/dashboard")},1200)}}}catch(e){}}copyBtn.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(input.value||"");showToast("Código Pix copiado")}catch(e){try{input.focus();input.select();document.execCommand("copy");showToast("Código Pix copiado")}catch(_){showToast("Falha ao copiar")}}});let ttl=15*60;setBadge(STATUS);const tick=setInterval(()=>{ttl=Math.max(0,ttl-1);const m=String(Math.floor(ttl/60)).padStart(2,"0");const s=String(ttl%60).padStart(2,"0");ttlEl.textContent=`${m}:${s}`;ring.style.setProperty("--p",((900-ttl)/900)*100);if(ttl===0){setBadge("expired")}},1000);let poller=setInterval(checkStatus,2000);document.addEventListener("visibilitychange",()=>{if(document.hidden){clearInterval(poller)}else{checkStatus();poller=setInterval(checkStatus,2000)}});window.addEventListener("pageshow",()=>{checkStatus()});
 </script>
 </body>
 </html>
