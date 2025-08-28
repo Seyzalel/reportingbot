@@ -248,6 +248,39 @@ def monitor_transaction(tx_hash):
                 break
         time.sleep(1)
 
+def cpf_is_valid(cpf):
+    s = re.sub(r'\D+', '', str(cpf or ''))
+    if len(s) != 11:
+        return False
+    if s == s[0] * 11:
+        return False
+    sm = 0
+    for i in range(9):
+        sm += int(s[i]) * (10 - i)
+    dv1 = (sm * 10) % 11
+    if dv1 == 10:
+        dv1 = 0
+    if dv1 != int(s[9]):
+        return False
+    sm = 0
+    for i in range(10):
+        sm += int(s[i]) * (11 - i)
+    dv2 = (sm * 10) % 11
+    if dv2 == 10:
+        dv2 = 0
+    return dv2 == int(s[10])
+
+def name_is_valid(name):
+    parts = re.split(r'\s+', str(name or '').strip())
+    parts = [p for p in parts if len(p) >= 2]
+    return len(parts) >= 2
+
+def wants_json():
+    a = str(request.headers.get('Accept', '')).lower()
+    x = str(request.headers.get('X-Requested-With', '')).lower()
+    ct = str(request.headers.get('Content-Type', '')).lower()
+    return request.is_json or 'application/json' in a or x in ('xmlhttprequest', 'fetch') or 'application/json' in ct
+
 @app.before_request
 def redirect_auth_pages_when_logged():
     if request.method == 'GET' and is_logged_in() and request.endpoint in ('login', 'register'):
@@ -375,7 +408,7 @@ def plans():
         u = get_user()
         if u:
             apply_user_migrations(u)
-        return render_template('planos.html', username=session.get('username'))
+        return render_template('planos.html', username=session.get('username'), plans=get_plans())
     except Exception:
         logging.exception('plans_error')
         return jsonify(ok=False, error='internal_error'), 500
@@ -398,15 +431,25 @@ def pix_payment():
         data = request.get_json(silent=True) or request.form
         plan = (data.get('plan') or '').strip()
         name = (data.get('name') or '').strip()
-        cpf = re.sub(r'\D+', '', data.get('cpf') or '')
+        cpf_raw = data.get('cpf') or ''
+        cpf = re.sub(r'\D+', '', cpf_raw)
         plans_cfg = get_plans()
         if plan not in plans_cfg:
-            return jsonify(ok=False, error='Plano inválido'), 400
+            msg = 'Plano inválido'
+            if wants_json():
+                return jsonify(ok=False, code='invalid_plan', message=msg), 400
+            return render_template('planos.html', username=session.get('username'), plans=plans_cfg, error_message=msg), 400
         p = plans_cfg[plan]
         if not p.get('active', True):
-            return jsonify(ok=False, error='Plano indisponível'), 400
-        if not name or not CPF_RE.match(cpf):
-            return jsonify(ok=False, error='Dados inválidos'), 400
+            msg = 'Plano indisponível'
+            if wants_json():
+                return jsonify(ok=False, code='plan_unavailable', message=msg), 400
+            return render_template('planos.html', username=session.get('username'), plans=plans_cfg, error_message=msg), 400
+        if not name_is_valid(name) or not cpf_is_valid(cpf):
+            msg = 'Por favor, informe seu nome completo e um CPF válido que corresponda ao banco de origem do pagamento.'
+            if wants_json():
+                return jsonify(ok=False, code='invalid_document', message=msg), 422
+            return render_template('planos.html', username=session.get('username'), plans=plans_cfg, error_message=msg), 422
         uid = session.get('user_id')
         user_doc = None
         if uid:
@@ -465,14 +508,34 @@ def pix_payment():
             r.raise_for_status()
             data = r.json()
         except requests.HTTPError as e:
+            status_code = 502
+            body = None
             try:
                 body = e.response.json()
             except Exception:
                 body = {'error': e.response.text if e.response is not None else str(e)}
-            return jsonify(ok=False, error=body), 502
+            text = json.dumps(body, ensure_ascii=False) if not isinstance(body, str) else body
+            lower = str(text or '').lower()
+            if e.response is not None and e.response.status_code in (400, 401, 403, 422):
+                msg = 'Por favor, informe seu nome completo e um CPF válido que corresponda ao banco de origem do pagamento.'
+                if 'document' in lower or 'cpf' in lower or 'customer' in lower:
+                    if wants_json():
+                        return jsonify(ok=False, code='invalid_document', message=msg, details=body), 422
+                    return render_template('planos.html', username=session.get('username'), plans=plans_cfg, error_message=msg), 422
+                msg = 'Não foi possível gerar a cobrança Pix. Tente novamente em instantes.'
+                if wants_json():
+                    return jsonify(ok=False, code='gateway_error', message=msg, details=body), 502
+                return render_template('planos.html', username=session.get('username'), plans=plans_cfg, error_message=msg), 502
+            msg = 'Não foi possível gerar a cobrança Pix. Tente novamente em instantes.'
+            if wants_json():
+                return jsonify(ok=False, code='gateway_error', message=msg, details=body), status_code
+            return render_template('planos.html', username=session.get('username'), plans=plans_cfg, error_message=msg), status_code
         except Exception as e:
             logging.exception('pix_create_error')
-            return jsonify(ok=False, error=str(e)), 502
+            msg = 'Não foi possível gerar a cobrança Pix. Tente novamente em instantes.'
+            if wants_json():
+                return jsonify(ok=False, code='gateway_error', message=msg), 502
+            return render_template('planos.html', username=session.get('username'), plans=plans_cfg, error_message=msg), 502
         d = data if isinstance(data, dict) else {}
         pix = d.get('pix') or {}
         pix_url = pix.get('pix_url') or d.get('pix_url')
@@ -480,7 +543,10 @@ def pix_payment():
         h = d.get('hash') or ''
         status = (d.get('payment_status') or 'waiting_payment').lower()
         if not emv:
-            return jsonify(ok=False, error='Falha ao criar cobrança Pix'), 502
+            msg = 'Não foi possível gerar a cobrança Pix. Tente novamente em instantes.'
+            if wants_json():
+                return jsonify(ok=False, code='gateway_error', message=msg), 502
+            return render_template('planos.html', username=session.get('username'), plans=plans_cfg, error_message=msg), 502
         qr_b64 = generate_qr_base64(emv)
         tx_doc = {
             'user_id': session.get('user_id'),
@@ -500,9 +566,13 @@ def pix_payment():
         res = transactions.update_one({'hash': h, 'monitoring': {'$ne': True}}, {'$set': {'monitoring': True}})
         if res.modified_count:
             threading.Thread(target=monitor_transaction, args=(h,), daemon=True).start()
+        if wants_json():
+            return jsonify(ok=True, redirect=url_for('pix_payment', hash=h))
         return render_template('checkout.html', username=session.get('username'), plan=plan, amount_brl=brl_from_cents(p['amount_cents']), status=status, hash=h, pix_url=pix_url, emv=emv, qr_b64=qr_b64)
     except Exception:
         logging.exception('pix_payment_error')
+        if wants_json():
+            return jsonify(ok=False, code='internal_error', message='Erro interno'), 500
         return jsonify(ok=False, error='internal_error'), 500
 
 @app.route('/pix/status', methods=['GET'])
