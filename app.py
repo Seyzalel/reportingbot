@@ -357,7 +357,7 @@ def register():
         if not USERNAME_RE.match(username):
             return jsonify(ok=False, field='username', error='Nome de usuário inválido'), 400
         if not EMAIL_RE.match(email):
-            return jsonify(ok=False, field='email', error='E-mail inválido'), 400
+            return jsonify(ok(False), field='email', error='E-mail inválido'), 400
         if len(password) < 8:
             return jsonify(ok=False, field='password', error='Senha muito curta'), 400
         if confirm != password:
@@ -462,6 +462,10 @@ def pix_payment():
         if user_doc:
             apply_user_migrations(user_doc)
         user_email = (user_doc or {}).get('email') or ''
+        try:
+            postback_url = url_for('tribopay_webhook', _external=True)
+        except Exception:
+            postback_url = url_for('tribopay_webhook')
         payload = {
             "amount": p['amount_cents'],
             "offer_hash": p['offer_hash'],
@@ -501,7 +505,7 @@ def pix_payment():
                 "utm_term": "",
                 "utm_content": ""
             },
-            "postback_url": url_for('tribopay_webhook', _external=True)
+            "postback_url": postback_url
         }
         try:
             r = requests.post(f"{TRIBOPAY_API}?api_token={TRIBOPAY_TOKEN}", headers=TRIBO_HEADERS, json=payload, timeout=30)
@@ -540,8 +544,24 @@ def pix_payment():
         pix = d.get('pix') or {}
         pix_url = pix.get('pix_url') or d.get('pix_url')
         emv = pix.get('pix_qr_code') or pix.get('copy_and_paste') or pix.get('emv') or d.get('pix_qr_code')
-        h = d.get('hash') or ''
-        status = (d.get('payment_status') or 'waiting_payment').lower()
+        h = d.get('hash') or pix.get('hash') or ''
+        raw_status = d.get('payment_status') or d.get('status') or d.get('status_payment')
+        if isinstance(raw_status, str):
+            status = raw_status.lower()
+        elif isinstance(raw_status, bool):
+            status = 'paid' if raw_status else 'waiting_payment'
+        elif isinstance(raw_status, (int, float)):
+            status = 'waiting_payment'
+        elif isinstance(raw_status, dict):
+            code = raw_status.get('code')
+            status = code.lower() if isinstance(code, str) else 'waiting_payment'
+        else:
+            status = 'waiting_payment'
+        if not h:
+            msg = 'Não foi possível gerar a cobrança Pix. Tente novamente em instantes.'
+            if wants_json():
+                return jsonify(ok=False, code='gateway_error', message=msg, details={'reason': 'missing_hash'}), 502
+            return render_template('planos.html', username=session.get('username'), plans=plans_cfg, error_message=msg), 502
         if not emv:
             msg = 'Não foi possível gerar a cobrança Pix. Tente novamente em instantes.'
             if wants_json():
