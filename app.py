@@ -357,7 +357,7 @@ def register():
         if not USERNAME_RE.match(username):
             return jsonify(ok=False, field='username', error='Nome de usuário inválido'), 400
         if not EMAIL_RE.match(email):
-            return jsonify(ok(False), field='email', error='E-mail inválido'), 400
+            return jsonify(ok=False, field='email', error='E-mail inválido'), 400
         if len(password) < 8:
             return jsonify(ok=False, field='password', error='Senha muito curta'), 400
         if confirm != password:
@@ -540,11 +540,12 @@ def pix_payment():
             if wants_json():
                 return jsonify(ok=False, code='gateway_error', message=msg), 502
             return render_template('planos.html', username=session.get('username'), plans=plans_cfg, error_message=msg), 502
-        d = data if isinstance(data, dict) else {}
+        resp = data if isinstance(data, dict) else {}
+        d = resp.get('data') if isinstance(resp.get('data', None), dict) else resp
         pix = d.get('pix') or {}
         pix_url = pix.get('pix_url') or d.get('pix_url')
-        emv = pix.get('pix_qr_code') or pix.get('copy_and_paste') or pix.get('emv') or d.get('pix_qr_code')
-        h = d.get('hash') or pix.get('hash') or ''
+        emv = pix.get('pix_qr_code') or pix.get('copy_and_paste') or pix.get('emv') or d.get('pix_qr_code') or d.get('copy_and_paste') or d.get('emv')
+        h = d.get('hash') or pix.get('hash') or d.get('transaction_hash') or d.get('id_hash') or ''
         raw_status = d.get('payment_status') or d.get('status') or d.get('status_payment')
         if isinstance(raw_status, str):
             status = raw_status.lower()
@@ -573,7 +574,7 @@ def pix_payment():
             'username': session.get('username'),
             'plan': plan,
             'amount_cents': p['amount_cents'],
-            'tribopay_id': d.get('id'),
+            'tribopay_id': d.get('id') or resp.get('id'),
             'hash': h,
             'payment_status': status,
             'pix_url': pix_url,
