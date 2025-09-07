@@ -1,10 +1,12 @@
 from flask import Blueprint, request, session, redirect, url_for, render_template, jsonify, current_app
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from bson.objectid import ObjectId
 from functools import wraps
 import hashlib
 import hmac
 import json
+import os
+import re
 
 admin_bp = Blueprint("admin", __name__)
 
@@ -228,6 +230,20 @@ def try_activation(tx):
     tx = current_app.config['transactions'].find_one({'_id': tx['_id']})
     ensure_receipt(tx)
 
+def _parse_client_iso(s):
+    try:
+        s2 = (s or '').strip()
+        if not s2:
+            return None
+        if s2.endswith('Z'):
+            s2 = s2[:-1]
+        dt = datetime.fromisoformat(s2)
+        if dt.tzinfo:
+            dt = dt.astimezone(timezone.utc).replace(tzinfo=None)
+        return dt
+    except Exception:
+        return None
+
 @admin_bp.route('/admin_panel', methods=['GET'])
 @login_required
 def admin_panel():
@@ -255,16 +271,26 @@ def admin_metrics():
             if agg:
                 return int(agg[0].get('total', 0)), int(agg[0].get('count', 0))
             return 0, 0
+        def sum_all():
+            pipe = [
+                {'$match': {'activated_at': {'$exists': True, '$lte': now}}},
+                {'$group': {'_id': None, 'total': {'$sum': '$amount_cents'}, 'count': {'$sum': 1}}}
+            ]
+            agg = list(current_app.config['transactions'].aggregate(pipe))
+            if agg:
+                return int(agg[0].get('total', 0)), int(agg[0].get('count', 0))
+            return 0, 0
         start_today = now.replace(hour=0, minute=0, second=0, microsecond=0)
         t_total, t_count = sum_range(start_today)
         d7 = now - timedelta(days=7)
         d7_total, d7_count = sum_range(d7)
         d30 = now - timedelta(days=30)
         d30_total, d30_count = sum_range(d30)
+        all_total, all_count = sum_all()
         pending = current_app.config['transactions'].count_documents({'payment_status': {'$nin': list(PAID_STATUSES | FAILED_STATUSES)}})
         paid = current_app.config['transactions'].count_documents({'payment_status': {'$in': list(PAID_STATUSES)}})
         failed = current_app.config['transactions'].count_documents({'payment_status': {'$in': list(FAILED_STATUSES)}})
-        return jsonify(ok=True, revenue_today_cents=t_total, revenue_7d_cents=d7_total, revenue_30d_cents=d30_total, count_today=t_count, count_7d=d7_count, count_30d=d30_count, tx_counts={'pending': pending, 'paid': paid, 'failed': failed})
+        return jsonify(ok=True, revenue_today_cents=t_total, revenue_7d_cents=d7_total, revenue_30d_cents=d30_total, revenue_all_time_cents=all_total, count_today=t_count, count_7d=d7_count, count_30d=d30_count, count_all_time=all_count, tx_counts={'pending': pending, 'paid': paid, 'failed': failed})
     except Exception:
         return jsonify(ok=False, error='internal_error'), 500
 
@@ -279,25 +305,25 @@ def admin_list_transactions():
         date_from = request.args.get('from')
         date_to = request.args.get('to')
         if status:
-            q['payment_status'] = status
+            if status == 'pending':
+                q['payment_status'] = {'$nin': list(PAID_STATUSES | FAILED_STATUSES)}
+            else:
+                q['payment_status'] = status
         if plan:
             q['plan'] = plan
         if date_from:
-            try:
-                dtf = datetime.fromisoformat(date_from)
+            dtf = _parse_client_iso(date_from)
+            if dtf:
                 q['created_at'] = q.get('created_at', {})
                 q['created_at']['$gte'] = dtf
-            except Exception:
-                pass
         if date_to:
-            try:
-                dtt = datetime.fromisoformat(date_to)
+            dtt = _parse_client_iso(date_to)
+            if dtt:
                 q['created_at'] = q.get('created_at', {})
                 q['created_at']['$lte'] = dtt
-            except Exception:
-                pass
         if text:
-            q['$or'] = [{'hash': {'$regex': text, '$options': 'i'}}, {'username': {'$regex': text, '$options': 'i'}}]
+            patt = re.escape(text)
+            q['$or'] = [{'hash': {'$regex': patt, '$options': 'i'}}, {'username': {'$regex': patt, '$options': 'i'}}]
         page = max(1, int(request.args.get('page', '1')))
         size = max(1, min(100, int(request.args.get('page_size', '20'))))
         skip = (page - 1) * size
@@ -348,7 +374,7 @@ def admin_tx_modify(tid):
             return jsonify(ok=False, error='not_found'), 404
         current_app.config['transactions'].update_one({'_id': oid}, {'$set': updates})
         tx = current_app.config['transactions'].find_one({'_id': oid})
-        if tx.get('payment_status') in PAID_STATUSES:
+        if (tx.get('payment_status') or '').lower() in PAID_STATUSES:
             try_activation(tx)
         return jsonify(ok=True)
     except Exception:
@@ -384,7 +410,8 @@ def admin_users_list():
         disabled = request.args.get('disabled')
         q = {}
         if text:
-            q['$or'] = [{'username': {'$regex': text, '$options': 'i'}}, {'email': {'$regex': text, '$options': 'i'}}]
+            patt = re.escape(text)
+            q['$or'] = [{'username': {'$regex': patt, '$options': 'i'}}, {'email': {'$regex': patt, '$options': 'i'}}]
         if adm in ('yes', 'no'):
             q['admin_permission'] = adm
         if disabled in ('true', 'false'):
@@ -464,6 +491,25 @@ def admin_user_force_logout(uid):
         except Exception:
             return jsonify(ok=False, error='invalid_id'), 400
         current_app.config['users'].update_one({'_id': oid}, {'$set': {'force_logout_at': datetime.utcnow()}})
+        return jsonify(ok=True)
+    except Exception:
+        return jsonify(ok=False, error='internal_error'), 500
+
+@admin_bp.route('/admin/api/users/<uid>/reset_password', methods=['POST'])
+@admin_required
+def admin_user_reset_password(uid):
+    try:
+        data = request.get_json(silent=True) or {}
+        pw = data.get('new_password')
+        if not isinstance(pw, str) or not pw:
+            return jsonify(ok=False, error='invalid_value'), 400
+        try:
+            oid = ObjectId(uid)
+        except Exception:
+            return jsonify(ok=False, error='invalid_id'), 400
+        salt = os.urandom(16)
+        dk = hashlib.pbkdf2_hmac('sha256', pw.encode('utf-8'), salt, 200000)
+        current_app.config['users'].update_one({'_id': oid}, {'$set': {'password_algo': 'pbkdf2_sha256', 'password_salt': salt.hex(), 'password_hash': dk.hex(), 'password_updated_at': datetime.utcnow()}})
         return jsonify(ok=True)
     except Exception:
         return jsonify(ok=False, error='internal_error'), 500
