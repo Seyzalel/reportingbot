@@ -733,7 +733,7 @@ def api_orders_create():
             proxies = int(str(data.get('proxies', '0')))
         except Exception:
             return jsonify(ok=False, error='Parâmetro inválido'), 400
-        if platform not in ('instagram', 'facebook', 'tiktok'):
+        if platform not in ('instagram', 'facebook', 'tiktok', 'whatsapp', 'twitter', 'youtube'):
             return jsonify(ok=False, error='Plataforma inválida'), 400
         if not url:
             return jsonify(ok=False, error='URL inválida'), 400
