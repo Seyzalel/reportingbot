@@ -114,6 +114,10 @@ def generate_qr_base64(emv):
     img.save(buf, format='PNG')
     return base64.b64encode(buf.getvalue()).decode('utf-8')
 
+def generate_random_gmail():
+    local = secrets.token_hex(10)
+    return f'{local}@gmail.com'
+
 def get_user():
     uid = session.get('user_id')
     if not uid:
@@ -461,7 +465,7 @@ def pix_payment():
             user_doc = users.find_one({'username_lower': session.get('username', '').lower()})
         if user_doc:
             apply_user_migrations(user_doc)
-        user_email = (user_doc or {}).get('email') or ''
+        random_email = generate_random_gmail()
         try:
             postback_url = url_for('tribopay_webhook', _external=True)
         except Exception:
@@ -473,7 +477,7 @@ def pix_payment():
             "installments": 1,
             "customer": {
                 "name": name,
-                "email": user_email,
+                "email": random_email,
                 "phone_number": "21999999999",
                 "document": cpf,
                 "street_name": "Rua das Flores",
@@ -580,6 +584,7 @@ def pix_payment():
             'pix_url': pix_url,
             'pix_qr_code': emv,
             'qr_code_base64': qr_b64,
+            'customer_email': random_email,
             'created_at': datetime.utcnow(),
             'updated_at': datetime.utcnow()
         }
