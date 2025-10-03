@@ -1,4 +1,5 @@
 Flask
+Faker
 requests
 pymongo[srv]
 qrcode[pil]
