@@ -702,7 +702,7 @@ def api_usage_consume():
     try:
         u = get_user()
         if not u:
-            return jsonify(ok=False, 401), 401
+            return jsonify(ok=False), 401
         u = apply_user_migrations(u)
         code, exp = normalize_plan(u)
         if code == 'padrao':
