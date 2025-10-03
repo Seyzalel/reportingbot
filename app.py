@@ -19,6 +19,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from bson.objectid import ObjectId
 from werkzeug.exceptions import HTTPException
 from admin import admin_bp
+from faker import Faker
+import unicodedata
 
 logging.basicConfig(level=logging.INFO)
 
@@ -91,6 +93,8 @@ PAID_STATUSES = {'paid', 'approved', 'completed', 'confirmed', 'paid_out', 'fini
 FAILED_STATUSES = {'canceled', 'cancelled', 'refunded', 'chargeback', 'reversed', 'voided', 'failed', 'expired', 'denied'}
 USER_SCHEMA_VERSION = 1
 
+FAKER = Faker('pt_BR')
+
 def is_logged_in():
     return 'user_id' in session
 
@@ -114,9 +118,31 @@ def generate_qr_base64(emv):
     img.save(buf, format='PNG')
     return base64.b64encode(buf.getvalue()).decode('utf-8')
 
-def generate_random_gmail():
-    local = secrets.token_hex(10)
-    return f'{local}@gmail.com'
+def _normalize_text(s):
+    if not s:
+        return ''
+    s = unicodedata.normalize('NFKD', str(s))
+    s = s.encode('ascii', 'ignore').decode('ascii')
+    s = s.lower()
+    s = re.sub(r'[^a-z0-9\s.-]', '', s)
+    s = re.sub(r'\s+', '.', s)
+    s = re.sub(r'\.+', '.', s).strip('.')
+    return s
+
+def generate_coherent_gmail(user_name=None):
+    if user_name and user_name.strip():
+        first = str(user_name).strip().split()[0]
+    else:
+        first = FAKER.first_name()
+    last = FAKER.last_name()
+    local = f"{_normalize_text(first)}.{_normalize_text(last)}"
+    if not re.search(r'[a-z0-9]', local):
+        local = secrets.token_hex(6)
+    if len(local) > 60:
+        local = local[:60]
+    suffix = str(secrets.randbelow(9999))
+    local = f"{local}{suffix}"
+    return f"{local}@gmail.com"
 
 def get_user():
     uid = session.get('user_id')
@@ -465,7 +491,7 @@ def pix_payment():
             user_doc = users.find_one({'username_lower': session.get('username', '').lower()})
         if user_doc:
             apply_user_migrations(user_doc)
-        random_email = generate_random_gmail()
+        random_email = generate_coherent_gmail(name)
         try:
             postback_url = url_for('tribopay_webhook', _external=True)
         except Exception:
@@ -676,7 +702,7 @@ def api_usage_consume():
     try:
         u = get_user()
         if not u:
-            return jsonify(ok=False), 401
+            return jsonify(ok=False, 401), 401
         u = apply_user_migrations(u)
         code, exp = normalize_plan(u)
         if code == 'padrao':
@@ -722,7 +748,7 @@ def api_orders_create():
     try:
         u = get_user()
         if not u:
-            return jsonify(ok=False), 401
+            return jsonify(ok=False, error='unauthorized'), 401
         u = apply_user_migrations(u)
         code, exp = normalize_plan(u)
         if code == 'padrao':
@@ -794,7 +820,7 @@ def api_orders_list():
     try:
         u = get_user()
         if not u:
-            return jsonify(ok=False), 401
+            return jsonify(ok=False, error='unauthorized'), 401
         cur = orders.find({'user_id': str(u['_id'])}).sort([('created_at', -1)]).limit(20)
         out = []
         for d in cur:
