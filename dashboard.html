@@ -1533,7 +1533,6 @@
             </div>
         </div>
     </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const state = {
@@ -1910,48 +1909,130 @@
             });
 
             async function createOrder(platform, urls, reports, proxies) {
-                const response = await fetch('/api/orders/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({
-                        platform: platform,
-                        urls: urls,
-                        reports: reports,
-                        proxies: proxies
-                    })
-                });
-
-                const data = await response.json();
-
-                if (!response.ok || !data || !data.ok) {
-                    if (data && data.error === 'Plano insuficiente') {
-                        goPlans();
-                        return null;
-                    }
-                    if (data && data.error === 'Limite diário excedido') {
-                        state.remaining_today = 0;
-                        setPlanBadge(state.plan, 0, state.daily_limit, null);
-                        guard(false, 'sem_cota');
-                        alert('Limite diário excedido.');
-                        return null;
-                    }
-                    if (data && data.error && data.error.startsWith('Quantidade permitida')) {
-                        alert(data.error);
-                        return null;
-                    }
-                    alert('Não foi possível iniciar.');
+                const urlList = Array.isArray(urls) ? urls.map(u => String(u).trim()).filter(u => u !== '') : [String(urls || '').trim()];
+                if (!urlList.length) {
+                    alert('Por favor, insira pelo menos uma URL válida.');
                     return null;
                 }
 
-                if (state.daily_limit !== null) {
-                    state.remaining_today = typeof data.remaining_today === 'number' ? data.remaining_today : state.remaining_today - 1;
-                    setPlanBadge(state.plan, state.remaining_today, state.daily_limit, null);
+                const range = rangeByPlan[state.plan] || [100, 15950];
+                const minPerOrder = range[0];
+                const maxPerOrder = range[1];
+
+                if (urlList.length === 1) {
+                    const payload = {
+                        platform: platform,
+                        url: urlList[0],
+                        reports: parseInt(reports, 10),
+                        proxies: parseInt(proxies, 10)
+                    };
+                    const response = await fetch('/api/orders/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'same-origin',
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await response.json();
+                    if (!response.ok || !data || !data.ok) {
+                        if (data && data.error === 'Plano insuficiente') {
+                            goPlans();
+                            return null;
+                        }
+                        if (data && data.error === 'Limite diário excedido') {
+                            state.remaining_today = 0;
+                            setPlanBadge(state.plan, 0, state.daily_limit, null);
+                            guard(false, 'sem_cota');
+                            alert('Limite diário excedido.');
+                            return null;
+                        }
+                        if (data && data.error && data.error.startsWith('Quantidade permitida')) {
+                            alert(data.error);
+                            return null;
+                        }
+                        if (data && data.error === 'URL inválida') {
+                            alert('URL inválida: verifique se a URL fornecida está completa (inclua https://) e válida.');
+                            return null;
+                        }
+                        alert('Não foi possível iniciar.');
+                        return null;
+                    }
+                    if (state.daily_limit !== null) {
+                        state.remaining_today = typeof data.remaining_today === 'number' ? data.remaining_today : state.remaining_today - 1;
+                        setPlanBadge(state.plan, state.remaining_today, state.daily_limit, null);
+                    }
+                    return data;
                 }
 
-                return data;
+                const totalReports = parseInt(reports, 10);
+                if (totalReports < urlList.length * minPerOrder) {
+                    alert(`Ao dividir ${totalReports} denúncias por ${urlList.length} URLs, cada URL teria menos do que o mínimo permitido (${minPerOrder}). Diminua o número de URLs ou aumente as denúncias.`);
+                    return null;
+                }
+
+                const basePer = Math.floor(totalReports / urlList.length);
+                let remainder = totalReports % urlList.length;
+                const proxyBase = Math.floor(Math.max(0, parseInt(proxies, 10) || 0) / urlList.length);
+                let proxyRem = Math.max(0, parseInt(proxies, 10) || 0) % urlList.length;
+
+                const results = [];
+                for (let i = 0; i < urlList.length; i++) {
+                    const url = urlList[i];
+                    const reportsForThis = basePer + (remainder > 0 ? 1 : 0);
+                    if (remainder > 0) remainder--;
+                    if (reportsForThis < minPerOrder || reportsForThis > maxPerOrder) {
+                        alert('Divisão de denúncias por URL resultaria em valores fora dos limites do plano. Ajuste URLs ou quantidade.');
+                        return null;
+                    }
+                    const proxiesForThis = proxyBase + (proxyRem > 0 ? 1 : 0);
+                    if (proxyRem > 0) proxyRem--;
+                    const payload = {
+                        platform: platform,
+                        url: url,
+                        reports: reportsForThis,
+                        proxies: proxiesForThis
+                    };
+                    const response = await fetch('/api/orders/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'same-origin',
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await response.json();
+                    if (!response.ok || !data || !data.ok) {
+                        if (data && data.error === 'Plano insuficiente') {
+                            goPlans();
+                            return null;
+                        }
+                        if (data && data.error === 'Limite diário excedido') {
+                            state.remaining_today = 0;
+                            setPlanBadge(state.plan, 0, state.daily_limit, null);
+                            guard(false, 'sem_cota');
+                            alert('Limite diário excedido durante criação de pedidos.');
+                            return null;
+                        }
+                        if (data && data.error === 'URL inválida') {
+                            alert(`URL inválida enviada ao servidor: "${url}". Verifique se está correta e inclui o protocolo (https://).`);
+                            return null;
+                        }
+                        alert('Falha ao criar pedido para: ' + url);
+                        return null;
+                    }
+                    results.push(data);
+                }
+
+                if (state.daily_limit !== null) {
+                    if (results.length) {
+                        const last = results[results.length - 1];
+                        state.remaining_today = typeof last.remaining_today === 'number' ? last.remaining_today : Math.max(0, state.remaining_today - results.length);
+                        setPlanBadge(state.plan, state.remaining_today, state.daily_limit, null);
+                    }
+                }
+
+                return results;
             }
 
             function getPlatformLabel(platform) {
@@ -2132,9 +2213,7 @@
                     return;
                 }
 
-                const urls = urlsText.split('\n').filter(function(url) {
-                    return url.trim() !== '';
-                });
+                const urls = urlsText.split('\n').map(u => u.trim()).filter(u => u !== '');
                 const range = rangeByPlan[state.plan] || [100, 15950];
 
                 if (reports < range[0] || reports > range[1]) {
