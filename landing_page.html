@@ -10,181 +10,874 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
-        /* --------------------------------------------------
-           Design system (tokens)
-           -------------------------------------------------- */
-        :root{
-            --bg-1: #0f172a; /* dark base for accents */
-            --primary: #6366f1;
-            --primary-2: #8b5cf6;
-            --accent: #ec4899;
-            --muted: #64748b;
-            --card: #ffffff;
-            --glass: rgba(255,255,255,0.7);
-            --glass-strong: rgba(255,255,255,0.9);
-            --radius: 18px;
-            --pad: clamp(1rem, 2.2vw, 1.6rem);
-            --gap: clamp(.8rem, 2vw, 1.2rem);
-            --fs-xl: clamp(1.2rem, 2.8vw, 2rem);
-            --fs-lg: clamp(1rem, 1.8vw, 1.2rem);
-            --fs-md: clamp(.9rem, 1.2vw, 1rem);
-            --fs-sm: clamp(.75rem, .9vw, .85rem);
-            --glass-border: 1px solid rgba(226,232,240,0.6);
-            --shadow-soft: 0 10px 30px -12px rgba(2,6,23,0.12);
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --bg-card: #1e1e1e;
+            --accent-primary: #8b5cf6;
+            --accent-secondary: #6366f1;
+            --accent-tertiary: #ec4899;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: #2d2d2d;
+            --success: #10b981;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
+            --shadow-strong: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --shadow-soft: 0 10px 30px -12px rgba(0, 0, 0, 0.4);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --gradient-primary: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            --gradient-secondary: linear-gradient(135deg, var(--accent-secondary), var(--accent-tertiary));
+            --gradient-dark: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary));
         }
 
-        /* Base reset and typography -------------------------------------------------- */
-        *{box-sizing:border-box}
-        html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#f8fafc 0%, #eef2ff 100%);color:var(--bg-1);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-        img,video{max-width:100%;height:auto;display:block}
-        a{color:inherit;text-decoration:none}
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-        /* Page container -------------------------------------------------- */
-        .container{width:min(1365px,96%);margin-inline:auto;padding-inline:clamp(.6rem,1.6vw,1rem)}
+        html, body {
+            height: 100%;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+            scroll-behavior: smooth;
+        }
 
-        /* Header -------------------------------------------------- */
-        header{position:fixed;inset:0 0 auto 0;z-index:1200;background:linear-gradient(180deg, rgba(255,255,255,0.66), rgba(255,255,255,0.55));backdrop-filter:blur(8px);border-bottom:1px solid rgba(15,23,42,0.04)}
-        .header-inner{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.9rem var(--pad)}
-        .brand{display:flex;align-items:center;gap:.8rem}
-        .brand-badge{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--primary-2));display:grid;place-items:center;box-shadow:0 8px 30px rgba(99,102,241,0.18);transition:transform .28s ease}
-        .brand-badge i{color:#fff;font-size:1.15rem}
-        .brand-title{font-weight:900;font-size:1.05rem;background:linear-gradient(90deg,var(--primary),var(--primary-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+        img, video {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
 
-        nav.desktop{display:flex;align-items:center;gap:1.2rem}
-        .nav-link{font-weight:600;font-size:var(--fs-md);color:var(--muted);padding:.4rem .25rem;position:relative}
-        .nav-link:focus{outline:2px solid rgba(99,102,241,0.14);outline-offset:3px;border-radius:6px}
-        .nav-link::after{content:'';position:absolute;left:0;bottom:-6px;width:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--primary-2));transition:width .28s ease}
-        .nav-link:hover{color:var(--primary-2)}
-        .nav-link:hover::after{width:100%}
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
 
-        .btn{appearance:none;border:0;cursor:pointer;border-radius:14px;padding:.7rem 1.1rem;font-weight:800;font-size:var(--fs-sm);color:#fff;background:linear-gradient(90deg,var(--primary),var(--primary-2));box-shadow:0 8px 30px rgba(99,102,241,0.12);transition:transform .18s ease,box-shadow .18s ease}
-        .btn:active{transform:translateY(1px)}
-        .btn.outline{background:transparent;color:var(--primary-2);border:1.5px solid rgba(99,102,241,0.12);box-shadow:none}
-        .btn.small{padding:.5rem .75rem;font-size:.9rem}
+        .container {
+            width: min(1400px, 95%);
+            margin: 0 auto;
+            padding: 0 clamp(1rem, 3vw, 2rem);
+        }
 
-        /* Mobile menu button */
-        .mobile-toggle{display:none;background:transparent;border:0;font-size:1.3rem;color:var(--muted);cursor:pointer}
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+        }
 
-        /* Hero -------------------------------------------------- */
-        .hero{padding-top:100px;padding-bottom:4.2rem;text-align:center;position:relative}
-        .hero-inner{max-width:980px;margin:0 auto}
-        .hero-title{font-weight:900;font-size:clamp(2rem,5.5vw,3.6rem);line-height:1.05;margin-bottom:1rem;background:linear-gradient(90deg,var(--primary),var(--primary-2),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
-        .hero-subtitle{color:var(--muted);font-size:var(--fs-lg);max-width:72ch;margin:0 auto 1.8rem}
-        .hero-cta{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 0;
+        }
 
-        /* Decorative hero shapes */
-        .hero-bg{position:absolute;inset:auto -5% -20% auto;width:720px;height:720px;pointer-events:none;filter:blur(48px);opacity:.18;background:radial-gradient(circle at 20% 30%, var(--primary), transparent 28%), radial-gradient(circle at 80% 70%, var(--primary-2), transparent 30%)}
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
 
-        /* Sections -------------------------------------------------- */
-        .section{padding:clamp(2.2rem,5vw,4rem) 0}
-        .section-title{font-weight:900;font-size:var(--fs-xl);text-align:center;color:var(--primary-2);margin-bottom:1rem}
-        .section-subtitle{text-align:center;color:var(--muted);max-width:72ch;margin:0 auto 2rem}
+        .brand-badge {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.25);
+            transition: var(--transition);
+        }
 
-        /* Cards / features grid -------------------------------------------------- */
-        .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem}
-        .feature{background:linear-gradient(180deg,var(--card),rgba(255,255,255,0.98));border-radius:14px;padding:1.4rem;display:flex;gap:.9rem;align-items:flex-start;border:1px solid rgba(15,23,42,0.03);box-shadow:var(--shadow-soft);transition:transform .2s ease,box-shadow .2s ease}
-        .feature i{font-size:1.45rem;color:var(--primary-2);min-width:2.2rem}
-        .feature h4{margin:0;font-size:var(--fs-lg);font-weight:800;color:var(--bg-1)}
-        .feature p{margin:0;color:var(--muted);font-size:var(--fs-md);line-height:1.5}
+        .brand-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(139, 92, 246, 0.35);
+        }
 
-        /* Tech detail (large cards) */
-        .tech-detail{background:linear-gradient(180deg,var(--card),rgba(255,255,255,0.99));border-radius:16px;padding:1.6rem;border:1px solid rgba(226,232,240,0.7);box-shadow:0 14px 40px -18px rgba(15,23,42,0.06);margin-bottom:1.2rem}
-        .tech-detail h3{display:flex;align-items:center;gap:.7rem;margin:0 0 .6rem 0;font-size:var(--fs-lg);color:var(--primary-2)}
-        .tech-detail p, .tech-detail li{color:var(--muted);font-size:var(--fs-md)}
-        .tech-detail ul{padding-left:1rem;margin:0}
+        .brand-badge i {
+            color: white;
+            font-size: 1.25rem;
+        }
 
-        /* Video container improved */
-        .video-wrap{position:relative;padding-bottom:56.25%;height:0;border-radius:12px;overflow:hidden;box-shadow:0 18px 50px -28px rgba(15,23,42,0.12);background:#000}
-        .video-wrap iframe, .video-wrap video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+        .brand-title {
+            font-weight: 900;
+            font-size: 1.2rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
 
-        /* Stats -------------------------------------------------- */
-        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin:2rem 0}
-        .stat{background:linear-gradient(180deg,var(--card),rgba(255,255,255,0.98));padding:1.6rem;border-radius:12px;text-align:center;border:1px solid rgba(15,23,42,0.03);box-shadow:var(--shadow-soft)}
-        .stat-number{font-weight:900;font-size:1.8rem;background:linear-gradient(90deg,var(--primary),var(--primary-2));-webkit-background-clip:text;background-clip:text;color:transparent}
-        .stat-label{font-size:var(--fs-md);color:var(--muted)}
+        nav.desktop {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
 
-        /* FAQ accordion accessible -------------------------------------------------- */
-        .faq{max-width:920px;margin:0 auto}
-        .accordion{border-radius:12px;overflow:hidden;margin-bottom:0.9rem;border:1px solid rgba(226,232,240,0.7);box-shadow:0 8px 35px -20px rgba(2,6,23,0.06);background:linear-gradient(180deg,var(--card),rgba(255,255,255,0.98))}
-        .accordion button{width:100%;text-align:left;padding:1rem 1.1rem;font-weight:700;font-size:var(--fs-md);border:0;background:transparent;display:flex;align-items:center;justify-content:space-between;gap:1rem;cursor:pointer}
-        .accordion button .chev{transition:transform .28s ease;color:var(--muted)}
-        .accordion .panel{padding:0 1.1rem;max-height:0;overflow:hidden;transition:max-height .36s cubic-bezier(.2,.9,.3,1),padding .28s ease}
-        .accordion .panel.open{padding:1rem 1.1rem 1.2rem;max-height:420px}
-        .accordion .panel p{margin:0;color:var(--muted);line-height:1.6}
+        .nav-link {
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            position: relative;
+        }
 
-        /* Footer -------------------------------------------------- */
-        footer{background:linear-gradient(180deg,var(--bg-1),#0b1220);color:#e6eefc;padding:3rem 0;margin-top:2rem}
-        .footer-content{display:flex;flex-direction:column;gap:1rem;align-items:center}
-        .footer-logo{display:flex;align-items:center;gap:.8rem}
-        .footer-logo-badge{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--primary-2));display:grid;place-items:center}
-        .footer-logo-text{font-weight:900;background:linear-gradient(90deg,var(--primary),var(--primary-2));-webkit-background-clip:text;color:transparent}
-        .footer-description{max-width:66ch;text-align:center;color:rgba(230,238,252,0.85)}
-        .footer-bottom{text-align:center;color:rgba(230,238,252,0.7);margin-top:1.4rem}
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
 
-        /* Scroll to top */
-        .to-top{position:fixed;right:22px;bottom:24px;width:48px;height:48px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(90deg,var(--primary),var(--primary-2));color:white;box-shadow:0 14px 40px rgba(99,102,241,0.16);cursor:pointer;z-index:1200;transform:translateY(10px);opacity:0;transition:all .22s ease}
-        .to-top.show{opacity:1;transform:translateY(0)}
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: var(--transition);
+            transform: translateX(-50%);
+        }
 
-        /* Utilities and animations */
-        .fade-in{opacity:0;transform:translateY(16px);transition:all .6s cubic-bezier(.2,.9,.3,1)}
-        .fade-in.visible{opacity:1;transform:none}
-        @keyframes floaty{0%{transform:translateY(0)}50%{transform:translateY(-8px)}100%{transform:translateY(0)}}
+        .nav-link:hover::after {
+            width: 80%;
+        }
 
-        /* Reduced motion */
-        @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            gap: 0.5rem;
+        }
 
-        /* Responsive tweaks */
-        @media (max-width:980px){.nav-link{display:none}.desktop{display:none}.mobile-toggle{display:inline-flex}.brand-title{font-size:.98rem}.hero{padding-top:88px}.hero-subtitle{padding-inline:1rem}}
-        @media (max-width:560px){.hero-title{font-size:1.8rem}}
+        .btn.primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+        }
+
+        .mobile-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .hero {
+            padding: 140px 0 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        .hero-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-weight: 900;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-primary) 70%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.6;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .section {
+            padding: clamp(4rem, 8vw, 8rem) 0;
+        }
+
+        .section-title {
+            font-weight: 800;
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            text-align: center;
+            margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: clamp(1rem, 1.5vw, 1.1rem);
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            line-height: 1.6;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-md);
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .tech-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .tech-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            transition: var(--transition);
+        }
+
+        .tech-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .tech-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tech-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-md);
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tech-icon i {
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .tech-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .tech-card p, .tech-card li {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+        }
+
+        .tech-card ul {
+            padding-left: 1.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .video-container {
+            position: relative;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+        }
+
+        .video-wrapper iframe,
+        .video-wrapper video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .faq-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .accordion {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .accordion:hover {
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        .accordion-header {
+            width: 100%;
+            padding: 1.5rem;
+            background: transparent;
+            border: none;
+            text-align: left;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .accordion-header:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .accordion-icon {
+            transition: var(--transition);
+        }
+
+        .accordion.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .accordion.active .accordion-content {
+            padding: 0 1.5rem 1.5rem;
+            max-height: 500px;
+        }
+
+        .accordion-content p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .cta-section {
+            background: var(--gradient-dark);
+            border-radius: var(--radius-lg);
+            padding: 4rem 2rem;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 4rem 0 2rem;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .footer-logo-badge {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-md);
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .footer-logo-text {
+            font-weight: 900;
+            font-size: 1.2rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .footer-description {
+            text-align: center;
+            color: var(--text-secondary);
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            color: var(--text-muted);
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-md);
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 100;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            background: var(--bg-primary);
+            border-left: 1px solid var(--border-color);
+            padding: 2rem;
+            transition: var(--transition);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .mobile-menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .mobile-menu-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .mobile-nav-link {
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-weight: 600;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .mobile-nav-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--border-color);
+        }
+
+        .mobile-menu-cta {
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 1500;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav.desktop {
+                display: none;
+            }
+
+            .mobile-toggle {
+                display: flex;
+            }
+
+            .hero {
+                padding: 120px 0 80px;
+            }
+
+            .hero-cta {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .section {
+                padding: 3rem 0;
+            }
+
+            .feature-card,
+            .tech-card,
+            .stat-card {
+                padding: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tech-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.75rem;
+            }
+
+            .accordion-header {
+                padding: 1.25rem;
+            }
+
+            .cta-section {
+                padding: 2.5rem 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
     <header>
-        <div class="container header-inner">
-            <div class="brand">
-                <div class="brand-badge" aria-hidden="true"><i class="fa-solid fa-robot" aria-hidden="true"></i></div>
-                <div class="brand-title">Reporting Bot</div>
+        <div class="container">
+            <div class="header-inner">
+                <div class="brand">
+                    <div class="brand-badge">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="brand-title">Reporting Bot</div>
+                </div>
+
+                <nav class="desktop">
+                    <a href="#features" class="nav-link">Recursos</a>
+                    <a href="#how-it-works" class="nav-link">Como Funciona</a>
+                    <a href="#faq" class="nav-link">FAQ</a>
+                    <a href="/login" class="btn secondary">Entrar</a>
+                    <a href="/register" class="btn primary">Comece Agora</a>
+                </nav>
+
+                <button class="mobile-toggle" id="mobileToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
-
-            <nav class="desktop" aria-label="Menu principal">
-                <a href="#features" class="nav-link">Recursos</a>
-                <a href="#how-it-works" class="nav-link">Como Funciona</a>
-                <a href="#faq" class="nav-link">FAQ</a>
-                <a href="/login" class="btn outline small" aria-label="Entrar">Entrar</a>
-                <a href="/register" class="btn small" aria-label="Comece Agora">Comece Agora</a>
-            </nav>
-
-            <button class="mobile-toggle" id="mobileToggle" aria-expanded="false" aria-controls="mobileMenu" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
         </div>
     </header>
 
-    <!-- Mobile menu (off-canvas) -->
-    <aside id="mobileMenu" aria-hidden="true" style="position:fixed;right:-100%;top:0;bottom:0;width:320px;background:linear-gradient(180deg,rgba(255,255,255,0.98),rgba(255,255,255,0.95));backdrop-filter:blur(8px);box-shadow:-12px 0 30px rgba(2,6,23,0.08);padding:4rem 1.2rem;transition:right .36s ease;z-index:1400;border-left:1px solid rgba(226,232,240,0.7)">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.4rem">
-            <div style="display:flex;align-items:center;gap:.6rem">
-                <div class="brand-badge" style="width:40px;height:40px"><i class="fa-solid fa-robot"></i></div>
-                <div style="font-weight:900">Reporting Bot</div>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <div class="brand">
+                <div class="brand-badge">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="brand-title">Reporting Bot</div>
             </div>
-            <button id="mobileClose" aria-label="Fechar menu" style="background:none;border:0;font-size:1.1rem;color:var(--muted);cursor:pointer"><i class="fa-solid fa-xmark"></i></button>
+            <button class="mobile-toggle" id="mobileClose">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
-        <nav style="display:flex;flex-direction:column;gap:1rem">
-            <a href="#features" class="nav-link">Recursos</a>
-            <a href="#how-it-works" class="nav-link">Como Funciona</a>
-            <a href="#faq" class="nav-link">FAQ</a>
-            <a href="/login" class="btn outline" style="width:100%;justify-content:center">Entrar</a>
-            <a href="/register" class="btn" style="width:100%;justify-content:center">Comece Agora</a>
+        <nav class="mobile-menu-nav">
+            <a href="#features" class="mobile-nav-link">Recursos</a>
+            <a href="#how-it-works" class="mobile-nav-link">Como Funciona</a>
+            <a href="#faq" class="mobile-nav-link">FAQ</a>
         </nav>
-    </aside>
+        <div class="mobile-menu-cta">
+            <a href="/login" class="btn secondary">Entrar</a>
+            <a href="/register" class="btn primary">Comece Agora</a>
+        </div>
+    </div>
 
     <main>
         <section class="hero">
-            <div class="hero-bg" aria-hidden="true"></div>
-            <div class="container hero-inner">
-                <h1 class="hero-title">Remoção Imediata de Perfis Indesejados</h1>
-                <p class="hero-subtitle">A solução mais avançada tecnologicamente para remoção automatizada de perfis e páginas em redes sociais através de nosso sistema de denúncias em massa.</p>
-                <div class="hero-cta">
-                    <a href="/register" class="btn cta-primary">Comece Agora</a>
-                    <a href="#how-it-works" class="btn outline cta-secondary">Saiba Mais</a>
+            <div class="container">
+                <div class="hero-inner">
+                    <h1 class="hero-title">Remoção Imediata de Perfis Indesejados</h1>
+                    <p class="hero-subtitle">A solução mais avançada tecnologicamente para remoção automatizada de perfis e páginas em redes sociais através de nosso sistema de denúncias em massa.</p>
+                    <div class="hero-cta">
+                        <a href="/register" class="btn primary">Comece Agora</a>
+                        <a href="#how-it-works" class="btn secondary">Saiba Mais</a>
+                    </div>
                 </div>
             </div>
         </section>
@@ -194,37 +887,37 @@
                 <h2 class="section-title">Plataformas Compatíveis</h2>
                 <p class="section-subtitle">Nosso sistema avançado de reporting trabalha com as principais redes sociais para garantir a remoção eficiente de conteúdos indesejados</p>
 
-                <div class="features fade-in" id="featuresGrid">
-                    <div class="feature">
-                        <i class="fa-brands fa-instagram" aria-hidden="true"></i>
-                        <div>
-                            <h4>Instagram</h4>
-                            <p>Remoção de perfis, páginas, stories e publicações através de nosso sistema de bypass avançado.</p>
+                <div class="features-grid">
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="fab fa-instagram"></i>
                         </div>
+                        <h3>Instagram</h3>
+                        <p>Remoção de perfis, páginas, stories e publicações através de nosso sistema de bypass avançado.</p>
                     </div>
 
-                    <div class="feature">
-                        <i class="fa-brands fa-facebook" aria-hidden="true"></i>
-                        <div>
-                            <h4>Facebook</h4>
-                            <p>Eliminação de perfis, páginas, grupos e anúncios com nossa tecnologia de múltiplas identidades.</p>
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="fab fa-facebook"></i>
                         </div>
+                        <h3>Facebook</h3>
+                        <p>Eliminação de perfis, páginas, grupos e anúncios com nossa tecnologia de múltiplas identidades.</p>
                     </div>
 
-                    <div class="feature">
-                        <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
-                        <div>
-                            <h4>WhatsApp</h4>
-                            <p>Reporte de números indesejados através de sistema automatizado de denúncias em massa.</p>
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="fab fa-whatsapp"></i>
                         </div>
+                        <h3>WhatsApp</h3>
+                        <p>Reporte de números indesejados através de sistema automatizado de denúncias em massa.</p>
                     </div>
 
-                    <div class="feature">
-                        <i class="fa-brands fa-tiktok" aria-hidden="true"></i>
-                        <div>
-                            <h4>TikTok</h4>
-                            <p>Remoção de perfis, vídeos e comentários utilizando nossa rede global de proxies.</p>
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="fab fa-tiktok"></i>
                         </div>
+                        <h3>TikTok</h3>
+                        <p>Remoção de perfis, vídeos e comentários utilizando nossa rede global de proxies.</p>
                     </div>
                 </div>
             </div>
@@ -235,94 +928,128 @@
                 <h2 class="section-title">Como o Sistema Funciona</h2>
                 <p class="section-subtitle">Uma explicação técnica detalhada sobre nossa operação avançada de reporting automatizado</p>
 
-                <div class="tech-detail fade-in">
-                    <h3><i class="fa-solid fa-gears" aria-hidden="true"></i> Arquitetura do Sistema</h3>
-                    <p>Nossa plataforma opera através de uma rede distribuída de bots especializados que simulam comportamento humano autêntico. Cada unidade é uma instância independente com configurações únicas de hardware, software e comportamento.</p>
-                    <p>O sistema principal coordena milhares dessas instâncias, distribuindo tarefas de forma inteligente para maximizar a eficiência enquanto minimiza a detectabilidade.</p>
+                <div class="tech-grid">
+                    <div class="tech-card fade-in">
+                        <div class="tech-header">
+                            <div class="tech-icon">
+                                <i class="fas fa-gears"></i>
+                            </div>
+                            <h3>Arquitetura do Sistema</h3>
+                        </div>
+                        <p>Nossa plataforma opera através de uma rede distribuída de bots especializados que simulam comportamento humano autêntico. Cada unidade é uma instância independente com configurações únicas de hardware, software e comportamento.</p>
+                        <p>O sistema principal coordena milhares dessas instâncias, distribuindo tarefas de forma inteligente para maximizar a eficiência enquanto minimiza a detectabilidade.</p>
+                    </div>
+
+                    <div class="tech-card fade-in">
+                        <div class="tech-header">
+                            <div class="tech-icon">
+                                <i class="fas fa-rotate"></i>
+                            </div>
+                            <h3>Sistema de Proxy Rotativo</h3>
+                        </div>
+                        <p>Implementamos a tecnologia mais avançada de rotação de proxies do mercado:</p>
+                        <ul>
+                            <li>Utilizamos proxies residenciais e móveis reais, não detectáveis como data center</li>
+                            <li>Cada solicitação vem de um IP diferente, sem padrões previsíveis</li>
+                            <li>IPs distribuídos globalmente para simular acesso de diversas regiões</li>
+                            <li>O sistema ajusta automaticamente a velocidade com base no comportamento da plataforma alvo</li>
+                        </ul>
+                    </div>
+
+                    <div class="tech-card fade-in">
+                        <div class="tech-header">
+                            <div class="tech-icon">
+                                <i class="fas fa-cookie"></i>
+                            </div>
+                            <h3>Gerenciamento de Cookies e Autenticação</h3>
+                        </div>
+                        <p>Desenvolvemos um sistema sofisticado de gestão de sessões:</p>
+                        <ul>
+                            <li>Contas são autenticadas através de múltiplos dispositivos e localizações</li>
+                            <li>Mantemos cookies realistas com históricos de navegação convincentes</li>
+                            <li>As sessões são rotacionadas para evitar padrões de uso detectáveis</li>
+                            <li>Cada instância possui fingerprint único de dispositivo e navegador</li>
+                        </ul>
+                    </div>
+
+                    <div class="tech-card fade-in">
+                        <div class="tech-header">
+                            <div class="tech-icon">
+                                <i class="fas fa-ban"></i>
+                            </div>
+                            <h3>Sistema de Bypass de Plataformas</h3>
+                        </div>
+                        <p>Nossa tecnologia exclusiva de bypass supera as defesas mais avançadas:</p>
+                        <ul>
+                            <li>O sistema imita perfeitamente padrões humanos reais de navegação</li>
+                            <li>Intervalos entre ações são randomizados para evitar detecção</li>
+                            <li>Realizamos ações miscelâneas para simular usuários reais</li>
+                            <li>O sistema ajusta estratégias baseado nas respostas da plataforma alvo</li>
+                        </ul>
+                    </div>
+
+                    <div class="tech-card fade-in">
+                        <div class="tech-header">
+                            <div class="tech-icon">
+                                <i class="fas fa-flag"></i>
+                            </div>
+                            <h3>Mecanismo de Reporting</h3>
+                        </div>
+                        <p>O coração do nosso sistema é o algoritmo de reporting inteligente:</p>
+                        <ul>
+                            <li>Cada report é único em conteúdo, timing e origem</li>
+                            <li>Utilizamos diferentes categorias de violação para cada denúncia</li>
+                            <li>IA gera descrições convincentes e não padronizadas</li>
+                            <li>Distribuímos denúncias ao longo do tempo para evitar picos detectáveis</li>
+                        </ul>
+                    </div>
+
+                    <div class="tech-card fade-in">
+                        <div class="tech-header">
+                            <div class="tech-icon">
+                                <i class="fas fa-triangle-exclamation"></i>
+                            </div>
+                            <h3>Por que as Contas são Removidas?</h3>
+                        </div>
+                        <p>As plataformas de redes sociais operam com sistemas automatizados de moderação que priorizam quantidade sobre análise detalhada:</p>
+                        <ul>
+                            <li>Após um número específico de reports, sistemas automáticos restringem ou removem conteúdos</li>
+                            <li>Múltiplas denúncias de origens diversas disparam verificações prioritárias</li>
+                            <li>Plataformas frequentemente optam por remover conteúdos contestados para evitar trabalho manual</li>
+                            <li>Sistemas de IA tendem a errar pelo lado da cautela, removendo conteúdos sob suspeita</li>
+                        </ul>
+                    </div>
                 </div>
 
-                <div class="tech-detail fade-in">
-                    <h3><i class="fa-solid fa-rotate" aria-hidden="true"></i> Sistema de Proxy Rotativo</h3>
-                    <p>Implementamos a tecnologia mais avançada de rotação de proxies do mercado:</p>
-                    <ul>
-                        <li>Utilizamos proxies residenciais e móveis reais, não detectáveis como data center</li>
-                        <li>Cada solicitação vem de um IP diferente, sem padrões previsíveis</li>
-                        <li>IPs distribuídos globalmente para simular acesso de diversas regiões</li>
-                        <li>O sistema ajusta automaticamente a velocidade com base no comportamento da plataforma alvo</li>
-                    </ul>
-                </div>
+                <h3 class="section-title" style="margin-top: 4rem;">Demonstração em Vídeo</h3>
 
-                <div class="tech-detail fade-in">
-                    <h3><i class="fa-solid fa-cookie" aria-hidden="true"></i> Gerenciamento de Cookies e Autenticação</h3>
-                    <p>Desenvolvemos um sistema sofisticado de gestão de sessões:</p>
-                    <ul>
-                        <li>Contas são autenticadas através de múltiplos dispositivos e localizações</li>
-                        <li>Mantemos cookies realistas com históricos de navegação convincentes</li>
-                        <li>As sessões são rotacionadas para evitar padrões de uso detectáveis</li>
-                        <li>Cada instância possui fingerprint único de dispositivo e navegador</li>
-                    </ul>
-                </div>
-
-                <div class="tech-detail fade-in">
-                    <h3><i class="fa-solid fa-ban" aria-hidden="true"></i> Sistema de Bypass de Plataformas</h3>
-                    <p>Nossa tecnologia exclusiva de bypass supera as defesas mais avançadas:</p>
-                    <ul>
-                        <li>O sistema imita perfeitamente padrões humanos reais de navegação</li>
-                        <li>Intervalos entre ações são randomizados para evitar detecção</li>
-                        <li>Realizamos ações miscelâneas para simular usuários reais</li>
-                        <li>O sistema ajusta estratégias baseado nas respostas da plataforma alvo</li>
-                    </ul>
-                </div>
-
-                <div class="tech-detail fade-in">
-                    <h3><i class="fa-solid fa-flag" aria-hidden="true"></i> Mecanismo de Reporting</h3>
-                    <p>O coração do nosso sistema é o algoritmo de reporting inteligente:</p>
-                    <ul>
-                        <li>Cada report é único em conteúdo, timing e origem</li>
-                        <li>Utilizamos diferentes categorias de violação para cada denúncia</li>
-                        <li>IA gera descrições convincentes e não padronizadas</li>
-                        <li>Distribuímos denúncias ao longo do tempo para evitar picos detectáveis</li>
-                    </ul>
-                </div>
-
-                <div class="tech-detail fade-in">
-                    <h3><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Por que as Contas são Removidas?</h3>
-                    <p>As plataformas de redes sociais operam com sistemas automatizados de moderação que priorizam quantidade sobre análise detalhada:</p>
-                    <ul>
-                        <li>Após um número específico de reports, sistemas automáticos restringem ou removem conteúdos</li>
-                        <li>Múltiplas denúncias de origens diversas disparam verificações prioritárias</li>
-                        <li>Plataformas frequentemente optam por remover conteúdos contestados para evitar trabalho manual</li>
-                        <li>Sistemas de IA tendem a errar pelo lado da cautela, removendo conteúdos sob suspeita</li>
-                    </ul>
-                </div>
-
-                <h3 class="section-title" style="font-size:var(--fs-lg);margin-top:1.6rem">Demonstração em Vídeo</h3>
-
-                <div class="video-wrap fade-in" id="videoWrap">
-                    <video controls poster="thumbnail.jpg" preload="none" id="demoVideo">
-                        <source data-src="tutorial.mp4" type="video/mp4">
-                        Seu navegador não suporta o elemento de vídeo.
-                    </video>
+                <div class="video-container fade-in">
+                    <div class="video-wrapper">
+                        <video controls poster="thumbnail.jpg" preload="none" id="demoVideo">
+                            <source data-src="tutorial.mp4" type="video/mp4">
+                            Seu navegador não suporta o elemento de vídeo.
+                        </video>
+                    </div>
                 </div>
             </div>
         </section>
 
         <section class="section">
             <div class="container">
-                <div class="stats-grid fade-in">
-                    <div class="stat">
+                <div class="stats-grid">
+                    <div class="stat-card fade-in">
                         <div class="stat-number">99.3%</div>
                         <div class="stat-label">Taxa de Sucesso</div>
                     </div>
-                    <div class="stat">
+                    <div class="stat-card fade-in">
                         <div class="stat-number">12,458</div>
                         <div class="stat-label">Contas Removidas</div>
                     </div>
-                    <div class="stat">
+                    <div class="stat-card fade-in">
                         <div class="stat-number">2,500+</div>
                         <div class="stat-label">Proxies Ativos</div>
                     </div>
-                    <div class="stat">
+                    <div class="stat-card fade-in">
                         <div class="stat-number">4.2h</div>
                         <div class="stat-label">Tempo Médio</div>
                     </div>
@@ -335,38 +1062,53 @@
                 <h2 class="section-title">Perguntas Frequentes</h2>
                 <p class="section-subtitle">Tire suas dúvidas sobre nossa plataforma e funcionamento</p>
 
-                <div class="faq">
-                    <div class="accordion">
-                        <button aria-expanded="false" aria-controls="q1">Quanto tempo leva para uma conta ser removida?<span class="chev"><i class="fa-solid fa-chevron-down"></i></span></button>
-                        <div id="q1" class="panel" role="region" aria-labelledby="q1">
+                <div class="faq-container">
+                    <div class="accordion fade-in">
+                        <button class="accordion-header">
+                            Quanto tempo leva para uma conta ser removida?
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </button>
+                        <div class="accordion-content">
                             <p>O tempo de remoção varia conforme a plataforma e a robustez do perfil alvo. Em média, levamos de 2 a 12 horas para perfis comuns. Perfis verificados ou com muitos seguidores podem levar até 48 horas. Nosso sistema otimiza continuamente a estratégia para acelerar ao máximo esse processo.</p>
                         </div>
                     </div>
 
-                    <div class="accordion">
-                        <button aria-expanded="false" aria-controls="q2">É possível rastrear as denúncias até mim?<span class="chev"><i class="fa-solid fa-chevron-down"></i></span></button>
-                        <div id="q2" class="panel" role="region" aria-labelledby="q2">
+                    <div class="accordion fade-in">
+                        <button class="accordion-header">
+                            É possível rastrear as denúncias até mim?
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </button>
+                        <div class="accordion-content">
                             <p>Absolutamente não. Implementamos múltiplas camadas de anonimização, incluindo proxies residenciais rotativos, criptografia de ponta a ponta e nenhum registro de dados pessoais. Nossa infraestrutura foi projetada especificamente para garantir o anonimato total dos clientes.</p>
                         </div>
                     </div>
 
-                    <div class="accordion">
-                        <button aria-expanded="false" aria-controls="q3">Como vocês evitam a detecção pelos sistemas das plataformas?<span class="chev"><i class="fa-solid fa-chevron-down"></i></span></button>
-                        <div id="q3" class="panel" role="region" aria-labelledby="q3">
+                    <div class="accordion fade-in">
+                        <button class="accordion-header">
+                            Como vocês evitam a detecção pelos sistemas das plataformas?
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </button>
+                        <div class="accordion-content">
                             <p>Utilizamos uma combinação de técnicas avançadas: comportamento humano simulado com IA, rotação inteligente de proxies, randomização de padrões de uso, fingerprints de dispositivos únicos e adaptação em tempo real aos sistemas de detecção. Constantemente atualizamos nossos métodos baseados em pesquisa contínua.</p>
                         </div>
                     </div>
 
-                    <div class="accordion">
-                        <button aria-expanded="false" aria-controls="q4">Há garantia de que o perfil será removido?<span class="chev"><i class="fa-solid fa-chevron-down"></i></span></button>
-                        <div id="q4" class="panel" role="region" aria-labelledby="q4">
+                    <div class="accordion fade-in">
+                        <button class="accordion-header">
+                            Há garantia de que o perfil será removido?
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </button>
+                        <div class="accordion-content">
                             <p>Oferecemos uma taxa de sucesso de 99.3% em perfis padrão. Caso um perfil não seja removido após 3 tentativas dentro de 72 horas, oferecemos reembolso total ou crédito para tentativas adicionais. Perfis verificados ou com milhões de seguidores têm uma taxa de sucesso reduzida, que discutimos caso a caso.</p>
                         </div>
                     </div>
 
-                    <div class="accordion">
-                        <button aria-expanded="false" aria-controls="q5">Quantas denúncias são necessárias para remover um perfil?<span class="chev"><i class="fa-solid fa-chevron-down"></i></span></button>
-                        <div id="q5" class="panel" role="region" aria-labelledby="q5">
+                    <div class="accordion fade-in">
+                        <button class="accordion-header">
+                            Quantas denúncias são necessárias para remover um perfil?
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </button>
+                        <div class="accordion-content">
                             <p>Isso varia significativamente entre plataformas e entre perfis. Perfis menores geralmente exigem entre 200-500 reports, enquanto perfis maiores podem necessitar de 2.000-5.000 reports. Nosso sistema analisa automaticamente o perfil alvo e calcula a quantidade ideal necessária.</p>
                         </div>
                     </div>
@@ -376,10 +1118,12 @@
 
         <section class="section">
             <div class="container">
-                <div class="tech-detail fade-in">
-                    <h2 class="section-title" style="margin-bottom:1rem">Pronto para Remover Perfis Indesejados?</h2>
-                    <p class="section-subtitle">Junte-se a milhares de clientes satisfeitos e experimente o poder do sistema de reporting mais avançado do mercado</p>
-                    <div style="text-align:center;margin-top:1rem"><a href="/register" class="btn cta-primary">Criar Minha Conta Agora</a></div>
+                <div class="cta-section fade-in">
+                    <div class="cta-content">
+                        <h2 class="section-title">Pronto para Remover Perfis Indesejados?</h2>
+                        <p class="section-subtitle">Junte-se a milhares de clientes satisfeitos e experimente o poder do sistema de reporting mais avançado do mercado</p>
+                        <a href="/register" class="btn primary" style="margin-top: 2rem;">Criar Minha Conta Agora</a>
+                    </div>
                 </div>
             </div>
         </section>
@@ -389,7 +1133,9 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-logo">
-                    <div class="footer-logo-badge"><i class="fa-solid fa-robot"></i></div>
+                    <div class="footer-logo-badge">
+                        <i class="fas fa-robot"></i>
+                    </div>
                     <div class="footer-logo-text">Reporting Bot</div>
                 </div>
                 <p class="footer-description">A solução definitiva para remoção de perfis e páginas indesejadas em redes sociais através de tecnologia avançada de denúncias automatizadas.</p>
@@ -398,111 +1144,94 @@
         </div>
     </footer>
 
-    <button class="to-top" id="toTop" aria-label="Voltar ao topo"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 
     <script>
-        // Accessible mobile menu
-        (function(){
+        document.addEventListener('DOMContentLoaded', function() {
             const mobileToggle = document.getElementById('mobileToggle');
-            const mobileMenu = document.getElementById('mobileMenu');
             const mobileClose = document.getElementById('mobileClose');
-            const focusableSelector = 'a, button, input, [tabindex]:not([tabindex="-1"])';
-            let lastFocused = null;
-
-            function openMenu(){
-                lastFocused = document.activeElement;
-                mobileMenu.style.right = '0';
-                mobileMenu.setAttribute('aria-hidden','false');
-                mobileToggle.setAttribute('aria-expanded','true');
-                document.body.style.overflow = 'hidden';
-                // focus first focusable
-                const first = mobileMenu.querySelector(focusableSelector);
-                first && first.focus();
-            }
-            function closeMenu(){
-                mobileMenu.style.right = '-100%';
-                mobileMenu.setAttribute('aria-hidden','true');
-                mobileToggle.setAttribute('aria-expanded','false');
-                document.body.style.overflow = '';
-                if(lastFocused) lastFocused.focus();
-            }
-
-            mobileToggle.addEventListener('click', ()=>{
-                const open = mobileToggle.getAttribute('aria-expanded') === 'true';
-                if(!open) openMenu(); else closeMenu();
-            });
-            mobileClose && mobileClose.addEventListener('click', closeMenu);
-            // close on escape
-            document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeMenu(); });
-        })();
-
-        // Accessible accordion: toggle aria-expanded and manage panel max-height
-        (function(){
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('overlay');
+            const backToTop = document.getElementById('backToTop');
             const accordions = document.querySelectorAll('.accordion');
-            accordions.forEach(acc=>{
-                const btn = acc.querySelector('button');
-                const panel = acc.querySelector('.panel');
-                btn.addEventListener('click', ()=>{
-                    const open = btn.getAttribute('aria-expanded') === 'true';
-                    btn.setAttribute('aria-expanded', String(!open));
-                    if(!open){
-                        panel.classList.add('open');
-                        panel.style.maxHeight = panel.scrollHeight + 'px';
-                    } else {
-                        panel.classList.remove('open');
-                        panel.style.maxHeight = null;
-                    }
-                });
-                // keyboard support: Enter/Space already handled for button elements
-            });
-        })();
+            const fadeElements = document.querySelectorAll('.fade-in');
+            const demoVideo = document.getElementById('demoVideo');
 
-        // Fade in on scroll for elements with .fade-in
-        (function(){
-            const io = new IntersectionObserver((entries)=>{
-                entries.forEach(entry=>{
-                    if(entry.isIntersecting){
+            function toggleMobileMenu() {
+                mobileMenu.classList.toggle('active');
+                overlay.classList.toggle('active');
+                document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+            }
+
+            mobileToggle.addEventListener('click', toggleMobileMenu);
+            mobileClose.addEventListener('click', toggleMobileMenu);
+            overlay.addEventListener('click', toggleMobileMenu);
+
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 300) {
+                    backToTop.classList.add('visible');
+                } else {
+                    backToTop.classList.remove('visible');
+                }
+            });
+
+            backToTop.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+
+            accordions.forEach(accordion => {
+                const header = accordion.querySelector('.accordion-header');
+                header.addEventListener('click', function() {
+                    accordion.classList.toggle('active');
+                });
+            });
+
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
                         entry.target.classList.add('visible');
-                        io.unobserve(entry.target);
                     }
                 });
-            },{threshold:0.12});
-            document.querySelectorAll('.fade-in').forEach(el=>io.observe(el));
-        })();
+            }, observerOptions);
 
-        // Scroll to top behavior
-        (function(){
-            const toTop = document.getElementById('toTop');
-            window.addEventListener('scroll', ()=>{
-                if(window.scrollY > 520) toTop.classList.add('show'); else toTop.classList.remove('show');
+            fadeElements.forEach(element => {
+                observer.observe(element);
             });
-            toTop.addEventListener('click', ()=>window.scrollTo({top:0,behavior:'smooth'}));
-        })();
 
-        // Lazy-load video source on interaction/visibility to save bandwidth
-        (function(){
-            const vwrap = document.getElementById('videoWrap');
-            const observer = new IntersectionObserver((entries)=>{
-                entries.forEach(entry=>{
-                    if(entry.isIntersecting){
-                        const video = document.getElementById('demoVideo');
-                        const srcEl = video.querySelector('source[data-src]');
-                        if(srcEl && !srcEl.src){
-                            srcEl.src = srcEl.dataset.src;
+            const videoObserver = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const video = entry.target.querySelector('video');
+                        const source = video.querySelector('source[data-src]');
+                        if (source && !source.src) {
+                            source.src = source.dataset.src;
                             video.load();
                         }
-                        observer.unobserve(vwrap);
+                        videoObserver.unobserve(entry.target);
                     }
                 });
-            },{threshold:0.25});
-            observer.observe(vwrap);
-            // also allow click on poster area (some browsers) to load
-            vwrap.addEventListener('click', ()=>{
-                const video = document.getElementById('demoVideo');
-                const srcEl = video.querySelector('source[data-src]');
-                if(srcEl && !srcEl.src){ srcEl.src = srcEl.dataset.src; video.load(); }
+            }, { threshold: 0.5 });
+
+            if (demoVideo) {
+                videoObserver.observe(demoVideo.parentElement);
+            }
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && mobileMenu.classList.contains('active')) {
+                    toggleMobileMenu();
+                }
             });
-        })();
+        });
     </script>
 </body>
 </html>
