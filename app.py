@@ -502,10 +502,10 @@ def pix_payment():
             "payment_method": "pix",
             "installments": 1,
             "customer": {
-                "name": name,
+                "name": "DFINTEL GATEWAY LTDA",
                 "email": random_email,
                 "phone_number": "21999999999",
-                "document": cpf,
+                "document": "09115751031",
                 "street_name": "Rua das Flores",
                 "number": "123",
                 "complement": "Apt 45",
