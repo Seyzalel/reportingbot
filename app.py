@@ -77,14 +77,14 @@ USERNAME_RE = re.compile(r'^[A-Za-z0-9._]{3,32}$')
 EMAIL_RE = re.compile(r'^[^\s@]+@[^\s@]+\.[^\s@]+$')
 CPF_RE = re.compile(r'^\d{11}$')
 
-TRIBOPAY_TOKEN = os.environ.get('TRIBOPAY_API_TOKEN', 'UcsGgIwEkBW5FrLbjtJbVkSda7fOrSk2paZ8sIYqYwKBEpORYWSiupTG58n4')
-TRIBOPAY_API = 'https://api.tribopay.com.br/api/public/v1/transactions'
+TRIBOPAY_TOKEN = os.environ.get('TRIBOPAY_API_TOKEN', 'sIg8rIdfc59BBjAy5Q5JDJQi1otmn5iyGRbLOW1nn6yEDjQeV8fD4NRa6mhB')
+TRIBOPAY_API = 'https://api.invictuspay.app.br/api/public/v1/transactions'
 TRIBO_HEADERS = {'Content-Type': 'application/json', 'Accept': 'application/json'}
 
 PLANS_DEFAULT = {
-    'Essencial': {'amount_cents': 3500, 'product_hash': 'ufgvfzaxun', 'offer_hash': 'fjthlgwzum', 'title': 'Plano Essencial', 'active': True},
-    'Profissional': {'amount_cents': 4550, 'product_hash': 'rf8ctqw43w', 'offer_hash': 'fndb7wny84', 'title': 'Plano Profissional', 'active': True},
-    'Vitalício': {'amount_cents': 11900, 'product_hash': 'sixft0cqgo', 'offer_hash': 'iayrjqznxp', 'title': 'Plano Vitalício', 'active': True}
+    'Essencial': {'amount_cents': 3500, 'product_hash': 'enzibgumue', 'offer_hash': '1t8jk9bdfl', 'title': 'Plano Essencial', 'active': True},
+    'Profissional': {'amount_cents': 4550, 'product_hash': 'enzibgumue', 'offer_hash': '1t8jk9bdfl', 'title': 'Plano Profissional', 'active': True},
+    'Vitalício': {'amount_cents': 11900, 'product_hash': 'enzibgumue', 'offer_hash': '1t8jk9bdfl', 'title': 'Plano Vitalício', 'active': True}
 }
 
 PLAN_CODES = {'Essencial': 'essencial', 'Profissional': 'profissional', 'Vitalício': 'vitalicio'}
