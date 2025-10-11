@@ -1,131 +1,337 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Cadastro — Reporting Bot</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 <style>
-:root{--primary:#6366f1;--primary-dark:#4f46e5;--primary-darker:#4338ca;--secondary:#8b5cf6;--accent:#ec4899;--light:#fff;--light-gray:#f8fafc;--gray:#e2e8f0;--dark-gray:#64748b;--darker-gray:#475569;--dark:#0f172a;--success:#10b981;--error:#ef4444;--warning:#f59e0b;--r:22px;--pad:clamp(1rem,2.2vw,2rem);--gap:clamp(.7rem,2vw,1.5rem);--fs-xxl:clamp(1.6rem,4.2vw,2.85rem);--fs-xl:clamp(1.25rem,2.8vw,2.1rem);--fs-lg:clamp(1.02rem,1.7vw,1.3rem);--fs-md:clamp(.95rem,1.3vw,1.05rem);--fs-sm:clamp(.84rem,1vw,.95rem)}
+:root{
+  --bg:#07070a;
+  --panel:#0f1115;
+  --panel-2:#14151a;
+  --card:#0f1318;
+  --glass: rgba(255,255,255,0.02);
+  --accent-1:#8b5cf6;
+  --accent-2:#6366f1;
+  --accent-3:#ec4899;
+  --muted:#99a4b5;
+  --text:#e6eef8;
+  --success:#10b981;
+  --danger:#ef4444;
+  --line: rgba(255,255,255,0.04);
+  --radius:14px;
+  --pad: clamp(.75rem,1.6vw,1.1rem);
+  --fs-base: 13px;
+  --shadow: 0 26px 60px -28px rgba(0,0,0,0.8);
+  --glass-2: rgba(255,255,255,0.015);
+}
+html{font-size:var(--fs-base)}
 *{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(950px 600px at -10% -10%,#e9d5ff33,transparent),radial-gradient(1000px 620px at 110% 30%,#93c5fd30,transparent),linear-gradient(135deg,var(--light-gray),#f1f5f9);color:var(--dark)}
-a{text-decoration:none;color:inherit}
-.container{width:min(980px,96%);margin-inline:auto;padding-inline:clamp(.6rem,1.6vw,1.2rem)}
-header{padding-top:clamp(1.6rem,5vw,3.6rem);padding-bottom:clamp(.8rem,2.6vw,1.8rem);text-align:center;position:relative}
-header::after{content:"";position:absolute;inset:auto 6% 0 6%;height:1px;background:linear-gradient(90deg,transparent,var(--gray),transparent)}
-.brand{display:flex;align-items:center;justify-content:center;gap:.9rem;margin-bottom:.5rem}
-.brand-badge{width:clamp(2.6rem,7.4vw,4rem);height:clamp(2.6rem,7.4vw,4rem);border-radius:22%;background:linear-gradient(135deg,var(--primary),var(--secondary));display:grid;place-items:center;box-shadow:0 18px 45px -14px rgba(99,102,241,.35)}
-.brand-badge i{font-size:clamp(1.1rem,2.8vw,1.55rem);color:#fff}
-.brand-title{font-weight:900;font-size:var(--fs-xxl);background:linear-gradient(90deg,var(--primary) 10%,var(--secondary) 55%,var(--accent) 95%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-.02em}
-.tagline{font-size:var(--fs-lg);color:var(--darker-gray);max-width:70ch;margin:.2rem auto 0}
-.main{display:grid;grid-template-columns:1fr;gap:var(--gap);margin-block:clamp(1rem,4vw,2rem)}
-.card{position:relative;background:rgba(255,255,255,.78);border:1px solid var(--gray);border-radius:var(--r);padding:var(--pad);backdrop-filter:blur(8px);box-shadow:0 30px 70px -20px rgba(2,6,23,.15);overflow:hidden}
-.card::before{content:"";position:absolute;inset:auto -30% 0 -30%;height:1px;opacity:.6;background:radial-gradient(60% 60% at 50% 50%,rgba(99,102,241,.25),transparent 70%)}
-.form{display:grid;gap:.95rem}
-.form-title{display:flex;align-items:center;gap:.6rem;font-size:var(--fs-xl);font-weight:900;color:var(--primary-dark)}
-.subtitle{font-size:var(--fs-md);color:var(--dark-gray)}
-.field{display:grid;gap:.45rem}
-.label{display:flex;align-items:center;gap:.55rem;font-weight:800;color:var(--darker-gray);font-size:var(--fs-sm)}
+html,body{height:100%;margin:0}
+body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:
+  radial-gradient(900px 560px at -10% -10%, rgba(139,92,246,0.06), transparent),
+  radial-gradient(900px 580px at 110% 30%, rgba(99,102,241,0.04), transparent),
+  linear-gradient(180deg,var(--bg),var(--panel));color:var(--text);-webkit-font-smoothing:antialiased}
+.container{max-width:980px;margin:28px auto;padding:18px;display:grid;gap:18px}
+.header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-badge{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent-1),var(--accent-2));box-shadow:0 18px 45px -18px rgba(99,102,241,.25)}
+.brand-badge i{color:#fff;font-size:20px}
+.brand-title{font-weight:800;font-size:1.05rem;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hint{color:var(--muted);font-size:.86rem}
+.layout{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start}
+@media(max-width:980px){.layout{grid-template-columns:1fr}}
+.card{background:linear-gradient(180deg,var(--card),var(--panel-2));border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);overflow:hidden}
+.form-title{display:flex;align-items:center;gap:12px;font-weight:900;font-size:1.05rem}
+.sub{color:var(--muted);margin-top:6px;font-size:.9rem}
+.form{display:grid;gap:12px;margin-top:12px}
+.row{display:grid;gap:8px}
+.label{font-weight:800;color:var(--muted);display:flex;align-items:center;gap:10px;font-size:.92rem}
 .input-wrap{position:relative}
-.input{width:100%;font-size:var(--fs-md);padding:1rem 2.8rem 1rem 2.6rem;background:#fff;border:1px solid var(--gray);color:var(--dark);border-radius:14px;outline:0;transition:border-color .15s,box-shadow .15s}
-.input:focus{border-color:var(--primary);box-shadow:0 0 0 .25rem rgba(99,102,241,.12)}
-.icon-left{position:absolute;left:.9rem;top:50%;transform:translateY(-50%);font-size:1rem;color:var(--dark-gray)}
-.icon-right{position:absolute;right:.9rem;top:50%;transform:translateY(-50%);font-size:1rem;color:var(--dark-gray);cursor:pointer}
-.error{min-height:18px;color:var(--error);font-size:.9rem}
-.meter{height:.9rem;border-radius:999px;background:rgba(99,102,241,.12);border:1px solid var(--gray);overflow:hidden}
+.input{width:100%;padding:12px 44px 12px 44px;border-radius:12px;background:var(--glass-2);border:1px solid rgba(255,255,255,0.02);color:var(--text);outline:0;font-weight:700;font-size:.95rem}
+.input::placeholder{color:rgba(230,238,248,0.45);font-weight:600}
+.input:focus{box-shadow:0 8px 30px -20px rgba(99,102,241,.25);border-color:rgba(99,102,241,.18)}
+.icon-left,.icon-right{position:absolute;top:50%;transform:translateY(-50%);color:var(--muted);font-size:0.95rem}
+.icon-left{left:12px}
+.icon-right{right:12px;cursor:pointer}
+.error{min-height:18px;color:var(--danger);font-size:.88rem;font-weight:700}
+.meter{height:8px;border-radius:999px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.02);overflow:hidden;margin-top:8px}
 .meter span{display:block;height:100%;width:0;background:linear-gradient(90deg,#ef4444,#f59e0b,#10b981);transition:width .25s}
-.actions{display:grid;gap:.7rem;margin-top:.2rem}
-.btn{appearance:none;border:none;cursor:pointer;border-radius:14px;padding:1rem;font-weight:900;font-size:var(--fs-md);color:#fff;background:linear-gradient(90deg,var(--primary),var(--secondary));box-shadow:0 16px 32px -14px rgba(99,102,241,.5);transition:transform .12s,filter .12s}
-.btn:active{transform:translateY(1px)}
-.btn:disabled{filter:saturate(.3) brightness(.95);cursor:not-allowed}
-.helper{font-size:.95rem;color:var(--dark-gray);text-align:center}
-.helper a{color:var(--primary-dark);font-weight:800}
-.toast{position:fixed;left:50%;top:18px;transform:translateX(-50%) translateY(-12px);opacity:0;z-index:60;background:#fff;border:1px solid var(--gray);border-radius:12px;box-shadow:0 20px 50px -20px rgba(2,6,23,.25);padding:.75rem 1rem;font-weight:800;display:flex;align-items:center;gap:.6rem;transition:opacity .22s,transform .22s}
+.controls{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:6px}
+.check{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;font-size:.92rem;color:var(--muted)}
+.checkbox{width:20px;height:20px;border-radius:6px;border:1px solid var(--line);background:transparent;display:grid;place-items:center}
+.checkbox i{color:#fff;opacity:0;transform:scale(.6)}
+input[type="checkbox"]{display:none}
+input[type="checkbox"]:checked + .checkbox{background:linear-gradient(135deg,var(--accent-1),var(--accent-2));border-color:transparent;box-shadow:0 8px 20px -12px rgba(99,102,241,.4)}
+input[type="checkbox"]:checked + .checkbox i{opacity:1;transform:scale(1)}
+.actions{display:grid;gap:10px;margin-top:8px}
+.btn{padding:12px;border-radius:12px;border:none;font-weight:900;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:#fff;cursor:pointer;box-shadow:0 16px 40px -20px rgba(99,102,241,.28);font-size:.95rem}
+.btn[disabled]{opacity:.6;cursor:not-allowed}
+.alt{background:transparent;border:1px solid var(--line);color:var(--text);padding:10px;border-radius:10px;font-weight:800}
+.panel{background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.015));border:1px solid rgba(255,255,255,0.02);padding:14px;border-radius:12px}
+.panel h4{margin:0;font-size:.98rem;font-weight:900}
+.panel p{margin-top:8px;color:var(--muted);font-size:.9rem}
+.tiny{font-size:.82rem;color:var(--muted)}
+.footer{margin-top:18px;text-align:center;color:var(--muted);font-size:.82rem}
+.toast{position:fixed;left:50%;top:18px;transform:translateX(-50%) translateY(-12px);opacity:0;z-index:90;background:linear-gradient(180deg,rgba(20,20,20,0.95),rgba(10,10,10,0.95));border-radius:10px;padding:10px 14px;font-weight:900;display:flex;align-items:center;gap:10px;color:var(--text);transition:opacity .22s,transform .22s}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-footer{color:var(--dark-gray);text-align:center;font-size:var(--fs-sm);padding:1.4rem 0;margin-top:clamp(1rem,3vw,2rem);background:#fff;border-top:1px solid var(--gray)}
+@media (prefers-reduced-motion: reduce){
+  .card{transition:none}
+  .input{transition:none}
+  .toast{transition:none}
+}
 </style>
 </head>
 <body>
 <div class="container">
-<header>
-<div class="brand"><div class="brand-badge"><i class="fa-solid fa-robot"></i></div><div class="brand-title">Reporting Bot</div></div>
-<p class="tagline">A solução definitiva para remoção de perfis e páginas indesejadas em redes sociais</p>
-</header>
-<div class="main">
-<section class="card">
-<form id="signup" class="form" novalidate>
-<div class="form-title"><i class="fa-solid fa-user-plus"></i><span>Criar conta</span></div>
-<div class="subtitle">Preencha os dados para começar</div>
-<div class="field">
-<div class="label"><i class="fa-regular fa-user"></i> Nome de usuário</div>
-<div class="input-wrap">
-<i class="fa-regular fa-user icon-left" aria-hidden="true"></i>
-<input class="input" id="username" name="username" type="text" inputmode="latin" autocomplete="username" minlength="3" maxlength="32" required aria-invalid="false" aria-describedby="err-u" placeholder="ex.: seunome">
-<i class="fa-solid fa-circle-check icon-right" id="ok-u" style="opacity:0"></i>
+  <div class="header">
+    <div class="brand">
+      <div class="brand-badge" aria-hidden="true"><i class="fa-solid fa-robot"></i></div>
+      <div>
+        <div class="brand-title">Reporting Bot</div>
+        <div class="hint">Crie sua conta e gerencie suas denúncias</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <main class="card" aria-labelledby="signup-heading">
+      <div class="form-title" id="signup-heading"><i class="fa-solid fa-user-plus" aria-hidden="true"></i><span style="margin-left:8px">Criar conta</span></div>
+      <div class="sub">Preencha os dados para começar</div>
+
+      <form id="signup" class="form" novalidate>
+        <div class="row">
+          <label class="label" for="username"><i class="fa-solid fa-user" aria-hidden="true"></i> Nome de usuário</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-user icon-left" aria-hidden="true"></i>
+            <input id="username" name="username" class="input" type="text" inputmode="latin" autocomplete="username" minlength="3" maxlength="32" required aria-describedby="errU" placeholder="ex.: seunome" />
+            <i class="fa-solid fa-circle-check icon-right" id="okU" style="opacity:0" aria-hidden="true"></i>
+          </div>
+          <div id="errU" class="error" aria-live="polite"></div>
+        </div>
+
+        <div class="row">
+          <label class="label" for="email"><i class="fa-regular fa-envelope" aria-hidden="true"></i> E-mail</label>
+          <div class="input-wrap">
+            <i class="fa-regular fa-envelope icon-left" aria-hidden="true"></i>
+            <input id="email" name="email" class="input" type="email" inputmode="email" autocomplete="email" required aria-describedby="errE" placeholder="voce@exemplo.com" />
+            <i class="fa-solid fa-circle-check icon-right" id="okE" style="opacity:0" aria-hidden="true"></i>
+          </div>
+          <div id="errE" class="error" aria-live="polite"></div>
+        </div>
+
+        <div class="row">
+          <label class="label" for="password"><i class="fa-solid fa-lock" aria-hidden="true"></i> Senha</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-lock icon-left" aria-hidden="true"></i>
+            <input id="password" name="password" class="input" type="password" autocomplete="new-password" minlength="8" required aria-describedby="errP" placeholder="mínimo 8 caracteres" />
+            <i id="togglePw" class="fa-regular fa-eye icon-right" role="button" aria-label="Mostrar senha" tabindex="0"></i>
+          </div>
+          <div class="meter" aria-hidden="true"><span id="meter"></span></div>
+          <div id="errP" class="error" aria-live="polite"></div>
+        </div>
+
+        <div class="row">
+          <label class="label" for="confirm"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Confirmar senha</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-shield-halved icon-left" aria-hidden="true"></i>
+            <input id="confirm" name="confirm" class="input" type="password" autocomplete="new-password" minlength="8" required aria-describedby="errC" placeholder="repita a senha" />
+            <i id="toggleCf" class="fa-regular fa-eye icon-right" role="button" aria-label="Mostrar confirmação" tabindex="0"></i>
+          </div>
+          <div id="errC" class="error" aria-live="polite"></div>
+        </div>
+
+        <div class="controls" style="margin-top:6px">
+          <label class="check" for="agree">
+            <input id="agree" type="checkbox" />
+            <span class="checkbox" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+            <span class="tiny">Li e aceito os <a href="/terms" style="color:var(--accent-2);font-weight:800">Termos de Uso</a></span>
+          </label>
+          <div class="tiny">Já tem conta? <a href="/login" style="color:var(--accent-2);font-weight:900">Entrar</a></div>
+        </div>
+
+        <div class="actions">
+          <button id="submit" class="btn" type="submit"><i class="fa-solid fa-user-plus" aria-hidden="true"></i> Criar conta</button>
+          <button type="button" id="alt" class="alt">Voltar</button>
+        </div>
+      </form>
+
+    </main>
+
+    <aside class="panel" aria-labelledby="help-title">
+      <h4 id="help-title">Segurança recomendada</h4>
+      <p>Use senhas longas contendo letras maiúsculas, minúsculas, números e símbolos. Ative autenticação de dois fatores quando disponível.</p>
+      <p style="margin-top:8px;font-weight:800;color:var(--muted)">Suporte: <a href="https://wa.me/5511932820951" style="color:var(--accent-2);font-weight:900">WhatsApp</a></p>
+    </aside>
+  </div>
+
+  <div class="footer">Reporting Bot © 2025 — Todos os direitos reservados</div>
 </div>
-<div id="err-u" class="error"></div>
-</div>
-<div class="field">
-<div class="label"><i class="fa-regular fa-envelope"></i> E-mail</div>
-<div class="input-wrap">
-<i class="fa-regular fa-envelope icon-left" aria-hidden="true"></i>
-<input class="input" id="email" name="email" type="email" inputmode="email" autocomplete="email" required aria-invalid="false" aria-describedby="err-e" placeholder="voce@exemplo.com">
-<i class="fa-solid fa-circle-check icon-right" id="ok-e" style="opacity:0"></i>
-</div>
-<div id="err-e" class="error"></div>
-</div>
-<div class="field">
-<div class="label"><i class="fa-solid fa-lock"></i> Senha</div>
-<div class="input-wrap">
-<i class="fa-solid fa-lock icon-left" aria-hidden="true"></i>
-<input class="input" id="password" name="password" type="password" autocomplete="new-password" minlength="8" required aria-invalid="false" aria-describedby="err-p" placeholder="mínimo 8 caracteres">
-<i id="toggle-pw" class="fa-regular fa-eye icon-right" aria-hidden="true"></i>
-</div>
-<div class="meter" aria-hidden="true"><span id="meter"></span></div>
-<div id="err-p" class="error"></div>
-</div>
-<div class="field">
-<div class="label"><i class="fa-solid fa-shield-halved"></i> Confirmar senha</div>
-<div class="input-wrap">
-<i class="fa-solid fa-shield-halved icon-left" aria-hidden="true"></i>
-<input class="input" id="confirm" name="confirm" type="password" autocomplete="new-password" minlength="8" required aria-invalid="false" aria-describedby="err-c" placeholder="repita a senha">
-<i id="toggle-cf" class="fa-regular fa-eye icon-right" aria-hidden="true"></i>
-</div>
-<div id="err-c" class="error"></div>
-</div>
-<div class="actions">
-<button id="submit" class="btn" type="submit"><i class="fa-solid fa-user-plus"></i> Criar conta</button>
-<div class="helper">Já tem conta? <a href="/login">Entrar</a></div>
-</div>
-</form>
-</section>
-</div>
-</div>
-<div id="toast" class="toast" role="status" aria-live="polite"><i class="fa-solid fa-circle-check" style="color:#10b981"></i><span>Conta criada com sucesso</span></div>
-<footer>
-Reporting Bot © 2025 • Todos os direitos reservados
-</footer>
+
+<div id="toast" class="toast" role="status" aria-live="polite"><i id="toastIcon" class="fa-solid fa-circle-check" style="color:var(--success)"></i><span id="toastText" style="margin-left:6px">Conta criada com sucesso</span></div>
+
 <script>
-const f=document.getElementById("signup");const u=document.getElementById("username");const e=document.getElementById("email");const p=document.getElementById("password");const c=document.getElementById("confirm");const errU=document.getElementById("err-u");const errE=document.getElementById("err-e");const errP=document.getElementById("err-p");const errC=document.getElementById("err-c");const btn=document.getElementById("submit");const toast=document.getElementById("toast");const toastIcon=toast.querySelector("i");const toastText=toast.querySelector("span");const meter=document.getElementById("meter");const togglePw=document.getElementById("toggle-pw");const toggleCf=document.getElementById("toggle-cf");const okU=document.getElementById("ok-u");const okE=document.getElementById("ok-e");
-function validUsername(v){return/^[a-zA-Z0-9._]{3,32}$/.test(v)}
-function validEmail(v){return/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)}
-function scorePassword(v){let s=0;if(v.length>=8)s++;if(/[A-Z]/.test(v))s++;if(/[a-z]/.test(v))s++;if(/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;if(v.length>=12)s++;return Math.min(s,5)}
-function setMeter(v){const s=scorePassword(v);const pct=[0,20,40,60,80,100][s];meter.style.width=pct+"%"}
-function setFieldState(input,errEl,okIcon,ok,err){input.setAttribute("aria-invalid",ok?"false":"true");errEl.textContent=ok?"":err||"";okIcon&&(okIcon.style.opacity=ok?"1":"0")}
-function clearErrors(){[errU,errE,errP,errC].forEach(x=>x.textContent="")}
-function validate(){let ok=true;const uv=u.value.trim();const ev=e.value.trim();const pv=p.value;const cv=c.value;const un=validUsername(uv);setFieldState(u,errU,okU,un,un?"":"Use 3–32 caracteres: letras, números, ponto ou _");ok=ok&&un;const em=validEmail(ev);setFieldState(e,errE,okE,em,em?"":"E-mail inválido");ok=ok&&em;const pw=pv.length>=8;setFieldState(p,errP,null,pw,pw?"":"Mínimo de 8 caracteres");ok=ok&&pw;const cf=cv===pv&&cv.length>0;setFieldState(c,errC,null,cf,cf?"":"As senhas não coincidem");ok=ok&&cf;btn.disabled=!ok;btn.style.opacity=ok?"1":".65";return ok}
-function showToast(msg,type){toastText.textContent=msg;if(type==="error"){toastIcon.classList.remove("fa-circle-check");toastIcon.classList.add("fa-circle-xmark");toastIcon.style.color="#ef4444"}else{toastIcon.classList.remove("fa-circle-xmark");toastIcon.classList.add("fa-circle-check");toastIcon.style.color="#10b981"}toast.classList.add("show");setTimeout(()=>{toast.classList.remove("show")},1800)}
-function setLoading(v){if(v){btn.disabled=true;btn.style.opacity=".65";btn.dataset.label=btn.innerHTML;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Criando...'}else{btn.disabled=false;btn.style.opacity="1";if(btn.dataset.label)btn.innerHTML=btn.dataset.label}}
-[u,e,p,c].forEach(x=>x.addEventListener("input",()=>{setMeter(p.value);validate()}));
-togglePw.addEventListener("click",()=>{const t=p.getAttribute("type")==="password"?"text":"password";p.setAttribute("type",t);togglePw.classList.toggle("fa-eye");togglePw.classList.toggle("fa-eye-slash")});
-toggleCf.addEventListener("click",()=>{const t=c.getAttribute("type")==="password"?"text":"password";c.setAttribute("type",t);toggleCf.classList.toggle("fa-eye");toggleCf.classList.toggle("fa-eye-slash")});
-f.addEventListener("submit",async ev=>{ev.preventDefault();if(!validate()){if(errU.textContent)u.focus();else if(errE.textContent)e.focus();else if(errP.textContent)p.focus();else if(errC.textContent)c.focus();return}setLoading(true);try{const res=await fetch("/register",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},credentials:"same-origin",body:JSON.stringify({username:u.value.trim(),email:e.value.trim(),password:p.value,confirm:c.value})});const data=await res.json().catch(()=>({}));if(res.ok&&data&&data.ok){showToast("Conta criada com sucesso","success");setTimeout(()=>{window.location.href=data.redirect||"/dashboard"},900);return}clearErrors();if(data&&data.field==="username")errU.textContent=data.error||"Erro no nome de usuário";else if(data&&data.field==="email")errE.textContent=data.error||"Erro no e-mail";else if(data&&data.field==="password")errP.textContent=data.error||"Erro na senha";else if(data&&data.field==="confirm")errC.textContent=data.error||"Erro na confirmação";else if(res.status===409){const m=(data&&data.error)||"Usuário ou e-mail já cadastrado";errU.textContent=m;errE.textContent=m}else{showToast((data&&data.error)||"Não foi possível criar a conta","error")}if(errU.textContent)u.focus();else if(errE.textContent)e.focus();else if(errP.textContent)p.focus();else if(errC.textContent)c.focus()}catch(err){showToast("Falha de conexão. Tente novamente.","error")}finally{setLoading(false)}});
-setMeter("");validate();
+const form = document.getElementById('signup');
+const username = document.getElementById('username');
+const email = document.getElementById('email');
+const password = document.getElementById('password');
+const confirm = document.getElementById('confirm');
+const agree = document.getElementById('agree');
+const errU = document.getElementById('errU');
+const errE = document.getElementById('errE');
+const errP = document.getElementById('errP');
+const errC = document.getElementById('errC');
+const submitBtn = document.getElementById('submit');
+const altBtn = document.getElementById('alt');
+const meter = document.getElementById('meter');
+const okU = document.getElementById('okU');
+const okE = document.getElementById('okE');
+const togglePw = document.getElementById('togglePw');
+const toggleCf = document.getElementById('toggleCf');
+const toast = document.getElementById('toast');
+const toastText = document.getElementById('toastText');
+const toastIcon = document.getElementById('toastIcon');
+
+function showToast(msg,type){
+  toastText.textContent = msg;
+  if(type === 'error'){
+    toastIcon.className = 'fa-solid fa-circle-xmark';
+    toastIcon.style.color = 'var(--danger)';
+  } else {
+    toastIcon.className = 'fa-solid fa-circle-check';
+    toastIcon.style.color = 'var(--success)';
+  }
+  toast.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=>{ toast.classList.remove('show'); },1800);
+}
+
+function isValidUsername(v){
+  return /^[a-zA-Z0-9._]{3,32}$/.test(v);
+}
+function isValidEmail(v){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
+function scorePassword(v){
+  let s = 0;
+  if(v.length >= 8) s++;
+  if(/[A-Z]/.test(v)) s++;
+  if(/[a-z]/.test(v)) s++;
+  if(/[0-9]/.test(v)) s++;
+  if(/[^A-Za-z0-9]/.test(v)) s++;
+  if(v.length >= 12) s++;
+  return Math.min(s,5);
+}
+function updateMeter(v){
+  const s = scorePassword(v);
+  const pct = [0,20,40,60,80,100][s];
+  meter.style.width = pct + '%';
+}
+function setFieldState(input,errEl,okIcon,ok,message){
+  input.setAttribute('aria-invalid', ok ? 'false' : 'true');
+  errEl.textContent = ok ? '' : (message || '');
+  if(okIcon) okIcon.style.opacity = ok ? '1' : '0';
+}
+function validate(){
+  let ok = true;
+  const u = username.value.trim();
+  const em = email.value.trim();
+  const pw = password.value;
+  const cf = confirm.value;
+  const uok = isValidUsername(u);
+  setFieldState(username, errU, okU, uok, uok ? '' : 'Use 3–32 caracteres: letras, números, ponto ou _');
+  ok = ok && uok;
+  const eok = isValidEmail(em);
+  setFieldState(email, errE, okE, eok, eok ? '' : 'E-mail inválido');
+  ok = ok && eok;
+  const pwok = typeof pw === 'string' && pw.length >= 8;
+  setFieldState(password, errP, null, pwok, pwok ? '' : 'Mínimo de 8 caracteres');
+  ok = ok && pwok;
+  const cfok = cf === pw && cf.length > 0;
+  setFieldState(confirm, errC, null, cfok, cfok ? '' : 'As senhas não coincidem');
+  ok = ok && cfok;
+  const agreed = agree.checked;
+  ok = ok && agreed;
+  submitBtn.disabled = !ok;
+  return ok;
+}
+
+username.addEventListener('input', ()=>{ validate(); });
+email.addEventListener('input', ()=>{ validate(); });
+password.addEventListener('input', ()=>{ updateMeter(password.value); validate(); });
+confirm.addEventListener('input', ()=>{ validate(); });
+agree.addEventListener('change', ()=>{ validate(); });
+
+togglePw.addEventListener('click', ()=>{ const t = password.getAttribute('type') === 'password' ? 'text' : 'password'; password.setAttribute('type', t); togglePw.classList.toggle('fa-eye'); togglePw.classList.toggle('fa-eye-slash'); });
+toggleCf.addEventListener('click', ()=>{ const t = confirm.getAttribute('type') === 'password' ? 'text' : 'password'; confirm.setAttribute('type', t); toggleCf.classList.toggle('fa-eye'); toggleCf.classList.toggle('fa-eye-slash'); });
+
+altBtn.addEventListener('click', ()=>{ window.history.back(); });
+
+function setLoading(on){
+  if(on){
+    submitBtn.disabled = true;
+    submitBtn.dataset.label = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Criando...';
+  } else {
+    submitBtn.disabled = false;
+    if(submitBtn.dataset.label) submitBtn.innerHTML = submitBtn.dataset.label;
+  }
+}
+
+form.addEventListener('submit', async function(ev){
+  ev.preventDefault();
+  if(!validate()){
+    if(errU.textContent) username.focus();
+    else if(errE.textContent) email.focus();
+    else if(errP.textContent) password.focus();
+    else if(errC.textContent) confirm.focus();
+    return;
+  }
+  setLoading(true);
+  try{
+    const payload = {
+      username: username.value.trim(),
+      email: email.value.trim(),
+      password: password.value,
+      confirm: confirm.value,
+      agree: agree.checked
+    };
+    const res = await fetch('/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json().catch(()=>({}));
+    if(res.ok && data && data.ok){
+      showToast('Conta criada com sucesso','success');
+      setTimeout(()=>{ window.location.href = data.redirect || '/dashboard'; },900);
+      return;
+    }
+    if(data && data.field === 'username'){ errU.textContent = data.error || 'Erro no nome de usuário'; username.focus(); }
+    else if(data && data.field === 'email'){ errE.textContent = data.error || 'Erro no e-mail'; email.focus(); }
+    else if(data && data.field === 'password'){ errP.textContent = data.error || 'Erro na senha'; password.focus(); }
+    else if(data && data.field === 'confirm'){ errC.textContent = data.error || 'Erro na confirmação'; confirm.focus(); }
+    else if(res.status === 409){
+      const msg = (data && data.error) || 'Usuário ou e-mail já cadastrado';
+      errU.textContent = msg;
+      errE.textContent = msg;
+    } else {
+      showToast((data && data.error) || 'Não foi possível criar a conta','error');
+    }
+  } catch(err){
+    showToast('Falha de conexão. Tente novamente.','error');
+  } finally {
+    setLoading(false);
+  }
+});
+
+updateMeter('');
+validate();
 </script>
 </body>
 </html>
