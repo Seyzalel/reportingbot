@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Planos — Reporting Bot</title>
+<title>Planos - Reporting Bot</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -97,31 +97,11 @@ footer::before{content:"";position:absolute;inset:0 6% auto 6%;height:1px;backgr
 .modal .htitle{font-weight:900;color:var(--text-primary)}
 .modal .close{appearance:none;border:none;background:transparent;font-size:20px;cursor:pointer;color:var(--text-secondary);padding:0.5rem;border-radius:var(--r);transition:var(--transition)}
 .modal .close:hover{background:rgba(255,255,255,0.1);color:var(--text-primary)}
-.form{margin-top:12px;display:grid;gap:12px}
-.row{display:grid;grid-template-columns:1fr;gap:12px}
-.kv{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border-color);border-radius:12px;padding:10px 12px;background:var(--bg-tertiary)}
-.kv .k{color:var(--text-secondary);font-weight:800}
-.kv .v{font-weight:900;color:var(--text-primary)}
-.input{display:flex;flex-direction:column;gap:6px}
-.input label{font-weight:900;color:var(--text-primary)}
-.input input{border:1px solid var(--border-color);border-radius:12px;padding:12px 14px;font-weight:800;outline:none;transition:var(--transition);background:var(--bg-tertiary);color:var(--text-primary)}
-.input input:focus{box-shadow:0 0 0 4px rgba(99,102,241,.15);border-color:var(--accent-primary)}
-.input input.valid{border-color:var(--success);box-shadow:0 0 0 4px rgba(16,185,129,.15)}
-.input input.invalid{border-color:var(--error);box-shadow:0 0 0 4px rgba(239,68,68,.15)}
-.err{display:none;color:var(--error);font-weight:800;font-size:.92rem}
 .actions-modal{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
 .btn-ghost{background:var(--bg-tertiary);border:1px solid var(--border-color);color:var(--text-primary);transition:var(--transition)}
 .btn-ghost:hover{background:rgba(255,255,255,0.1);border-color:var(--border-color)}
 .btn-primary{background:var(--gradient-primary);color:#fff;transition:var(--transition)}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 30px -10px rgba(99,102,241,.5)}
-.policy{margin-top:12px;border:1px solid rgba(99,102,241,.25);border-radius:16px;background:var(--bg-tertiary);padding:12px}
-.policy .ph{display:flex;align-items:center;gap:.6rem;font-weight:900;color:var(--text-primary)}
-.policy .ph i{color:var(--accent-primary)}
-.policy .pb{margin-top:8px;color:var(--text-secondary);font-size:.94rem;line-height:1.4}
-.policy .pts{display:grid;gap:6px;margin-top:8px}
-.policy .pt{display:flex;gap:.55rem;align-items:flex-start}
-.policy .pt i{color:var(--success);min-width:1rem;margin-top:.15rem}
-.policy .pt div{color:var(--text-secondary);font-size:.94rem;line-height:1.4}
 @keyframes spin{to{transform:rotate(1turn)}}
 @keyframes fall{0%{transform:translateY(-20vh) rotate(0turn);opacity:1}100%{transform:translateY(60vh) rotate(1.5turn);opacity:0}}
 @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
@@ -139,7 +119,7 @@ footer::before{content:"";position:absolute;inset:0 6% auto 6%;height:1px;backgr
 <p class="tagline">Escolha o plano ideal. Planos mensais de 30 dias e opção vitalícia. Pagamento exclusivo via Pix, suporte rápido por chat</p>
 <div class="ribbon"><i class="fa-solid fa-bolt"></i><span>Ativação imediata</span><span style="display:inline-flex;align-items:center;gap:.45rem;padding:.3rem .6rem;border:1px solid rgba(16,185,129,.25);border-radius:999px;background:rgba(16,185,129,.12);color:var(--success);font-weight:900"><i class="fa-brands fa-pix"></i> Pagamento via Pix</span></div>
 </header>
-<section class="grid">
+<section class="grid" aria-label="Planos disponíveis">
 <article class="card tilt" data-plan="Essencial" data-price="R$35" data-period="30 dias">
 <div class="period-chip"><i class="fa-solid fa-rotate"></i> Mensal (30 dias)</div>
 <div class="head"><div class="icon"><i class="fa-regular fa-gem"></i></div><div class="title">Essencial</div></div>
@@ -153,7 +133,7 @@ footer::before{content:"";position:absolute;inset:0 6% auto 6%;height:1px;backgr
 <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Fila de processamento padrão</span></div>
 </div>
 <div class="payline"><i class="fa-brands fa-pix"></i><span>Pagamento via Pix</span></div>
-<div class="actions"><button class="btn select"><i class="fa-solid fa-cart-shopping"></i>Assinar Essencial</button><div class="note">QR Code Pix emitido na confirmação</div></div>
+<div class="actions"><button class="btn select" type="button"><i class="fa-solid fa-cart-shopping"></i>Assinar Essencial</button><div class="note">QR Code Pix emitido na confirmação</div></div>
 </article>
 <article class="card tilt" data-plan="Profissional" data-price="R$45,50" data-period="30 dias">
 <div class="badge">Mais popular</div>
@@ -169,7 +149,7 @@ footer::before{content:"";position:absolute;inset:0 6% auto 6%;height:1px;backgr
 <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Processamento de fila prioritário</span></div>
 </div>
 <div class="payline"><i class="fa-brands fa-pix"></i><span>Pagamento via Pix</span></div>
-<div class="actions"><button class="btn select"><i class="fa-solid fa-cart-shopping"></i>Assinar Profissional</button><div class="note">QR Code Pix emitido na confirmação</div></div>
+<div class="actions"><button class="btn select" type="button"><i class="fa-solid fa-cart-shopping"></i>Assinar Profissional</button><div class="note">QR Code Pix emitido na confirmação</div></div>
 </article>
 <article class="card tilt" data-plan="Vitalício" data-price="R$119" data-period="Acesso permanente">
 <div class="badge">Melhor valor</div>
@@ -184,10 +164,10 @@ footer::before{content:"";position:absolute;inset:0 6% auto 6%;height:1px;backgr
 <div class="feature"><i class="fa-solid fa-check-circle"></i><span>Recursos ilimitados, sucesso garantido e maior prioridade</span></div>
 </div>
 <div class="payline"><i class="fa-brands fa-pix"></i><span>Pagamento via Pix</span></div>
-<div class="actions"><button class="btn select"><i class="fa-solid fa-cart-shopping"></i>Assinar Vitalício</button><div class="note">Pagamento único com Pix</div></div>
+<div class="actions"><button class="btn select" type="button"><i class="fa-solid fa-cart-shopping"></i>Assinar Vitalício</button><div class="note">Pagamento único com Pix</div></div>
 </article>
 </section>
-<section class="compare">
+<section class="compare" aria-label="Comparativo de recursos">
 <table class="table" id="compare-table">
 <thead>
 <tr><th>Recursos</th><th>Essencial</th><th>Profissional</th><th>Vitalício</th></tr>
@@ -205,35 +185,10 @@ footer::before{content:"";position:absolute;inset:0 6% auto 6%;height:1px;backgr
 </section>
 </div>
 <div id="toast" class="toast" aria-live="polite"><i class="fa-solid fa-circle-check" style="color:#10b981"></i><span id="toast-text">Plano selecionado</span></div>
-<div id="confetti" class="confetti"></div>
+<div id="confetti" class="confetti" aria-hidden="true"></div>
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="dlg-title">
 <div class="overlay" id="overlay"></div>
-<div class="panel">
-<div class="head">
-<div class="hleft"><div class="hicon"><i class="fa-brands fa-pix"></i></div><div class="htitle" id="dlg-title">Finalizar assinatura</div></div>
-<button class="close" id="closeModal" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
-</div>
-<div class="row" style="margin-top:10px">
-<div class="kv"><div class="k">Plano</div><div class="v" id="m-plan">—</div></div>
-<div class="kv"><div class="k">Valor</div><div class="v" id="m-price">—</div></div>
-</div>
-<form class="form" id="pix-form" action="/pixPayment" method="post" novalidate>
-<input type="hidden" name="plan" id="f-plan">
-<div class="input"><label for="f-name">Nome completo</label><input id="f-name" name="name" type="text" placeholder="Digite seu nome completo" required aria-describedby="e-name" aria-invalid="false" autocomplete="name"><div class="err" id="e-name" aria-live="polite">Informe seu nome completo</div></div>
-<div class="input"><label for="f-cpf">CPF (apenas números)</label><input id="f-cpf" name="cpf" inputmode="numeric" pattern="^\d{11}$" maxlength="11" placeholder="Somente números" required aria-describedby="e-cpf e-cpf-invalid" aria-invalid="false" autocomplete="off"><div class="err" id="e-cpf" aria-live="polite">Informe um CPF com 11 dígitos</div><div class="err" id="e-cpf-invalid" aria-live="polite">CPF inválido. Verifique os dígitos.</div></div>
-<div class="err" id="e-server" role="alert" aria-live="polite"></div>
-<div class="actions-modal"><button type="button" class="btn btn-ghost" id="cancel">Cancelar</button><button type="submit" class="btn btn-primary" id="submitBtn">Continuar para Pix</button></div>
-</form>
-<div class="policy" id="policy">
-<div class="ph"><i class="fa-solid fa-shield-halved"></i><span>Por que pedimos seu nome completo e CPF?</span></div>
-<div class="pb">Usamos essas informações exclusivamente para gerar a cobrança Pix e para que a instituição financeira valide e aprove o pagamento automaticamente. Assim que o pagamento é confirmado, seu acesso é liberado imediatamente e todas as funções são ativadas sem espera.</div>
-<div class="pts">
-<div class="pt"><i class="fa-solid fa-circle-check"></i><div>Dados usados apenas para aprovar sua transação Pix (QR Code e copia e cola). Não salvamos seu nome ou CPF em nossos servidores nem em nosso banco de dados.</div></div>
-<div class="pt"><i class="fa-solid fa-circle-check"></i><div>As informações seguem para a processadora/banco com a finalidade de autenticar a cobrança e garantir a aprovação instantânea do pagamento.</div></div>
-<div class="pt"><i class="fa-solid fa-circle-check"></i><div>Após a confirmação do pagamento, o acesso é liberado automaticamente e nada do seu cadastro é retido por nós.</div></div>
-</div>
-</div>
-</div>
+<div class="panel" id="modal-panel" aria-live="polite" role="document"></div>
 </div>
 <footer>Reporting Bot © 2025 • Todos os direitos reservados</footer>
 <script id="plans-data" type="application/json">{"plans":""}</script>
@@ -250,14 +205,12 @@ document.addEventListener('DOMContentLoaded', function() {
             return null;
         }
     }
-
     function brl(cents) {
         if (!Number.isFinite(cents)) return "";
         var r = cents / 100;
         var isInt = cents % 100 === 0;
         return isInt ? ("R$" + Math.trunc(r).toLocaleString("pt-BR")) : ("R$" + r.toLocaleString("pt-BR", {minimumFractionDigits: 2, maximumFractionDigits: 2}));
     }
-
     function mergePlans(runtime) {
         var base = {
             "Essencial": {"amount_cents": 3500, "active": true},
@@ -274,7 +227,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         return out;
     }
-
     function applyPrices(plans) {
         document.querySelectorAll(".card").forEach(function(card) {
             var name = card.getAttribute("data-plan");
@@ -286,6 +238,8 @@ document.addEventListener('DOMContentLoaded', function() {
             card.setAttribute("data-price", priceStr);
             if (cfg.active !== true) {
                 card.style.display = "none";
+            } else {
+                card.style.display = "";
             }
         });
         var table = document.getElementById("compare-table");
@@ -305,11 +259,19 @@ document.addEventListener('DOMContentLoaded', function() {
                             cells[idx] && (cells[idx].style.display = "none");
                         });
                     }
+                } else {
+                    var idx2 = colIndexByName[name];
+                    if (typeof idx2 === "number" && idx2 > 0) {
+                        headers[idx2].style.display = "";
+                        table.querySelectorAll("tbody tr").forEach(function(tr) {
+                            var cells = tr.querySelectorAll("td");
+                            cells[idx2] && (cells[idx2].style.display = "");
+                        });
+                    }
                 }
             });
         }
     }
-
     function showToast(msg) {
         if (!toast || !toastText) return;
         toastText.textContent = msg;
@@ -318,7 +280,6 @@ document.addEventListener('DOMContentLoaded', function() {
             toast.classList.remove("show");
         }, 1600);
     }
-
     function burstConfetti(x, y) {
         if (!confetti) return;
         var n = 28;
@@ -343,98 +304,6 @@ document.addEventListener('DOMContentLoaded', function() {
             })(p);
         }
     }
-
-    function cpfIsValid(c) {
-        var s = String(c || "").replace(/\D+/g, "");
-        if (s.length !== 11) return false;
-        if (/^(\d)\1+$/.test(s)) return false;
-        var sum = 0;
-        for (var i = 0; i < 9; i++) sum += parseInt(s[i], 10) * (10 - i);
-        var dv1 = (sum * 10) % 11;
-        dv1 = dv1 === 10 ? 0 : dv1;
-        if (dv1 !== parseInt(s[9], 10)) return false;
-        sum = 0;
-        for (var j = 0; j < 10; j++) sum += parseInt(s[j], 10) * (11 - j);
-        var dv2 = (sum * 10) % 11;
-        dv2 = dv2 === 10 ? 0 : dv2;
-        return dv2 === parseInt(s[10], 10);
-    }
-
-    function nameIsValid(n) {
-        var p = String(n || "").trim().split(/\s+/).filter(function(x) { return x.length >= 2; });
-        return p.length >= 2;
-    }
-
-    function setFieldState(input, ok) {
-        input.classList.remove("valid", "invalid");
-        input.setAttribute("aria-invalid", String(!ok));
-        if (ok) input.classList.add("valid");
-        else input.classList.add("invalid");
-    }
-
-    function validate() {
-        var ok = true;
-        var name = String(fName.value || "").trim();
-        var cpf = String(fCpf.value || "").replace(/\D+/g, "");
-        var nameOk = nameIsValid(name);
-        var cpfLenOk = cpf.length === 11;
-        var cpfOk = cpfLenOk && cpfIsValid(cpf);
-        var eName = document.getElementById("e-name");
-        var eCpf = document.getElementById("e-cpf");
-        var eCpfInvalid = document.getElementById("e-cpf-invalid");
-        if (eName) eName.style.display = nameOk ? "none" : "block";
-        if (eCpf) eCpf.style.display = cpfLenOk ? "none" : "block";
-        if (eCpfInvalid) eCpfInvalid.style.display = (cpfLenOk && !cpfOk) ? "block" : "none";
-        setFieldState(fName, nameOk);
-        setFieldState(fCpf, cpfOk);
-        if (!nameOk) ok = false;
-        if (!cpfOk) ok = false;
-        return ok;
-    }
-
-    function clearServerError() {
-        if (eServer) {
-            eServer.textContent = "";
-            eServer.style.display = "none";
-        }
-    }
-
-    function showServerError(msg) {
-        if (eServer) {
-            eServer.textContent = msg;
-            eServer.style.display = "block";
-        }
-    }
-
-    function openModal(plan, price) {
-        lastFocus = document.activeElement;
-        if (mPlan) mPlan.textContent = plan;
-        if (mPrice) mPrice.textContent = price;
-        if (fPlan) fPlan.value = plan;
-        clearServerError();
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = "Continuar para Pix";
-        }
-        modal && modal.classList.add("show");
-        document.body.classList.add("body-modal-open");
-        if (main) main.setAttribute("inert", "");
-        setTimeout(function() {
-            try { fName && fName.focus(); } catch (e) {}
-        }, 50);
-    }
-
-    function closeModal() {
-        modal && modal.classList.remove("show");
-        document.body.classList.remove("body-modal-open");
-        if (main) main.removeAttribute("inert");
-        if (lastFocus && typeof lastFocus.focus === "function") try { lastFocus.focus(); } catch (e) {}
-    }
-
-    function onlyDigits(s) {
-        return String(s || "").replace(/\D+/g, "");
-    }
-
     function handleTabTrap(e) {
         if (!modal || !modal.classList.contains("show")) return;
         var focusables = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
@@ -452,98 +321,65 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
-
-    function fetchJson(url, opts) {
-        if (window.fetch) {
-            return fetch(url, opts).then(function(r) {
-                return r.json().catch(function() { return null; });
-            }).catch(function() { return null; });
+    function openThankYouModal(plan, price, period) {
+        lastFocus = document.activeElement;
+        if (!modal) return;
+        var panel = document.getElementById('modal-panel');
+        if (!panel) return;
+        panel.innerHTML = ''
+            + '<div class="head">'
+            + '  <div class="hleft"><div class="hicon"><i class="fa-brands fa-pix"></i></div><div class="htitle" id="dlg-title">Obrigado — Quase lá!</div></div>'
+            + '  <button class="close" id="closeModal" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>'
+            + '</div>'
+            + '<div style="margin-top:12px">'
+            + '  <div class="kv" style="margin-bottom:10px"><div class="k">Plano</div><div class="v" id="m-plan">' + escapeHtml(plan) + '</div></div>'
+            + '  <div class="kv" style="margin-bottom:10px"><div class="k">Valor</div><div class="v" id="m-price">' + escapeHtml(price) + '</div></div>'
+            + '  <div class="kv" style="margin-bottom:6px"><div class="k">Período</div><div class="v" id="m-period">' + escapeHtml(period || '') + '</div></div>'
+            + '  <p style="margin-top:12px;color:var(--text-secondary);font-size:0.96rem;line-height:1.45">Recebemos sua solicitação. Ao prosseguir você será redirecionado para a cobrança Pix com os dados do plano selecionado. Após o pagamento, o acesso será ativado automaticamente.</p>'
+            + '  <div class="actions-modal" style="margin-top:14px">'
+            + '    <button type="button" class="btn btn-ghost" id="cancelBtn">Cancelar</button>'
+            + '    <button type="button" class="btn btn-primary" id="continueBtn">Continuar para Pix</button>'
+            + '  </div>'
+            + '</div>';
+        modal.classList.add('show');
+        document.body.classList.add('body-modal-open');
+        if (main) main.setAttribute('inert', '');
+        setTimeout(function() {
+            try { var cb = document.getElementById('continueBtn'); if (cb) cb.focus(); } catch (e) {}
+        }, 50);
+        var closeBtn = document.getElementById('closeModal');
+        var cancelBtn = document.getElementById('cancelBtn');
+        var continueBtn = document.getElementById('continueBtn');
+        function closeAndRestore() {
+            modal && modal.classList.remove('show');
+            document.body.classList.remove('body-modal-open');
+            if (main) main.removeAttribute('inert');
+            if (lastFocus && typeof lastFocus.focus === 'function') try { lastFocus.focus(); } catch (e) {}
         }
-        return new Promise(function(resolve) {
-            var xhr = new XMLHttpRequest();
-            xhr.open((opts && opts.method) ? opts.method : "GET", url);
-            for (var k in (opts && opts.headers) || {}) xhr.setRequestHeader(k, (opts.headers || {})[k]);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                    try {
-                        var json = JSON.parse(xhr.responseText);
-                        resolve(json);
-                    } catch (e) {
-                        resolve(null);
-                    }
-                }
-            };
-            xhr.send((opts && opts.body) ? opts.body : null);
+        if (closeBtn) closeBtn.addEventListener('click', function() { closeAndRestore(); });
+        if (cancelBtn) cancelBtn.addEventListener('click', function() { closeAndRestore(); });
+        if (continueBtn) continueBtn.addEventListener('click', function() {
+            var q = []
+            q.push('plan=' + encodeURIComponent(plan || ''));
+            q.push('price=' + encodeURIComponent(price || ''));
+            q.push('period=' + encodeURIComponent(period || ''));
+            var url = '/pixPayment?' + q.join('&');
+            window.location.href = url;
         });
     }
-
-    function validateAndSubmit() {
-        if (!validate()) return;
-        clearServerError();
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.textContent = "Gerando Pix...";
-        }
-        fCpf.value = onlyDigits(fCpf.value);
-        var payload = {
-            plan: fPlan.value,
-            name: String(fName.value || "").trim(),
-            cpf: String(fCpf.value || "").trim()
-        };
-        fetchJson("/pixPayment", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "X-Requested-With": "fetch"
-            },
-            body: JSON.stringify(payload)
-        }).then(function(data) {
-            if (data && data.ok && data.redirect) {
-                window.location.href = data.redirect;
-                return;
-            }
-            var msg = "Não foi possível gerar a cobrança Pix. Tente novamente em instantes.";
-            if (data && data.message) msg = data.message;
-            showServerError(msg);
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.textContent = "Continuar para Pix";
-            }
-            if (data && data.code === "invalid_document") {
-                fCpf.focus();
-            }
-        }).catch(function() {
-            showServerError("Não foi possível gerar a cobrança Pix. Verifique sua conexão e tente novamente.");
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.textContent = "Continuar para Pix";
-            }
-        });
+    function escapeHtml(s) {
+        return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
-
     var runtimePlans = parsePlans();
     var currentPlans = mergePlans(runtimePlans);
     applyPrices(currentPlans);
-
     var toast = document.getElementById("toast");
     var toastText = document.getElementById("toast-text");
     var confetti = document.getElementById("confetti");
     var modal = document.getElementById("modal");
     var overlay = document.getElementById("overlay");
-    var closeModalBtn = document.getElementById("closeModal");
-    var cancelBtn = document.getElementById("cancel");
-    var form = document.getElementById("pix-form");
-    var fPlan = document.getElementById("f-plan");
-    var fName = document.getElementById("f-name");
-    var fCpf = document.getElementById("f-cpf");
-    var mPlan = document.getElementById("m-plan");
-    var mPrice = document.getElementById("m-price");
-    var submitBtn = document.getElementById("submitBtn");
-    var eServer = document.getElementById("e-server");
     var main = document.querySelector(".container");
     var lastFocus = null;
-
     document.addEventListener("click", function(e) {
         var sel = e.target.closest && e.target.closest(".card .select");
         if (!sel) return;
@@ -551,24 +387,33 @@ document.addEventListener('DOMContentLoaded', function() {
         try { if (getComputedStyle(card).display === "none") return; } catch (ee) {}
         card.style.animation = "pulse .6s ease";
         setTimeout(function() { card.style.animation = ""; }, 620);
-        var plan = card.getAttribute("data-plan");
-        var price = card.getAttribute("data-price");
-        var period = card.getAttribute("data-period");
+        var plan = card.getAttribute("data-plan") || '';
+        var price = card.getAttribute("data-price") || '';
+        var period = card.getAttribute("data-period") || '';
         showToast(plan + " selecionado (" + price + " • " + period + " • Pix)");
         var r = card.getBoundingClientRect();
         burstConfetti(r.left + r.width / 2, r.top + window.scrollY + 40);
-        openModal(plan, price);
+        openThankYouModal(plan, price, period);
     });
-
-    overlay && overlay.addEventListener("click", closeModal);
-    closeModalBtn && closeModalBtn.addEventListener("click", closeModal);
-    cancelBtn && cancelBtn.addEventListener("click", closeModal);
-
+    if (overlay) {
+        overlay.addEventListener("click", function() {
+            if (modal && modal.classList.contains("show")) {
+                modal.classList.remove("show");
+                document.body.classList.remove("body-modal-open");
+                if (main) main.removeAttribute("inert");
+                if (lastFocus && typeof lastFocus.focus === "function") try { lastFocus.focus(); } catch (e) {}
+            }
+        });
+    }
     document.addEventListener("keydown", function(e) {
-        if (e.key === "Escape" && modal && modal.classList.contains("show")) closeModal();
+        if (e.key === "Escape" && modal && modal.classList.contains("show")) {
+            modal.classList.remove("show");
+            document.body.classList.remove("body-modal-open");
+            if (main) main.removeAttribute("inert");
+            if (lastFocus && typeof lastFocus.focus === "function") try { lastFocus.focus(); } catch (err) {}
+        }
         handleTabTrap(e);
     });
-
     document.querySelectorAll && document.querySelectorAll(".tilt").forEach && document.querySelectorAll(".tilt").forEach(function(card) {
         card.addEventListener("mousemove", function(e) {
             var r = card.getBoundingClientRect();
@@ -582,31 +427,6 @@ document.addEventListener('DOMContentLoaded', function() {
             card.style.transform = "rotateX(0) rotateY(0)";
         });
     });
-
-    if (fCpf) {
-        fCpf.addEventListener("input", function(e) {
-            var d = onlyDigits(e.target.value).slice(0, 11);
-            e.target.value = d;
-            validate();
-            clearServerError();
-        });
-    }
-
-    if (fName) {
-        fName.addEventListener("input", function() {
-            validate();
-            clearServerError();
-        });
-    }
-
-    if (form) {
-        form.addEventListener("submit", function(e) {
-            e.preventDefault();
-            validateAndSubmit();
-        });
-    }
-
-    window.addEventListener("unhandledrejection", function() {});
 });
 </script>
 </body>
