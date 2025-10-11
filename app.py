@@ -460,9 +460,6 @@ def pix_payment():
             return render_template('checkout.html', username=session.get('username'), plan=tx.get('plan'), amount_brl=brl_from_cents(tx.get('amount_cents', 0)), status=tx.get('payment_status', 'waiting_payment'), hash=tx.get('hash'), pix_url=tx.get('pix_url'), emv=tx.get('pix_qr_code'), qr_b64=qr_b64)
         data = request.get_json(silent=True) or request.form
         plan = (data.get('plan') or '').strip()
-        name = (data.get('name') or '').strip()
-        cpf_raw = data.get('cpf') or ''
-        cpf = re.sub(r'\D+', '', cpf_raw)
         plans_cfg = get_plans()
         if plan not in plans_cfg:
             msg = 'Plano inválido'
@@ -475,11 +472,6 @@ def pix_payment():
             if wants_json():
                 return jsonify(ok=False, code='plan_unavailable', message=msg), 400
             return render_template('planos.html', username=session.get('username'), plans=plans_cfg, error_message=msg), 400
-        if not name_is_valid(name) or not cpf_is_valid(cpf):
-            msg = 'Por favor, informe seu nome completo e um CPF válido que corresponda ao banco de origem do pagamento.'
-            if wants_json():
-                return jsonify(ok=False, code='invalid_document', message=msg), 422
-            return render_template('planos.html', username=session.get('username'), plans=plans_cfg, error_message=msg), 422
         uid = session.get('user_id')
         user_doc = None
         if uid:
@@ -491,6 +483,18 @@ def pix_payment():
             user_doc = users.find_one({'username_lower': session.get('username', '').lower()})
         if user_doc:
             apply_user_migrations(user_doc)
+        name = (data.get('name') or '').strip()
+        cpf_raw = data.get('cpf') or ''
+        cpf = re.sub(r'\D+', '', cpf_raw)
+        if not name and user_doc:
+            name = (user_doc.get('name') or user_doc.get('full_name') or user_doc.get('username') or '').strip()
+        if not cpf and user_doc:
+            cpf = re.sub(r'\D+', '', (user_doc.get('document') or user_doc.get('cpf') or ''))
+        if not name_is_valid(name) or not cpf_is_valid(cpf):
+            msg = 'Por favor, informe seu nome completo e um CPF válido que corresponda ao banco de origem do pagamento.'
+            if wants_json():
+                return jsonify(ok=False, code='invalid_document', message=msg), 422
+            return render_template('planos.html', username=session.get('username'), plans=plans_cfg, error_message=msg), 422
         random_email = generate_coherent_gmail(name)
         try:
             postback_url = url_for('tribopay_webhook', _external=True)
@@ -502,10 +506,10 @@ def pix_payment():
             "payment_method": "pix",
             "installments": 1,
             "customer": {
-                "name": "DFINTEL GATEWAY LTDA",
+                "name": name,
                 "email": random_email,
                 "phone_number": "21999999999",
-                "document": "09115751031",
+                "document": cpf,
                 "street_name": "Rua das Flores",
                 "number": "123",
                 "complement": "Apt 45",
