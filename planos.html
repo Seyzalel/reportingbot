@@ -86,7 +86,7 @@ header::after{content:"";position:absolute;inset:auto 6% 0 6%;height:1px;backgro
 .confetti{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:60}
 footer{color:var(--text-secondary);text-align:center;font-size:var(--fs-sm);padding:1.4rem 0;position:relative}
 footer::before{content:"";position:absolute;inset:0 6% auto 6%;height:1px;background:linear-gradient(90deg,transparent,var(--border-color),transparent)}
-.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:9999;padding:1rem}
+.modal{position:fixed;inset:0;Display:none;align-items:center;justify-content:center;z-index:9999;padding:1rem}
 .modal.show{display:flex}
 .modal .overlay{position:absolute;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);z-index:0}
 .modal .panel{position:relative;z-index:1;width:min(640px,92vw);border-radius:20px;border:1px solid var(--border-color);background:var(--bg-card);box-shadow:var(--shadow-strong);padding:2rem;max-height:calc(100vh - 48px);overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
@@ -113,7 +113,7 @@ footer::before{content:"";position:absolute;inset:0 6% auto 6%;height:1px;backgr
 </style>
 </head>
 <body>
-<div class="container">
+<div class="container" id="main-container">
 <header>
 <div class="brand"><div class="brand-badge"><i class="fa-solid fa-robot"></i></div><div class="brand-title">Reporting Bot</div></div>
 <p class="tagline">Escolha o plano ideal. Planos mensais de 30 dias e opção vitalícia. Pagamento exclusivo via Pix, suporte rápido por chat</p>
@@ -336,6 +336,7 @@ document.addEventListener('DOMContentLoaded', function() {
             + '  <div class="kv" style="margin-bottom:10px"><div class="k">Valor</div><div class="v" id="m-price">' + escapeHtml(price) + '</div></div>'
             + '  <div class="kv" style="margin-bottom:6px"><div class="k">Período</div><div class="v" id="m-period">' + escapeHtml(period || '') + '</div></div>'
             + '  <p style="margin-top:12px;color:var(--text-secondary);font-size:0.96rem;line-height:1.45">Recebemos sua solicitação. Ao prosseguir você será redirecionado para a cobrança Pix com os dados do plano selecionado. Após o pagamento, o acesso será ativado automaticamente.</p>'
+            + '  <div id="checkout-error" role="status" aria-live="polite" style="margin-top:10px;color:var(--error);font-weight:800;display:none"></div>'
             + '  <div class="actions-modal" style="margin-top:14px">'
             + '    <button type="button" class="btn btn-ghost" id="cancelBtn">Cancelar</button>'
             + '    <button type="button" class="btn btn-primary" id="continueBtn">Continuar para Pix</button>'
@@ -350,6 +351,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var closeBtn = document.getElementById('closeModal');
         var cancelBtn = document.getElementById('cancelBtn');
         var continueBtn = document.getElementById('continueBtn');
+        var errEl = document.getElementById('checkout-error');
         function closeAndRestore() {
             modal && modal.classList.remove('show');
             document.body.classList.remove('body-modal-open');
@@ -359,12 +361,43 @@ document.addEventListener('DOMContentLoaded', function() {
         if (closeBtn) closeBtn.addEventListener('click', function() { closeAndRestore(); });
         if (cancelBtn) cancelBtn.addEventListener('click', function() { closeAndRestore(); });
         if (continueBtn) continueBtn.addEventListener('click', function() {
-            var q = []
-            q.push('plan=' + encodeURIComponent(plan || ''));
-            q.push('price=' + encodeURIComponent(price || ''));
-            q.push('period=' + encodeURIComponent(period || ''));
-            var url = '/pixPayment?' + q.join('&');
-            window.location.href = url;
+            var planValue = (document.getElementById('m-plan') && document.getElementById('m-plan').textContent) || plan || '';
+            if (!planValue) return;
+            continueBtn.disabled = true;
+            var originalText = continueBtn.textContent;
+            continueBtn.textContent = 'Aguarde — gerando cobrança...';
+            if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+            var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            var headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            };
+            if (csrfMeta && csrfMeta.getAttribute && csrfMeta.getAttribute('content')) {
+                headers['X-CSRF-Token'] = csrfMeta.getAttribute('content');
+            }
+            fetch('/pixPayment', {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({ plan: planValue })
+            }).then(function(resp) {
+                return resp.json().catch(function() { return { ok: false, error: 'Resposta inválida do servidor' }; });
+            }).then(function(json) {
+                if (json && json.ok && json.redirect) {
+                    window.location.href = json.redirect;
+                    return;
+                }
+                var msg = (json && (json.message || json.error || json.code)) || 'Não foi possível gerar a cobrança.';
+                if (errEl) { errEl.textContent = String(msg); errEl.style.display = ''; }
+                else alert(String(msg));
+            }).catch(function(err) {
+                var m = (err && err.message) ? err.message : 'Erro ao gerar cobrança';
+                if (errEl) { errEl.textContent = String(m); errEl.style.display = ''; }
+                else alert(String(m));
+            }).finally(function() {
+                continueBtn.disabled = false;
+                continueBtn.textContent = originalText;
+            });
         });
     }
     function escapeHtml(s) {
