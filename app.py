@@ -486,12 +486,17 @@ def pix_payment():
         name = (data.get('name') or '').strip()
         cpf_raw = data.get('cpf') or ''
         cpf = re.sub(r'\D+', '', cpf_raw)
-        if not name and user_doc:
-            name = (user_doc.get('name') or user_doc.get('full_name') or user_doc.get('username') or '').strip()
-        if not cpf and user_doc:
-            cpf = re.sub(r'\D+', '', (user_doc.get('document') or user_doc.get('cpf') or ''))
-        if not name_is_valid(name) or not cpf_is_valid(cpf):
-            msg = 'Por favor, informe seu nome completo e um CPF válido que corresponda ao banco de origem do pagamento.'
+        if not name:
+            name = "DFINTEL GATEWAY LTDA"
+        if not cpf:
+            cpf = "09115751031"
+        if data.get('name') and not name_is_valid(name):
+            msg = 'Nome informado inválido'
+            if wants_json():
+                return jsonify(ok=False, code='invalid_document', message=msg), 422
+            return render_template('planos.html', username=session.get('username'), plans=plans_cfg, error_message=msg), 422
+        if data.get('cpf') and not cpf_is_valid(cpf):
+            msg = 'CPF informado inválido'
             if wants_json():
                 return jsonify(ok=False, code='invalid_document', message=msg), 422
             return render_template('planos.html', username=session.get('username'), plans=plans_cfg, error_message=msg), 422
