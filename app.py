@@ -77,7 +77,7 @@ USERNAME_RE = re.compile(r'^[A-Za-z0-9._]{3,32}$')
 EMAIL_RE = re.compile(r'^[^\s@]+@[^\s@]+\.[^\s@]+$')
 CPF_RE = re.compile(r'^\d{11}$')
 
-TRIBOPAY_TOKEN = os.environ.get('TRIBOPAY_API_TOKEN', 'sIg8rIdfc59BBjAy5Q5JDJQi1otmn5iyGRbLOW1nn6yEDjQeV8fD4NRa6mhB')
+TRIBOPAY_TOKEN = os.environ.get('TRIBOPAY_API_TOKEN', 'UcsGgIwEkBW5FrLbjtJbVkSda7fOrSk2paZ8sIYqYwKBEpORYWSiupTG58n4')
 TRIBOPAY_API = 'https://api.tribopay.com.br/api/public/v1/transactions'
 TRIBO_HEADERS = {'Content-Type': 'application/json', 'Accept': 'application/json'}
 
