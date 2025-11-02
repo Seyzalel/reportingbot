@@ -260,6 +260,21 @@ def tribopay_fetch_status(tx_hash) -> (Optional[str], Optional[Dict[str, Any]]):
         status = obj.get("status") or obj.get("status_payment") or obj.get("payment_status")
     return (status.lower() if isinstance(status, str) else None), obj
 
+def plan_name_to_code(plan_name):
+    if not plan_name:
+        return None
+    s = unicodedata.normalize("NFKD", str(plan_name))
+    s = s.encode("ascii", "ignore").decode("ascii").lower()
+    s = re.sub(r"[^a-z0-9]+", "", s)
+    for k, v in PLAN_CODES.items():
+        nk = unicodedata.normalize("NFKD", str(k)).encode("ascii", "ignore").decode("ascii").lower()
+        nk = re.sub(r"[^a-z0-9]+", "", nk)
+        if s == nk:
+            return v
+    if plan_name in PLAN_CODES.values():
+        return plan_name
+    return None
+
 def try_activation(tx):
     st = (tx.get("payment_status") or "").lower()
     if st not in PAID_STATUSES:
@@ -273,14 +288,22 @@ def try_activation(tx):
         return
     uid = tx.get("user_id")
     plan_name = tx.get("plan")
-    code = PLAN_CODES.get(plan_name)
+    code = plan_name_to_code(plan_name) if plan_name else None
+    if not code and isinstance(plan_name, str):
+        pn = plan_name.strip().lower()
+        if pn in PLAN_CODES.values():
+            code = pn
     if not uid or not code:
         return
     exp = None
     if code in ("essencial", "profissional"):
         exp = datetime.utcnow() + timedelta(days=30)
     try:
-        users.update_one({"_id": ObjectId(uid)}, {"$set": {"plans": code, "plan_started_at": datetime.utcnow(), "plan_expires_at": exp}})
+        try:
+            oid = ObjectId(uid)
+            users.update_one({"_id": oid}, {"$set": {"plans": code, "plan_started_at": datetime.utcnow(), "plan_expires_at": exp}})
+        except Exception:
+            users.update_one({"_id": uid}, {"$set": {"plans": code, "plan_started_at": datetime.utcnow(), "plan_expires_at": exp}})
     except Exception:
         app.logger.exception("try_activation_user_update")
 
@@ -854,7 +877,7 @@ def api_plan_status():
         limit = plan_meta(code)
         today = date_key_utc()
         used = 0
-        if limit:
+        if limit and limit != None:
             try:
                 rec = usage.find_one({"user_id": str(u["_id"]), "date": today})
                 used = rec.get("used", 0) if rec else 0
@@ -862,7 +885,7 @@ def api_plan_status():
                 app.logger.exception("api_plan_status_usage_find")
                 used = 0
         remaining = None if limit is None else max(0, int(limit) - int(used))
-        return jsonify(ok=True, plan=code, expires_at=(exp.isoformat() if exp else None), daily_limit=limit, used_today=used if limit else 0, remaining_today=remaining)
+        return jsonify(ok=True, plan=code, expires_at=(exp.isoformat() if exp else None), daily_limit=limit, used_today=used if limit and limit != None else 0, remaining_today=remaining)
     except Exception:
         app.logger.exception("plan_status_error")
         return jsonify(ok=False, error="internal_error"), 500
