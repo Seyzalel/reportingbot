@@ -112,7 +112,7 @@ PLANS_DEFAULT = {
 }
 
 PLAN_CODES = {"Essencial": "essencial", "Profissional": "profissional", "Vitalício": "vitalicio"}
-PLAN_LIMITS = {"padrao": 0, "essencial": 5, "profissional": 15, "vitalicio": None}
+PLAN_LIMITS = {"padrao": 0, "essencial": 5, "profissional": 15, "vitalicio": 25}
 PAID_STATUSES = {"paid", "approved", "completed", "confirmed", "paid_out", "finished", "success", "settled", "captured", "accredited", "credited", "confirmed_payment"}
 FAILED_STATUSES = {"canceled", "cancelled", "refunded", "chargeback", "reversed", "voided", "failed", "expired", "denied"}
 USER_SCHEMA_VERSION = 1
