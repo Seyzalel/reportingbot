@@ -106,9 +106,9 @@ TRIBOPAY_API = "https://api.tribopay.com.br/api/public/v1/transactions"
 TRIBO_HEADERS = {"Content-Type": "application/json", "Accept": "application/json"}
 
 PLANS_DEFAULT = {
-    "Essencial": {"amount_cents": 3500, "product_hash": "tiz24o81ww", "offer_hash": "cz664sul2g", "title": "Plano Essencial", "active": True},
-    "Profissional": {"amount_cents": 4550, "product_hash": "tiz24o81ww", "offer_hash": "cz664sul2g", "title": "Plano Profissional", "active": True},
-    "Vitalício": {"amount_cents": 11900, "product_hash": "tiz24o81ww", "offer_hash": "cz664sul2g", "title": "Plano Vitalício", "active": True},
+    "Essencial": {"amount_cents": 3500, "product_hash": "ci64qmkguj", "offer_hash": "shvnrzezce", "title": "Plano Essencial", "active": True},
+    "Profissional": {"amount_cents": 4550, "product_hash": "ci64qmkguj", "offer_hash": "shvnrzezce", "title": "Plano Profissional", "active": True},
+    "Vitalício": {"amount_cents": 11900, "product_hash": "ci64qmkguj", "offer_hash": "shvnrzezce", "title": "Plano Vitalício", "active": True},
 }
 
 PLAN_CODES = {"Essencial": "essencial", "Profissional": "profissional", "Vitalício": "vitalicio"}
