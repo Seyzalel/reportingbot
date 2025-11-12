@@ -275,6 +275,70 @@ def plan_name_to_code(plan_name):
         return plan_name
     return None
 
+def try_activation_by_hash(tx_hash):
+    attempts = 0
+    max_attempts = 3
+    while attempts < max_attempts:
+        try:
+            tx = transactions.find_one({"hash": tx_hash})
+            if not tx:
+                app.logger.error(f"Transação {tx_hash} não encontrada para ativação")
+                return False
+            st = (tx.get("payment_status") or "").lower()
+            app.logger.info(f"Tentativa {attempts+1} de ativação para {tx_hash}, status: {st}")
+            if st not in PAID_STATUSES:
+                app.logger.warning(f"Status {st} não é pago para transação {tx_hash}")
+                return False
+            if tx.get("activated_at"):
+                app.logger.info(f"Transação {tx_hash} já ativada anteriormente")
+                return True
+            result = transactions.update_one(
+                {
+                    "_id": tx["_id"],
+                    "activated_at": {"$exists": False},
+                    "payment_status": {"$in": list(PAID_STATUSES)}
+                },
+                {
+                    "$set": {
+                        "activated_at": datetime.utcnow(),
+                        "last_activation_attempt": datetime.utcnow()
+                    }
+                }
+            )
+            if result.modified_count > 0:
+                app.logger.info(f"Ativação BEM-SUCEDIDA para transação {tx_hash}")
+                uid = tx.get("user_id")
+                plan_name = tx.get("plan")
+                code = plan_name_to_code(plan_name) if plan_name else None
+                app.logger.info(f"Ativando usuário {uid} com plano {plan_name} → código: {code}")
+                if not uid or not code:
+                    app.logger.error(f"Dados insuficientes para ativação: uid={uid}, code={code}")
+                    return False
+                exp = None
+                if code in ("essencial", "profissional"):
+                    exp = datetime.utcnow() + timedelta(days=30)
+                try:
+                    try:
+                        oid = ObjectId(uid)
+                        users.update_one({"_id": oid}, {"$set": {"plans": code, "plan_started_at": datetime.utcnow(), "plan_expires_at": exp}})
+                    except Exception:
+                        users.update_one({"_id": uid}, {"$set": {"plans": code, "plan_started_at": datetime.utcnow(), "plan_expires_at": exp}})
+                except Exception as e:
+                    app.logger.error(f"Erro ao ativar usuário {uid}: {str(e)}")
+                    return False
+                app.logger.info(f"Usuário {uid} ativado com plano {code}")
+                return True
+            else:
+                app.logger.warning(f"Ativação não modificou transação {tx_hash} - possível race condition")
+                attempts += 1
+                time.sleep(1)
+        except Exception as e:
+            app.logger.error(f"Erro na tentativa {attempts+1} de ativação para {tx_hash}: {str(e)}")
+            attempts += 1
+            time.sleep(2)
+    app.logger.error(f"Todas as tentativas de ativação falharam para {tx_hash}")
+    return False
+
 def try_activation(tx):
     st = (tx.get("payment_status") or "").lower()
     if st not in PAID_STATUSES:
@@ -359,28 +423,43 @@ def monitor_transaction_worker(tx_hash):
             return
         monitored_hashes.add(tx_hash)
     try:
-        backoff = [1, 2, 4, 8, 16, 30]
-        max_attempts = 48
+        backoff = [1, 2, 4, 8, 16, 30, 45, 60]
+        max_attempts = 96
         attempt = 0
         last_status = None
+        activation_attempted = False
         while attempt < max_attempts:
             st, payload = tribopay_fetch_status(tx_hash)
+            current_status = st if st else "unknown"
+            app.logger.info(f"Transação {tx_hash} - Status: {current_status} (tentativa {attempt + 1})")
             if st:
                 now = datetime.utcnow()
                 try:
-                    transactions.update_one({"hash": tx_hash}, {"$set": {"payment_status": st, "updated_at": now, "raw_last": payload}})
+                    transactions.update_one(
+                        {"hash": tx_hash}, 
+                        {
+                            "$set": {
+                                "payment_status": st, 
+                                "updated_at": now, 
+                                "raw_last": payload,
+                                "last_status_check": now
+                            }
+                        }
+                    )
                 except Exception:
                     app.logger.exception("monitor_transaction_db_update")
-                if st in PAID_STATUSES:
-                    try:
-                        tx = transactions.find_one({"hash": tx_hash})
-                        if tx:
-                            try_activation(tx)
-                            publish_event(tx.get("user_id"), {"type": "tx_update", "hash": tx_hash, "status": st, "timestamp": now.isoformat()})
-                    except Exception:
-                        app.logger.exception("monitor_activation_publish")
-                    break
-                if st in FAILED_STATUSES:
+                if st in PAID_STATUSES and not activation_attempted:
+                    app.logger.info(f"Status PAGO detectado para {tx_hash}, tentando ativação...")
+                    activation_success = try_activation_by_hash(tx_hash)
+                    if activation_success:
+                        app.logger.info(f"Ativação CONCLUÍDA com sucesso para {tx_hash}")
+                        activation_attempted = True
+                        break
+                    else:
+                        app.logger.warning(f"Ativação FALHOU para {tx_hash}, continuando monitoramento...")
+                        activation_attempted = True
+                elif st in FAILED_STATUSES:
+                    app.logger.info(f"Status FALHA detectado para {tx_hash}, parando monitoramento")
                     try:
                         transactions.update_one({"hash": tx_hash}, {"$set": {"failed_at": now}})
                         tx = transactions.find_one({"hash": tx_hash})
@@ -389,7 +468,8 @@ def monitor_transaction_worker(tx_hash):
                     except Exception:
                         app.logger.exception("monitor_failed_publish")
                     break
-                if last_status != st:
+                elif last_status != st:
+                    app.logger.info(f"Mudança de status: {last_status} → {st} para {tx_hash}")
                     last_status = st
                     try:
                         tx = transactions.find_one({"hash": tx_hash})
@@ -397,9 +477,17 @@ def monitor_transaction_worker(tx_hash):
                             publish_event(tx.get("user_id"), {"type": "tx_update", "hash": tx_hash, "status": st, "timestamp": now.isoformat()})
                     except Exception:
                         app.logger.exception("monitor_status_change_publish")
+            else:
+                app.logger.warning(f"Status vazio/nulo para transação {tx_hash}")
             sleep_interval = backoff[min(attempt, len(backoff) - 1)]
+            if st in ["pending", "processing", "under_review", "analyzing"]:
+                sleep_interval = min(sleep_interval * 2, 300)
+                app.logger.info(f"Status de revisão detectado, aumentando intervalo para {sleep_interval}s")
             time.sleep(sleep_interval)
             attempt += 1
+        app.logger.info(f"FINALIZANDO monitoramento para transação {tx_hash} após {attempt} tentativas")
+    except Exception as e:
+        app.logger.error(f"ERRO CRÍTICO no monitoramento de {tx_hash}: {str(e)}")
     finally:
         with monitored_hashes_lock:
             monitored_hashes.discard(tx_hash)
@@ -839,7 +927,9 @@ def pix_status():
 @app.route("/webhook/tribopay", methods=["POST"])
 def tribopay_webhook():
     try:
+        app.logger.info("WEBHOOK TriboPay recebido")
         data = request.get_json(force=True, silent=False)
+        app.logger.info(f"Dados do webhook: {json.dumps(data, indent=2)}")
     except Exception:
         return jsonify(ok=False), 400
     try:
@@ -850,20 +940,39 @@ def tribopay_webhook():
             pix = data.get("pix") or {}
             h = pix.get("hash") or ""
         if not h:
-            return jsonify(ok=False), 400
+            h = data.get("transaction_hash") or data.get("id_hash") or ""
+        if not h:
+            app.logger.error("Hash não encontrado nos dados do webhook")
+            return jsonify(ok=False, error="missing_hash"), 400
+        app.logger.info(f"Processando webhook para hash: {h}")
+        current_status = data.get("status") or data.get("payment_status") or ""
+        app.logger.info(f"Status no webhook: {current_status}")
+        if current_status and current_status.lower() in PAID_STATUSES:
+            app.logger.info(f"Webhook com status PAGO, tentando ativação imediata para {h}")
+            activation_success = try_activation_by_hash(h)
+            if activation_success:
+                app.logger.info(f"Ativação VIA WEBHOOK bem-sucedida para {h}")
+            else:
+                app.logger.warning(f"Ativação via webhook FALHOU para {h}, iniciando monitoramento")
         try:
-            res = transactions.update_one({"hash": h, "monitoring": {"$ne": True}}, {"$set": {"monitoring": True}})
-        except Exception:
-            res = None
-            app.logger.exception("webhook_db_flag")
-        try:
-            ensure_monitoring_started(h)
-        except Exception:
-            app.logger.exception("webhook_ensure_monitor")
-        return jsonify(ok=True)
+            transactions.update_one(
+                {"hash": h}, 
+                {
+                    "$set": {
+                        "monitoring": True,
+                        "last_webhook": datetime.utcnow(),
+                        "webhook_data": data
+                    }
+                }
+            )
+        except Exception as db_error:
+            app.logger.error(f"Erro ao atualizar transação {h}: {str(db_error)}")
+        ensure_monitoring_started(h)
+        app.logger.info(f"Webhook processado com sucesso para {h}")
+        return jsonify(ok=True, hash=h, activation_attempted=True)
     except Exception:
         app.logger.exception("webhook_error")
-        return jsonify(ok=False), 500
+        return jsonify(ok=False, error="internal_error"), 500
 
 @app.route("/api/plan/status", methods=["GET"])
 @login_required
