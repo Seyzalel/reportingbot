@@ -143,7 +143,7 @@ body{
       <div class="form-group">
         <label class="label" for="username">Usuário</label>
         <div class="input-wrap">
-          <input id="username" class="input" type="text" placeholder="Como devemos te chamar?" required>
+          <input id="username" name="username" class="input" type="text" placeholder="Como devemos te chamar?" required>
           <i class="fa-solid fa-check icon-right" id="okU" style="color:var(--success);opacity:0"></i>
         </div>
         <div id="errU" class="error"></div>
@@ -152,7 +152,7 @@ body{
       <div class="form-group">
         <label class="label" for="email">E-mail</label>
         <div class="input-wrap">
-          <input id="email" class="input" type="email" placeholder="seu@email.com" required>
+          <input id="email" name="email" class="input" type="email" placeholder="seu@email.com" required>
           <i class="fa-solid fa-check icon-right" id="okE" style="color:var(--success);opacity:0"></i>
         </div>
         <div id="errE" class="error"></div>
@@ -161,7 +161,7 @@ body{
       <div class="form-group">
         <label class="label" for="password">Senha</label>
         <div class="input-wrap">
-          <input id="password" class="input" type="password" placeholder="Mínimo 8 caracteres" required>
+          <input id="password" name="password" class="input" type="password" placeholder="Mínimo 8 caracteres" required>
           <i id="togglePw" class="fa-regular fa-eye icon-right" tabindex="0"></i>
         </div>
         <div class="meter" id="meterWrap"><span id="meter"></span></div>
@@ -171,7 +171,7 @@ body{
       <div class="form-group">
         <label class="label" for="confirm">Confirmar senha</label>
         <div class="input-wrap">
-          <input id="confirm" class="input" type="password" placeholder="Repita a senha" required>
+          <input id="confirm" name="confirm" class="input" type="password" placeholder="Repita a senha" required>
         </div>
         <div id="errC" class="error"></div>
       </div>
@@ -190,7 +190,7 @@ body{
 </div>
 
 <script>
-// Mantendo a lógica de validação original, mas adaptada ao HTML limpo
+// Referências aos elementos do DOM
 const form = document.getElementById('signup');
 const username = document.getElementById('username');
 const email = document.getElementById('email');
@@ -201,7 +201,7 @@ const meterWrap = document.getElementById('meterWrap');
 const togglePw = document.getElementById('togglePw');
 const submitBtn = document.getElementById('submit');
 
-// Elementos de Erro
+// Elementos de Feedback (Erros e Ícones)
 const errU = document.getElementById('errU');
 const errE = document.getElementById('errE');
 const errP = document.getElementById('errP');
@@ -209,7 +209,7 @@ const errC = document.getElementById('errC');
 const okU = document.getElementById('okU');
 const okE = document.getElementById('okE');
 
-// Toast
+// Toast Notification
 const toast = document.getElementById('toast');
 const toastText = document.getElementById('toastText');
 const toastIcon = document.getElementById('toastIcon');
@@ -219,13 +219,15 @@ function showToast(msg, type){
   toastIcon.className = type === 'error' ? 'fa-solid fa-circle-xmark' : 'fa-solid fa-circle-check';
   toastIcon.style.color = type === 'error' ? 'var(--danger)' : 'var(--success)';
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2500);
+  if(showToast._t) clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toast.classList.remove('show'), 2500);
 }
 
-// Helpers
+// Helpers de Validação
 const isValidUsername = v => /^[a-zA-Z0-9._]{3,32}$/.test(v);
 const isValidEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 
+// Função da Barra de Força da Senha
 function checkPwStrength(v){
   if(v.length === 0) { meterWrap.classList.remove('active'); return; }
   meterWrap.classList.add('active');
@@ -240,6 +242,7 @@ function checkPwStrength(v){
   meterSpan.style.background = colors[Math.min(s, 4)];
 }
 
+// Função Genérica de Validação de Campo
 function validateField(input, validator, errEl, okIcon, errMsg){
   const valid = validator(input.value.trim());
   if(okIcon) okIcon.style.opacity = valid ? '1' : '0';
@@ -247,7 +250,7 @@ function validateField(input, validator, errEl, okIcon, errMsg){
   return valid;
 }
 
-// Event Listeners
+// Event Listeners (Digitação)
 username.addEventListener('input', () => validateField(username, isValidUsername, errU, okU, 'Mínimo 3 caracteres, sem espaços.'));
 email.addEventListener('input', () => validateField(email, isValidEmail, errE, okE, 'E-mail inválido.'));
 password.addEventListener('input', () => {
@@ -258,17 +261,18 @@ confirm.addEventListener('input', () => {
   errC.textContent = confirm.value === password.value ? '' : 'As senhas não conferem.';
 });
 
+// Botão de Olho (Mostrar/Ocultar Senha)
 togglePw.addEventListener('click', () => {
   const type = password.type === 'password' ? 'text' : 'password';
   password.type = type;
   togglePw.className = type === 'password' ? 'fa-regular fa-eye icon-right' : 'fa-regular fa-eye-slash icon-right';
 });
 
-// Submit
+// SUBMIT DO FORMULÁRIO (CONEXÃO REAL COM BACKEND)
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   
-  // Validação final antes do envio
+  // 1. Validação Final antes de enviar
   const uValid = isValidUsername(username.value);
   const eValid = isValidEmail(email.value);
   const pValid = password.value.length >= 8;
@@ -280,19 +284,60 @@ form.addEventListener('submit', async (e) => {
     return;
   }
 
+  // 2. Travar botão e mostrar Loading
   submitBtn.disabled = true;
+  const originalLabel = submitBtn.innerHTML;
   submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Criando...';
 
-  // Simulação de envio (Backend)
   try {
-    // await fetch('/register', ...) aqui
-    await new Promise(r => setTimeout(r, 1500)); // Delay fake
-    showToast('Conta criada com sucesso!', 'success');
-    setTimeout(() => window.location.href = '/login', 1000);
+    // 3. Montar Payload (JSON)
+    const payload = {
+      username: username.value.trim(),
+      email: email.value.trim(),
+      password: password.value,
+      confirm: confirm.value
+    };
+
+    // 4. Envio REAL para o servidor
+    const res = await fetch('/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json().catch(()=>({}));
+
+    // 5. Sucesso
+    if(res.ok && data && data.ok){
+      showToast('Conta criada com sucesso!', 'success');
+      // Redireciona para o Dashboard (ou link enviado pelo server)
+      setTimeout(()=>{ window.location.href = data.redirect || '/dashboard'; }, 900);
+      return;
+    }
+
+    // 6. Erros do Backend (Usuário já existe, etc)
+    if(data && data.field === 'username'){ errU.textContent = data.error || 'Erro no nome de usuário'; username.focus(); }
+    else if(data && data.field === 'email'){ errE.textContent = data.error || 'Erro no e-mail'; email.focus(); }
+    else if(data && data.field === 'password'){ errP.textContent = data.error || 'Erro na senha'; password.focus(); }
+    else if(data && data.field === 'confirm'){ errC.textContent = data.error || 'Erro na confirmação'; confirm.focus(); }
+    else if(res.status === 409){
+      const msg = (data && data.error) || 'Usuário ou e-mail já cadastrado';
+      errU.textContent = msg;
+      errE.textContent = msg;
+      showToast(msg, 'error');
+    } else {
+      showToast((data && data.error) || 'Não foi possível criar a conta', 'error');
+    }
+
   } catch(err) {
-    showToast('Erro ao criar conta', 'error');
+    // 7. Erro de Rede
+    showToast('Falha de conexão. Tente novamente.', 'error');
+    console.error(err);
+  } finally {
+    // 8. Restaurar botão
     submitBtn.disabled = false;
-    submitBtn.textContent = 'Cadastrar';
+    submitBtn.innerHTML = originalLabel;
   }
 });
 </script>
