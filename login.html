@@ -6,224 +6,302 @@
 <title>Login — Reporting Bot</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 <style>
 :root{
-  --bg:#07070a;
-  --panel:#0f1115;
-  --panel-2:#14151a;
-  --card:#0f1318;
-  --glass: rgba(255,255,255,0.02);
-  --accent-1:#8b5cf6;
-  --accent-2:#6366f1;
-  --accent-3:#ec4899;
-  --muted:#99a4b5;
-  --text:#e6eef8;
-  --success:#10b981;
-  --danger:#ef4444;
-  --line: rgba(255,255,255,0.04);
-  --radius:18px;
-  --pad: clamp(.75rem,1.6vw,1.1rem);
-  --fs-base: 13px;
-  --shadow: 0 24px 60px -30px rgba(0,0,0,0.8);
-  --glass-2: rgba(255,255,255,0.015);
+  --bg: #09090b;
+  --card-bg: #121214;
+  --accent: #8b5cf6;
+  --text: #e4e4e7;
+  --muted: #71717a;
+  --border: #27272a;
+  --danger: #ef4444;
+  --success: #10b981;
+  --radius: 12px;
 }
-html{font-size:var(--fs-base)}
 *{box-sizing:border-box}
-html,body{height:100%;margin:0}
-body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:
-  radial-gradient(800px 500px at -10% -10%,rgba(139,92,246,0.06),transparent),
-  radial-gradient(900px 600px at 110% 30%,rgba(99,102,241,0.04),transparent),
-  linear-gradient(180deg,var(--bg),var(--panel));color:var(--text);-webkit-font-smoothing:antialiased}
-.container{max-width:980px;margin:28px auto;padding:18px;display:grid;gap:18px}
-.header{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.brand{display:flex;align-items:center;gap:12px}
-.brand-badge{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent-1),var(--accent-2));box-shadow:0 18px 45px -18px rgba(99,102,241,.25)}
-.brand-badge i{color:#fff;font-size:20px}
-.brand-title{font-weight:800;font-size:1.05rem;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.hint{color:var(--muted);font-size:.86rem}
-.layout{display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start}
-@media(max-width:980px){.layout{grid-template-columns:1fr}}
-.card{background:linear-gradient(180deg,var(--card),var(--panel-2));border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);overflow:hidden}
-.form-title{display:flex;align-items:center;gap:12px;font-weight:900;font-size:1.1rem}
-.sub{color:var(--muted);margin-top:6px;font-size:.92rem}
-.form{display:grid;gap:12px;margin-top:12px}
-.row{display:grid;gap:8px}
-.label{font-weight:800;color:var(--muted);display:flex;align-items:center;gap:8px;font-size:.92rem}
-.input-wrap{position:relative}
-.input{width:100%;padding:12px 44px 12px 44px;border-radius:12px;background:var(--glass-2);border:1px solid rgba(255,255,255,0.02);color:var(--text);outline:0;font-weight:700;font-size:.95rem}
-.input::placeholder{color:rgba(230,238,248,0.45);font-weight:600}
-.input:focus{box-shadow:0 8px 30px -20px rgba(99,102,241,.25);border-color:rgba(99,102,241,.18)}
-.icon-left,.icon-right{position:absolute;top:50%;transform:translateY(-50%);color:var(--muted);font-size:0.95rem}
-.icon-left{left:12px}
-.icon-right{right:12px;cursor:pointer}
-.error{min-height:18px;color:var(--danger);font-size:.88rem;font-weight:800}
-.controls{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:6px}
-.check{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;font-size:.92rem;color:var(--muted)}
-.checkbox{width:20px;height:20px;border-radius:6px;border:1px solid var(--line);background:transparent;display:grid;place-items:center}
-.checkbox i{color:#fff;opacity:0;transform:scale(.6)}
-input[type="checkbox"]{display:none}
-input[type="checkbox"]:checked + .checkbox{background:linear-gradient(135deg,var(--accent-1),var(--accent-2));border-color:transparent;box-shadow:0 8px 20px -12px rgba(99,102,241,.4)}
-input[type="checkbox"]:checked + .checkbox i{opacity:1;transform:scale(1)}
-.actions{display:grid;gap:10px;margin-top:8px}
-.btn{padding:12px;border-radius:12px;border:none;font-weight:900;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:#fff;cursor:pointer;box-shadow:0 16px 40px -20px rgba(99,102,241,.28);font-size:.95rem}
-.btn[disabled]{opacity:.6;cursor:not-allowed}
-.alt{background:transparent;border:1px solid var(--line);color:var(--text);padding:10px;border-radius:10px;font-weight:800}
-.side{display:grid;gap:12px}
-.panel{background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.015));border:1px solid rgba(255,255,255,0.02);padding:14px;border-radius:12px}
-.panel h4{margin:0;font-size:.98rem;font-weight:900}
-.panel p{margin-top:8px;color:var(--muted);font-size:.9rem}
-.tiny{font-size:.82rem;color:var(--muted)}
-.footer{margin-top:18px;text-align:center;color:var(--muted);font-size:.82rem}
-.toast{position:fixed;left:50%;top:18px;transform:translateX(-50%) translateY(-12px);opacity:0;z-index:90;background:linear-gradient(180deg,rgba(20,20,20,0.95),rgba(10,10,10,0.95));border-radius:10px;padding:10px 14px;font-weight:900;display:flex;align-items:center;gap:10px;color:var(--text);transition:opacity .22s,transform .22s}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media (prefers-reduced-motion: reduce){
-  .card{transition:none}
-  .input{transition:none}
-  .toast{transition:none}
+body{
+  margin:0;font-family:'Inter',sans-serif;
+  background-color: var(--bg);
+  background-image: radial-gradient(circle at 50% -20%, rgba(139, 92, 246, 0.15), transparent 50%);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
 }
+.container{
+  width:100%;
+  max-width:400px;
+}
+.logo-area{
+  text-align:center;
+  margin-bottom:24px;
+}
+.logo-icon{
+  width:48px;height:48px;
+  background:linear-gradient(135deg, var(--accent), #6366f1);
+  color:#fff;
+  border-radius:12px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  box-shadow:0 10px 25px -10px rgba(139, 92, 246, 0.5);
+  margin-bottom:12px;
+}
+.title{font-size:1.5rem;font-weight:700;margin:0}
+.subtitle{color:var(--muted);margin-top:4px;font-size:0.9rem}
+
+.card{
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:32px;
+  box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);
+}
+
+.form-group{margin-bottom:16px;position:relative}
+.label{display:block;font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:6px}
+.input-wrap{position:relative}
+
+.input{
+  width:100%;
+  background:#18181b;
+  border:1px solid var(--border);
+  color:#fff;
+  padding:12px 16px;
+  border-radius:8px;
+  font-size:0.95rem;
+  outline:none;
+  transition:all 0.2s;
+}
+.input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 2px rgba(139, 92, 246, 0.15);
+}
+.input::placeholder{color:#3f3f46}
+
+.icon-right{
+  position:absolute; right:12px; top:50%; transform:translateY(-50%);
+  color:var(--muted); cursor:pointer; font-size:0.9rem;
+}
+
+.error{
+  color:var(--danger); font-size:0.8rem; margin-top:4px; min-height:16px; font-weight:500;
+}
+
+/* Flex row for Checkbox and Forgot Password */
+.actions-row{
+  display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; font-size:0.85rem;
+}
+.forgot-link{ color:var(--muted); text-decoration:none; transition:0.2s; }
+.forgot-link:hover{ color:var(--text); }
+
+/* Custom Checkbox */
+.check-wrap{ display:flex; align-items:center; cursor:pointer; gap:8px; user-select:none; color:var(--muted); }
+.check-input{ display:none; }
+.check-box{
+  width:18px; height:18px; border:1px solid var(--border); border-radius:4px; background:#18181b;
+  display:flex; align-items:center; justify-content:center; transition:0.2s;
+}
+.check-input:checked + .check-box{ background:var(--accent); border-color:var(--accent); }
+.check-box i{ color:white; font-size:10px; opacity:0; transform:scale(0.5); transition:0.2s; }
+.check-input:checked + .check-box i{ opacity:1; transform:scale(1); }
+
+.btn{
+  width:100%;
+  padding:12px;
+  background:var(--accent);
+  color:white;
+  border:none;
+  border-radius:8px;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.2s;
+}
+.btn:hover{background:#7c3aed}
+.btn:disabled{opacity:0.6;cursor:not-allowed}
+
+.footer-link{
+  text-align:center; margin-top:20px; font-size:0.85rem; color:var(--muted);
+}
+.footer-link a{color:var(--accent);text-decoration:none;font-weight:600}
+
+/* Toast Notification */
+.toast{
+  position:fixed; top:20px; left:50%; transform:translateX(-50%) translateY(-20px);
+  background:#18181b; border:1px solid var(--border); padding:10px 16px;
+  border-radius:50px; display:flex; align-items:center; gap:8px;
+  opacity:0; transition:0.3s; font-size:0.9rem; pointer-events:none; z-index:99;
+  box-shadow:0 10px 15px -3px rgba(0,0,0,0.3);
+}
+.toast.show{transform:translateX(-50%) translateY(0); opacity:1}
 </style>
 </head>
 <body>
+
 <div class="container">
-  <div class="header">
-    <div class="brand">
-      <div class="brand-badge" aria-hidden="true"><i class="fa-solid fa-robot"></i></div>
-      <div>
-        <div class="brand-title">Reporting Bot</div>
-        <div class="hint">Protegemos seus dados e garantimos integridade nas ações</div>
+  <div class="logo-area">
+    <div class="logo-icon"><i class="fa-solid fa-robot"></i></div>
+    <h1 class="title">Bem-vindo</h1>
+    <div class="subtitle">Faça login para continuar</div>
+  </div>
+
+  <div class="card">
+    <form id="loginForm" novalidate>
+      
+      <div class="form-group">
+        <label class="label" for="username">Usuário</label>
+        <div class="input-wrap">
+          <input id="username" name="username" class="input" type="text" autocomplete="username" placeholder="Seu nome de usuário" required>
+        </div>
+        <div id="errU" class="error"></div>
       </div>
-    </div>
+
+      <div class="form-group">
+        <label class="label" for="password">Senha</label>
+        <div class="input-wrap">
+          <input id="password" name="password" class="input" type="password" autocomplete="current-password" placeholder="Sua senha" required>
+          <i id="togglePw" class="fa-regular fa-eye icon-right" tabindex="0"></i>
+        </div>
+        <div id="errP" class="error"></div>
+      </div>
+
+      <div class="actions-row">
+        <label class="check-wrap">
+          <input type="checkbox" id="remember" class="check-input">
+          <div class="check-box"><i class="fa-solid fa-check"></i></div>
+          <span>Lembrar de mim</span>
+        </label>
+        <a href="/forgot" class="forgot-link">Esqueceu a senha?</a>
+      </div>
+
+      <button id="submitBtn" class="btn" type="submit">Entrar</button>
+
+      <div class="footer-link">
+        Não tem uma conta? <a href="/register">Cadastre-se</a>
+      </div>
+    </form>
   </div>
-
-  <div class="layout">
-    <main class="card" aria-labelledby="login-heading">
-      <div class="form-title" id="login-heading"><i class="fa-solid fa-user-lock" aria-hidden="true"></i><span>Entrar na sua conta</span></div>
-      <div class="sub">Acesse seu painel com segurança</div>
-
-      <form id="loginForm" class="form" novalidate>
-        <div class="row">
-          <label class="label" for="username"><i class="fa-solid fa-user-tie" aria-hidden="true"></i> Nome de usuário</label>
-          <div class="input-wrap">
-            <i class="fa-solid fa-user-tie icon-left" aria-hidden="true"></i>
-            <input id="username" name="username" class="input" type="text" autocomplete="username" inputmode="latin" placeholder="seunome" minlength="3" maxlength="32" required aria-describedby="errU" aria-invalid="false" />
-            <span class="icon-right tiny" id="u-help" aria-hidden="true"><i class="fa-solid fa-info-circle"></i></span>
-          </div>
-          <div id="errU" class="error" aria-live="polite"></div>
-        </div>
-
-        <div class="row">
-          <label class="label" for="password"><i class="fa-solid fa-key" aria-hidden="true"></i> Senha</label>
-          <div class="input-wrap">
-            <i class="fa-solid fa-lock icon-left" aria-hidden="true"></i>
-            <input id="password" name="password" class="input" type="password" autocomplete="current-password" placeholder="mínimo 8 caracteres" minlength="8" required aria-describedby="errP" aria-invalid="false" />
-            <i id="togglePw" class="fa-regular fa-eye icon-right" role="button" aria-label="Mostrar senha" tabindex="0"></i>
-          </div>
-          <div id="errP" class="error" aria-live="polite"></div>
-        </div>
-
-        <div class="controls">
-          <label class="check" for="remember">
-            <input id="remember" type="checkbox" />
-            <span class="checkbox" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
-            <span class="tiny">Manter conectado por <strong>15 dias</strong></span>
-          </label>
-          <div class="tiny"><a class="tiny" href="/forgot" style="color:var(--accent-2);font-weight:800">Esqueci minha senha</a></div>
-        </div>
-
-        <div class="actions">
-          <button id="submitBtn" class="btn" type="submit" aria-live="polite"><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> Entrar</button>
-          <button type="button" class="alt" id="createBtn">Criar conta</button>
-        </div>
-      </form>
-
-      <div class="tiny" style="margin-top:14px;color:var(--muted)">Ao acessar, você concorda com nossos <a href="/terms" style="color:var(--accent-2);font-weight:800">Termos de Uso</a> e <a href="/privacy" style="color:var(--accent-2);font-weight:800">Política de Privacidade</a>.</div>
-    </main>
-
-    <aside class="side">
-      <section class="panel" aria-labelledby="panel-title">
-        <h4 id="panel-title">Segurança aprimorada</h4>
-        <p>Recomendamos usar autenticação em dois fatores e manter sua senha em um gerenciador seguro.</p>
-        <p style="margin-top:8px;font-weight:800;color:var(--muted)">Suporte: <a href="https://wa.me/5511932820951" style="color:var(--accent-2);font-weight:900">WhatsApp</a></p>
-      </section>
-
-      <section class="panel" style="margin-top:12px">
-        <h4 style="margin:0">Dicas rápidas</h4>
-        <p class="tiny" style="margin-top:8px">Use senhas longas e únicas. Evite usar a mesma senha em vários serviços.</p>
-      </section>
-    </aside>
-  </div>
-
-  <div class="footer">Reporting Bot © 2025 — Todos os direitos reservados</div>
 </div>
 
-<div id="toast" class="toast" role="status" aria-live="polite"><i id="toastIcon" class="fa-solid fa-circle-check" style="color:var(--success)"></i><span id="toastText">Ação realizada</span></div>
+<div id="toast" class="toast">
+  <i id="toastIcon"></i> <span id="toastText"></span>
+</div>
 
 <script>
+// Elementos
 const form = document.getElementById('loginForm');
 const username = document.getElementById('username');
 const password = document.getElementById('password');
+const submitBtn = document.getElementById('submitBtn');
+const togglePw = document.getElementById('togglePw');
 const errU = document.getElementById('errU');
 const errP = document.getElementById('errP');
-const submitBtn = document.getElementById('submitBtn');
-const createBtn = document.getElementById('createBtn');
-const togglePw = document.getElementById('togglePw');
 const toast = document.getElementById('toast');
 const toastText = document.getElementById('toastText');
 const toastIcon = document.getElementById('toastIcon');
-function showToast(msg,type){
+
+// Função de Toast
+function showToast(msg, type){
   toastText.textContent = msg;
-  if(type === 'error'){
-    toastIcon.className = 'fa-solid fa-circle-xmark';
-    toastIcon.style.color = 'var(--danger)';
-  } else {
-    toastIcon.className = 'fa-solid fa-circle-check';
-    toastIcon.style.color = 'var(--success)';
-  }
+  toastIcon.className = type === 'error' ? 'fa-solid fa-circle-xmark' : 'fa-solid fa-circle-check';
+  toastIcon.style.color = type === 'error' ? 'var(--danger)' : 'var(--success)';
   toast.classList.add('show');
-  clearTimeout(showToast._t);
-  showToast._t = setTimeout(()=>{ toast.classList.remove('show'); },1800);
+  if(showToast._t) clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toast.classList.remove('show'), 2000);
 }
-function isValidUsername(v){
-  return /^[a-zA-Z0-9._]{3,32}$/.test(v);
-}
+
+// Validação Básica
+const isValidUsername = v => /^[a-zA-Z0-9._]{3,32}$/.test(v);
+
 function validate(){
   let ok = true;
   errU.textContent = '';
   errP.textContent = '';
+  
   const u = username.value.trim();
   const p = password.value;
-  if(!isValidUsername(u)){ errU.textContent = 'Use 3–32 caracteres: letras, números, ponto ou _'; ok = false; username.setAttribute('aria-invalid','true'); } else { username.setAttribute('aria-invalid','false'); }
-  if(typeof p !== 'string' || p.length < 8){ errP.textContent = 'Mínimo de 8 caracteres'; ok = false; password.setAttribute('aria-invalid','true'); } else { password.setAttribute('aria-invalid','false'); }
-  submitBtn.disabled = !ok;
+
+  if(!isValidUsername(u)){
+    errU.textContent = u.length === 0 ? 'Campo obrigatório' : 'Usuário inválido';
+    ok = false;
+  }
+  
+  if(p.length < 8){
+    errP.textContent = p.length === 0 ? 'Campo obrigatório' : 'Mínimo de 8 caracteres';
+    ok = false;
+  }
+  
   return ok;
 }
-username.addEventListener('input', validate);
-password.addEventListener('input', validate);
-togglePw.addEventListener('click', ()=>{ const t = password.getAttribute('type') === 'password' ? 'text' : 'password'; password.setAttribute('type', t); togglePw.classList.toggle('fa-eye'); togglePw.classList.toggle('fa-eye-slash'); });
-togglePw.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePw.click(); } });
-createBtn.addEventListener('click', ()=>{ window.location.href = '/register'; });
-function setLoading(on){
-  if(on){ submitBtn.disabled = true; submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Entrando...'; } else { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> Entrar'; }
-}
+
+// Listeners
+username.addEventListener('input', () => { errU.textContent = ''; });
+password.addEventListener('input', () => { errP.textContent = ''; });
+
+togglePw.addEventListener('click', () => {
+  const type = password.type === 'password' ? 'text' : 'password';
+  password.type = type;
+  togglePw.className = type === 'password' ? 'fa-regular fa-eye icon-right' : 'fa-regular fa-eye-slash icon-right';
+});
+
+// Envio do Formulário
 form.addEventListener('submit', async function(e){
   e.preventDefault();
-  if(!validate()){ if(errU.textContent) username.focus(); else password.focus(); return; }
-  setLoading(true);
+  
+  if(!validate()) {
+    showToast('Verifique os campos', 'error');
+    return;
+  }
+
+  // Estado de Carregamento
+  submitBtn.disabled = true;
+  const originalBtnText = submitBtn.textContent;
+  submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Entrando...';
+
   try{
-    const payload = { username: username.value.trim(), password: password.value, remember: document.getElementById('remember').checked };
-    const res = await fetch('/login', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, credentials: 'same-origin', body: JSON.stringify(payload) });
+    const payload = {
+      username: username.value.trim(),
+      password: password.value,
+      remember: document.getElementById('remember').checked
+    };
+
+    const res = await fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify(payload)
+    });
+
     const data = await res.json().catch(()=>({}));
-    if(res.ok && data && data.ok){ showToast('Login efetuado','success'); setTimeout(()=>{ window.location.href = data.redirect || '/dashboard'; },900); return; }
-    if(res.status === 400){ showToast((data && data.error) || 'Credenciais inválidas','error'); } else if(res.status === 401){ errP.textContent = (data && data.error) || 'Usuário ou senha incorretos'; showToast('Usuário ou senha incorretos','error'); } else { showToast((data && data.error) || 'Não foi possível entrar','error'); }
-  } catch(e){
-    showToast('Falha de conexão. Tente novamente.','error');
+
+    if(res.ok && data && data.ok){
+      showToast('Login efetuado com sucesso!', 'success');
+      setTimeout(()=>{ window.location.href = data.redirect || '/dashboard'; }, 1000);
+      return;
+    }
+
+    // Tratamento de Erros
+    if(res.status === 400){
+      showToast((data && data.error) || 'Dados inválidos', 'error');
+    } else if(res.status === 401){
+      errP.textContent = 'Usuário ou senha incorretos';
+      showToast('Credenciais inválidas', 'error');
+    } else {
+      showToast((data && data.error) || 'Erro no servidor', 'error');
+    }
+
+  } catch(err){
+    showToast('Falha de conexão. Tente novamente.', 'error');
   } finally {
-    setLoading(false);
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalBtnText;
   }
 });
-validate();
 </script>
 </body>
 </html>
