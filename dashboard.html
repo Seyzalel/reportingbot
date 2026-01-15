@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Painel de Denúncias – Reporting Bot</title>
+    <title>Painel – Reporting Bot</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         :root {
@@ -24,14 +24,15 @@
             --success: #10b981;
             --error: #ef4444;
             --warning: #f59e0b;
-            --r: 20px;
-            --pad: clamp(1rem, 2.2vw, 2rem);
-            --gap: clamp(.7rem, 2vw, 1.5rem);
-            --fs-xxl: clamp(1.6rem, 4.2vw, 2.85rem);
-            --fs-xl: clamp(1.25rem, 2.8vw, 2.1rem);
-            --fs-lg: clamp(1.02rem, 1.7vw, 1.3rem);
-            --fs-md: clamp(.95rem, 1.3vw, 1.05rem);
-            --fs-sm: clamp(.84rem, 1vw, .95rem);
+            --r: 16px;
+            --pad: 1.5rem;
+            --gap: 1rem;
+            --fs-xxl: 2.5rem;
+            --fs-xl: 1.75rem;
+            --fs-lg: 1.125rem;
+            --fs-md: 0.95rem;
+            --fs-sm: 0.85rem;
+            --fs-xs: 0.75rem;
             --bg-primary: #0a0a0a;
             --bg-secondary: #111111;
             --bg-tertiary: #1a1a1a;
@@ -40,11 +41,11 @@
             --text-secondary: #cbd5e1;
             --text-muted: #94a3b8;
             --border-color: #2d2d2d;
-            --shadow-strong: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            --shadow-soft: 0 10px 30px -12px rgba(0, 0, 0, 0.4);
+            --shadow-strong: 0 20px 40px -12px rgba(0, 0, 0, 0.5);
+            --shadow-soft: 0 8px 24px -12px rgba(0, 0, 0, 0.4);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --gradient-primary: linear-gradient(135deg, var(--primary), var(--secondary));
-            --gradient-dark: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary));
+            --header-height: 72px;
         }
 
         * {
@@ -55,134 +56,243 @@
 
         html, body {
             height: 100%;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             -webkit-font-smoothing: antialiased;
             text-rendering: optimizeLegibility;
             scroll-behavior: smooth;
-        }
-
-        .container {
-            width: min(1365px, 97%);
-            margin-inline: auto;
-            padding-inline: clamp(.6rem, 1.6vw, 1.2rem);
+            font-size: 14px;
         }
 
         header {
-            padding-top: clamp(1.6rem, 5vw, 3.6rem);
-            padding-bottom: clamp(.8rem, 2.6vw, 1.8rem);
-            text-align: center;
-            position: relative;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 10, 10, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
         }
 
-        header::after {
-            content: "";
-            position: absolute;
-            inset: auto 6% 0 6%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+        .container {
+            width: min(1200px, 95%);
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .header-container {
+            width: min(1200px, 95%);
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
         }
 
         .brand {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: .9rem;
-            margin-bottom: .5rem;
-        }
-
-        .brand-badge {
-            width: clamp(2.6rem, 7.4vw, 4rem);
-            height: clamp(2.6rem, 7.4vw, 4rem);
-            border-radius: 22%;
-            background: var(--gradient-primary);
-            display: grid;
-            place-items: center;
-            box-shadow: 0 18px 45px -14px rgba(99, 102, 241, .35);
-            transition: var(--transition);
-        }
-
-        .brand-badge:hover {
-            transform: translateY(-3px) rotate(5deg);
-            box-shadow: 0 25px 60px -12px rgba(99, 102, 241, .5);
-        }
-
-        .brand-badge i {
-            font-size: clamp(1.1rem, 2.8vw, 1.55rem);
-            color: #fff;
-        }
-
-        .brand-title {
-            font-weight: 900;
-            font-size: var(--fs-xxl);
-            background: linear-gradient(90deg, var(--primary) 10%, var(--secondary) 55%, var(--accent) 95%);
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary) 100%);
             -webkit-background-clip: text;
             background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -.02em;
+            color: transparent;
         }
 
-        .tagline {
-            font-size: var(--fs-lg);
+        nav.desktop {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            font-weight: 600;
             color: var(--text-secondary);
-            max-width: 70ch;
-            margin: 0 auto;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            position: relative;
         }
 
-        .support-bar {
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: var(--transition);
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::after {
+            width: 70%;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.65rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+            gap: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        .btn.primary {
+            background: var(--primary);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn.primary:hover {
+            background: #7c3aed;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn.secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn.secondary:hover {
+            border-color: var(--primary);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .mobile-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .main-content {
+            padding-top: calc(var(--header-height) + 1.5rem);
+            padding-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .userbar {
+            margin: 0 0 2rem 0;
+        }
+
+        .usercard {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--r);
+            padding: 1.25rem 1.5rem;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .user-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--gradient-primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: .7rem;
-            flex-wrap: wrap;
-            margin: clamp(.7rem, 2vw, 1rem) auto 0 auto;
-        }
-
-        .support-msg {
-            display: inline-flex;
-            align-items: center;
-            gap: .5rem;
-            font-weight: 800;
-            color: var(--text-secondary);
-            background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 999px;
-            padding: .5rem .8rem;
         }
 
-        .support-msg i {
-            color: #25d366;
-        }
-
-        .support-cta {
-            display: inline-flex;
-            align-items: center;
-            gap: .55rem;
-            font-weight: 900;
-            font-size: var(--fs-sm);
+        .avatar i {
             color: #fff;
-            padding: .72rem 1.05rem;
-            border-radius: 999px;
-            background: linear-gradient(90deg, #25D366, #128C7E);
-            box-shadow: 0 14px 36px -12px rgba(37, 211, 102, .45);
-            border: 1px solid rgba(0, 0, 0, .04);
-            transition: var(--transition);
+            font-size: 1.2rem;
         }
 
-        .support-cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 16px 40px -8px rgba(37, 211, 102, .6);
+        .user-info h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+        }
+
+        .chips {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            font-size: 0.75rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-weight: 600;
+        }
+
+        .chip.plan {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+        }
+
+        .chip.status.ok {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--success);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        .chip.status.limited {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--error);
+            border-color: rgba(239, 68, 68, 0.2);
         }
 
         .grid {
             display: grid;
-            grid-template-columns: 1.15fr .85fr;
+            grid-template-columns: 1fr 1fr;
             gap: var(--gap);
-            margin-block: clamp(.8rem, 3.6vw, 1.8rem);
+            margin-bottom: 2rem;
         }
 
-        @media (max-width: 980px) {
+        @media (max-width: 1024px) {
             .grid {
                 grid-template-columns: 1fr;
             }
@@ -200,25 +310,16 @@
         }
 
         .card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-3px);
             box-shadow: var(--shadow-strong);
-        }
-
-        .card::before {
-            content: "";
-            position: absolute;
-            inset: auto -30% 0 -30%;
-            height: 1px;
-            opacity: .5;
-            background: radial-gradient(60% 60% at 50% 50%, rgba(99, 102, 241, .25), transparent 70%);
         }
 
         .section-title {
             display: flex;
             align-items: center;
-            gap: .7rem;
-            font-size: var(--fs-xl);
-            font-weight: 800;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
             margin: 0 0 1rem 0;
             color: var(--primary);
         }
@@ -230,298 +331,78 @@
         .network-stats {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 1.2rem;
-        }
-
-        @media (max-width: 640px) {
-            .network-stats {
-                grid-template-columns: 1fr;
-            }
+            gap: 1rem;
+            position: relative;
+            z-index: 2;
         }
 
         .network-card {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
-            border: 1px solid rgba(99, 102, 241, 0.15);
-            border-radius: 18px;
-            padding: 1.8rem 1.5rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1.5rem;
             position: relative;
             overflow: hidden;
-            transition: var(--transition);
-            backdrop-filter: blur(10px);
-        }
-
-        .network-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--gradient-primary);
-        }
-
-        .network-card::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 120%;
-            height: 120%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
-            transform: translate(-50%, -50%);
-            opacity: 0;
             transition: var(--transition);
         }
 
         .network-card:hover {
-            transform: translateY(-8px);
             border-color: rgba(99, 102, 241, 0.3);
-            box-shadow: 0 20px 40px -12px rgba(99, 102, 241, 0.25);
-        }
-
-        .network-card:hover::after {
-            opacity: 1;
         }
 
         .network-icon {
-            width: 3.5rem;
-            height: 3.5rem;
-            border-radius: 16px;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
             background: var(--gradient-primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1.2rem;
-            position: relative;
-            z-index: 2;
-            box-shadow: 0 8px 25px -8px rgba(99, 102, 241, 0.5);
+            margin-bottom: 1rem;
+            box-shadow: 0 10px 25px -8px rgba(99, 102, 241, 0.5);
         }
 
         .network-icon i {
             color: white;
-            font-size: 1.4rem;
-        }
-
-        .network-content {
-            position: relative;
-            z-index: 2;
+            font-size: 1.25rem;
         }
 
         .network-value {
-            font-size: 2.2rem;
-            font-weight: 900;
+            font-size: 2rem;
+            font-weight: 800;
             color: var(--text-primary);
             line-height: 1;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+            margin-bottom: 0.35rem;
         }
 
         .network-label {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: var(--text-secondary);
-            font-weight: 600;
-            margin-bottom: 0.8rem;
+            font-weight: 500;
         }
 
-        .network-trend {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            font-size: 0.85rem;
-            padding: 0.4rem 0.8rem;
-            border-radius: 8px;
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--success);
-            font-weight: 700;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        .network-trend.down {
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--error);
-            border-color: rgba(239, 68, 68, 0.2);
-        }
-
-        .network-trend.neutral {
-            background: rgba(100, 116, 139, 0.15);
-            color: var(--dark-gray);
-            border-color: rgba(100, 116, 139, 0.2);
-        }
-
-        .network-badge {
+        .stats-update {
             position: absolute;
-            top: 1rem;
+            bottom: 1rem;
             right: 1rem;
-            padding: 0.3rem 0.7rem;
-            border-radius: 6px;
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--success);
-            font-size: 0.75rem;
-            font-weight: 700;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-
-        .userbar {
-            width: 100%;
-            margin: clamp(.5rem, 1.8vw, 1rem) auto;
-        }
-
-        .usercard {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: .9rem;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: .7rem .9rem;
-            box-shadow: var(--shadow-soft);
-        }
-
-        @media (max-width: 768px) {
-            .usercard {
-                flex-direction: column;
-                text-align: center;
-            }
-        }
-
-        .user-left {
+            font-size: 0.7rem;
+            color: var(--text-muted);
             display: flex;
             align-items: center;
-            gap: .8rem;
-        }
-
-        @media (max-width: 768px) {
-            .user-left {
-                flex-direction: column;
-            }
-        }
-
-        .avatar {
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: 12px;
-            background: var(--gradient-primary);
-            display: grid;
-            place-items: center;
-            border: 1px solid var(--border-color);
-        }
-
-        .avatar i {
-            color: #fff;
-            font-size: 1.1rem;
-        }
-
-        .hello {
-            font-weight: 800;
-            font-size: var(--fs-md);
-        }
-
-        .chips {
-            display: flex;
-            gap: .35rem;
-            flex-wrap: wrap;
-            margin-top: .15rem;
-        }
-
-        .chip {
-            font-size: .83rem;
-            padding: .32rem .56rem;
-            border-radius: 999px;
-            border: 1px solid var(--border-color);
-            background: rgba(99, 102, 241, .04);
-            font-weight: 800;
-            display: inline-flex;
-            align-items: center;
-            gap: .35rem;
-        }
-
-        .chip.plan.essencial {
-            background: rgba(99, 102, 241, .08);
-            color: var(--primary);
-        }
-
-        .chip.plan.profissional {
-            background: rgba(139, 92, 246, .08);
-            color: var(--secondary);
-        }
-
-        .chip.plan.vitalicio {
-            background: rgba(16, 185, 129, .12);
-            color: var(--success);
-        }
-
-        .chip.status.ok {
-            background: rgba(16, 185, 129, .12);
-            color: var(--success);
-        }
-
-        .chip.status.limited {
-            background: rgba(239, 68, 68, .12);
-            color: var(--error);
-        }
-
-        .btn {
-            appearance: none;
-            border: none;
-            cursor: pointer;
-            border-radius: 12px;
-            padding: .65rem .9rem;
-            font-weight: 900;
-            font-size: var(--fs-sm);
-            color: #fff;
-            background: var(--gradient-primary);
-            box-shadow: 0 10px 24px -12px rgba(99, 102, 241, .4);
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px -10px rgba(99, 102, 241, .5);
-        }
-
-        .btn.outline {
-            background: var(--bg-card);
-            color: var(--primary);
-            border: 1.5px solid var(--border-color);
-            box-shadow: none;
-        }
-
-        .btn.outline:hover {
-            background: rgba(99, 102, 241, .1);
-            border-color: rgba(99, 102, 241, .3);
-        }
-
-        .btns {
-            display: flex;
-            gap: .45rem;
-            align-items: center;
-        }
-
-        @media (max-width: 768px) {
-            .btns {
-                width: 100%;
-                justify-content: center;
-            }
+            gap: 0.25rem;
         }
 
         .form .row {
             display: grid;
             gap: var(--gap);
+            margin-bottom: 1rem;
         }
 
         .form .row.two {
             grid-template-columns: 1fr 1fr;
         }
 
-        @media (max-width: 720px) {
+        @media (max-width: 768px) {
             .form .row.two {
                 grid-template-columns: 1fr;
             }
@@ -530,32 +411,32 @@
         .label {
             display: flex;
             align-items: center;
-            gap: .55rem;
-            font-weight: 700;
+            gap: 0.5rem;
+            font-weight: 600;
             color: var(--text-primary);
-            font-size: var(--fs-sm);
-            margin-bottom: .4rem;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
         }
 
-        .input {
+        .input, .textarea {
             width: 100%;
-            font-size: var(--fs-md);
-            padding: .95rem;
+            font-size: 0.9rem;
+            padding: 0.85rem;
             background: var(--bg-tertiary);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
-            border-radius: 14px;
-            outline: 0;
+            border-radius: 10px;
+            outline: none;
             transition: var(--transition);
         }
 
-        .input:focus {
+        .input:focus, .textarea:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 .25rem rgba(99, 102, 241, .12);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
 
         .textarea {
-            min-height: 120px;
+            min-height: 100px;
             resize: vertical;
             font-family: inherit;
         }
@@ -569,175 +450,140 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: .75rem;
-            padding: .95rem;
-            border-radius: 14px;
+            padding: 0.85rem;
+            border-radius: 10px;
             border: 1px solid var(--border-color);
             background: var(--bg-tertiary);
             color: var(--text-primary);
-            font-size: var(--fs-md);
+            font-size: 0.9rem;
             cursor: pointer;
-            user-select: none;
             transition: var(--transition);
         }
 
         .select-trigger:hover {
-            border-color: rgba(99, 102, 241, .3);
+            border-color: rgba(99, 102, 241, 0.3);
         }
 
         .select-left {
             display: flex;
             align-items: center;
-            gap: .65rem;
-            min-width: 0;
+            gap: 0.5rem;
         }
 
         .select-icon {
-            width: 1.55rem;
-            height: 1.55rem;
-            border-radius: 10px;
-            display: grid;
-            place-items: center;
-            background: rgba(99, 102, 241, .1);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(99, 102, 241, 0.1);
             color: var(--primary);
-        }
-
-        .select-label {
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
-        }
-
-        .chev {
-            opacity: .85;
-            transition: var(--transition);
         }
 
         .menu {
             position: absolute;
             left: 0;
             right: 0;
-            top: calc(100% + .45rem);
+            top: calc(100% + 0.5rem);
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 14px;
+            border-radius: 10px;
             box-shadow: var(--shadow-strong);
             display: none;
-            max-height: 50vh;
+            max-height: 300px;
             overflow: auto;
             z-index: 40;
         }
 
         .menu.open {
             display: block;
-            animation: fadeIn .12s;
+            animation: fadeIn 0.15s;
         }
 
         .opt {
             display: flex;
             align-items: center;
-            gap: .65rem;
-            padding: .8rem .95rem;
-            font-size: var(--fs-md);
+            gap: 0.5rem;
+            padding: 0.85rem;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: var(--transition);
         }
 
         .opt:hover {
-            background: rgba(99, 102, 241, .06);
+            background: rgba(99, 102, 241, 0.06);
         }
 
         .opt i {
-            width: 1.2rem;
+            width: 20px;
             text-align: center;
             color: var(--primary);
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: .45rem;
-            font-size: .9rem;
-            padding: .5rem .75rem;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-card);
-            color: var(--text-primary);
         }
 
         .slider-block {
             background: var(--bg-tertiary);
             border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 1rem;
+            border-radius: 10px;
+            padding: 1.25rem;
         }
 
         .slider-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: .75rem;
+            margin-bottom: 0.75rem;
         }
 
         .slider-value {
-            font-weight: 900;
+            font-weight: 800;
             color: var(--accent);
+            font-size: 1rem;
         }
 
         .range {
-            appearance: none;
             width: 100%;
-            height: .65rem;
-            border-radius: 999px;
-            background: rgba(99, 102, 241, .15);
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(99, 102, 241, 0.15);
             outline: none;
+            -webkit-appearance: none;
         }
 
         .range::-webkit-slider-thumb {
-            appearance: none;
-            width: 1.15rem;
-            height: 1.15rem;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             background: var(--gradient-primary);
             border: 2px solid var(--bg-card);
-            box-shadow: 0 6px 16px rgba(236, 72, 153, .35);
+            cursor: pointer;
+            -webkit-appearance: none;
         }
 
         .tag {
-            font-weight: 900;
-            font-size: .9rem;
-            padding: .35rem .8rem;
-            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
             color: #fff;
         }
 
-        .tag.low {
-            background: var(--success);
-        }
-
-        .tag.mid {
-            background: var(--warning);
-        }
-
-        .tag.high {
-            background: var(--error);
-        }
-
-        .tag.crit {
-            background: #7e22ce;
-        }
+        .tag.low { background: var(--success); }
+        .tag.mid { background: var(--warning); }
+        .tag.high { background: var(--error); }
+        .tag.crit { background: #7e22ce; }
 
         .switch {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: .85rem;
+            margin-bottom: 1rem;
         }
 
         .tog {
             position: relative;
-            width: 3.1rem;
-            height: 1.6rem;
+            width: 48px;
+            height: 24px;
         }
 
         .tog input {
@@ -749,22 +595,22 @@
         .knob {
             position: absolute;
             inset: 0;
-            border-radius: 999px;
-            background: rgba(99, 102, 241, .2);
+            border-radius: 12px;
+            background: rgba(99, 102, 241, 0.2);
             transition: var(--transition);
         }
 
         .knob:before {
             content: "";
             position: absolute;
-            width: 1.2rem;
-            height: 1.2rem;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            left: .2rem;
-            top: .2rem;
+            left: 2px;
+            top: 2px;
             background: var(--bg-card);
             transition: var(--transition);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .tog input:checked + .knob {
@@ -772,32 +618,23 @@
         }
 
         .tog input:checked + .knob:before {
-            transform: translateX(1.5rem);
-        }
-
-        .proxy-panel {
-            display: none;
-        }
-
-        .proxy-panel.show {
-            display: block;
+            transform: translateX(24px);
         }
 
         .actions {
-            margin-top: 1rem;
+            margin-top: 1.5rem;
         }
 
         .cta {
             width: 100%;
-            padding: 1rem 1.05rem;
-            border-radius: 14px;
-            border: 1px solid transparent;
+            padding: 1rem;
+            border-radius: 10px;
+            border: none;
             background: var(--gradient-primary);
             color: #fff;
-            font-weight: 900;
-            font-size: var(--fs-md);
+            font-weight: 600;
+            font-size: 0.9rem;
             cursor: pointer;
-            box-shadow: 0 14px 36px -12px rgba(99, 102, 241, .45);
             transition: var(--transition);
             display: flex;
             align-items: center;
@@ -807,55 +644,17 @@
 
         .cta:hover {
             transform: translateY(-2px);
-            box-shadow: 0 16px 40px -8px rgba(99, 102, 241, .6);
+            box-shadow: 0 12px 30px -10px rgba(99, 102, 241, 0.4);
         }
 
         .cta:disabled {
-            filter: saturate(.2) brightness(.9);
+            opacity: 0.5;
             cursor: not-allowed;
         }
 
-        .lock {
-            position: absolute;
-            inset: 0;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            border-radius: var(--r);
-            background: linear-gradient(0deg, rgba(15, 23, 42, .18), rgba(15, 23, 42, .18));
-            backdrop-filter: blur(1px);
-            z-index: 5;
-        }
-
-        .lock.show {
-            display: flex;
-        }
-
-        .lock-card {
-            width: min(520px, 92%);
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 1rem;
-            box-shadow: var(--shadow-strong);
-            text-align: center;
-        }
-
-        .lock-title {
-            font-weight: 900;
-            font-size: var(--fs-md);
-            color: var(--text-primary);
-        }
-
-        .lock-sub {
-            color: var(--text-secondary);
-            margin: .35rem 0 1rem 0;
-            font-size: var(--fs-sm);
-        }
-
         .report {
-            margin-block: clamp(.9rem, 3vw, 1.5rem);
             display: none;
+            margin-top: 2rem;
         }
 
         .report.show {
@@ -866,76 +665,68 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: .95rem;
-        }
-
-        @media (max-width: 768px) {
-            .report-head {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
-            }
+            margin-bottom: 1rem;
         }
 
         .report-title {
             display: flex;
             align-items: center;
-            gap: .65rem;
-            font-weight: 900;
-            font-size: var(--fs-lg);
+            gap: 0.5rem;
+            font-weight: 700;
+            font-size: 1rem;
             color: var(--primary);
         }
 
         .kpi {
             display: grid;
-            gap: var(--gap);
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
-        @media (max-width: 980px) {
+        @media (max-width: 768px) {
             .kpi {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
-        @media (max-width: 560px) {
+        @media (max-width: 480px) {
             .kpi {
                 grid-template-columns: 1fr;
             }
         }
 
         .kpi .box {
-            background: var(--bg-card);
+            background: var(--bg-tertiary);
             border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 1rem;
+            border-radius: 10px;
+            padding: 1.25rem;
             text-align: center;
         }
 
         .kpi .big {
-            font-size: clamp(1.15rem, 3.6vw, 1.7rem);
-            font-weight: 900;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-top: 0.5rem;
         }
 
         .progress {
-            margin: 1.1rem 0;
+            margin: 1.5rem 0;
         }
 
         .progress-top {
             display: flex;
             justify-content: space-between;
-            margin-bottom: .4rem;
-            font-weight: 700;
-            font-size: var(--fs-sm);
-            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.85rem;
         }
 
         .bar {
-            height: .9rem;
-            border-radius: 999px;
-            background: rgba(99, 102, 241, .15);
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(99, 102, 241, 0.15);
             overflow: hidden;
-            border: 1px solid var(--border-color);
         }
 
         .fill {
@@ -949,139 +740,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: .35rem;
-            margin-top: .55rem;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
             color: var(--text-secondary);
-        }
-
-        .success {
-            margin-top: 1rem;
-            display: none;
-            text-align: center;
-            border: 2px dashed rgba(16, 185, 129, .5);
-            border-radius: 14px;
-            padding: 1rem;
-            background: rgba(16, 185, 129, .08);
-        }
-
-        .success.show {
-            display: block;
-        }
-
-        .success h3 {
-            margin: 0 0 .35rem 0;
-            color: var(--success);
-            font-size: var(--fs-lg);
-        }
-
-        .orders {
-            margin-block: clamp(.9rem, 3vw, 1.5rem);
-        }
-
-        .orders-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: .85rem;
-        }
-
-        @media (max-width: 768px) {
-            .orders-head {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
-            }
-        }
-
-        .orders-title {
-            display: flex;
-            align-items: center;
-            gap: .65rem;
-            font-weight: 900;
-            font-size: var(--fs-lg);
-            color: var(--primary);
-        }
-
-        .orders-wrap {
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            background: var(--bg-card);
-            overflow: hidden;
-        }
-
-        .orders-row {
-            display: grid;
-            grid-template-columns: 1.3fr 1fr 2.6fr .9fr .9fr;
-            gap: .6rem;
-            padding: .8rem 1rem;
-            align-items: center;
-        }
-
-        .orders-row.h {
-            background: linear-gradient(90deg, rgba(99, 102, 241, .06), rgba(139, 92, 246, .06));
-            font-weight: 800;
-            color: var(--text-primary);
-        }
-
-        .orders-row:not(.h):nth-child(even) {
-            background: var(--bg-tertiary);
-        }
-
-        .orders-id {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            font-size: .86rem;
-            color: var(--text-secondary);
-        }
-
-        .orders-plat i {
-            margin-right: .4rem;
-            color: var(--primary);
-        }
-
-        .orders-url a {
-            color: var(--primary);
-            text-decoration: underline;
-            word-break: break-word;
-        }
-
-        .orders-empty {
-            padding: 1rem;
-            text-align: center;
-            color: var(--text-secondary);
-        }
-
-        @media (max-width: 900px) {
-            .orders-row {
-                grid-template-columns: 1.4fr .9fr 2.2fr .8fr .8fr;
-            }
-        }
-
-        @media (max-width: 720px) {
-            .orders-row {
-                grid-template-columns: 1fr;
-                gap: .25rem;
-            }
-
-            .orders-row.h {
-                display: none;
-            }
-
-            .orders-cell {
-                display: flex;
-                justify-content: space-between;
-                gap: .75rem;
-            }
-
-            .orders-cell b {
-                color: var(--text-primary);
-            }
-        }
-
-        footer {
-            color: var(--text-secondary);
-            text-align: center;
-            font-size: var(--fs-sm);
-            padding: 1.4rem 0;
+            font-size: 0.85rem;
         }
 
         .modal {
@@ -1090,12 +752,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(10px);
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            z-index: 2000;
             padding: 1rem;
         }
 
@@ -1104,11 +766,11 @@
         }
 
         .modal-content {
-            width: min(600px, 100%);
+            width: min(500px, 95%);
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--r);
-            padding: 2rem;
+            padding: 1.5rem;
             position: relative;
             box-shadow: var(--shadow-strong);
         }
@@ -1123,7 +785,7 @@
             font-size: 1.25rem;
             cursor: pointer;
             padding: 0.5rem;
-            border-radius: var(--r);
+            border-radius: 8px;
             transition: var(--transition);
         }
 
@@ -1134,12 +796,13 @@
 
         .modal-header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
+            padding-right: 2rem;
         }
 
         .modal-icon {
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             background: var(--gradient-primary);
             display: flex;
@@ -1150,51 +813,46 @@
 
         .modal-icon i {
             color: white;
-            font-size: 2rem;
+            font-size: 1.5rem;
         }
 
         .modal-title {
-            font-weight: 800;
-            font-size: 1.5rem;
+            font-weight: 700;
+            font-size: 1.25rem;
             color: var(--text-primary);
             margin-bottom: 0.5rem;
         }
 
         .modal-subtitle {
             color: var(--text-secondary);
-            line-height: 1.6;
+            line-height: 1.5;
+            font-size: 0.9rem;
         }
 
         .modal-stats {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
-            margin: 2rem 0;
-        }
-
-        @media (max-width: 480px) {
-            .modal-stats {
-                grid-template-columns: 1fr;
-            }
+            margin: 1.5rem 0;
         }
 
         .stat-item {
             background: var(--bg-tertiary);
             border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 1.5rem;
+            border-radius: 10px;
+            padding: 1rem;
             text-align: center;
         }
 
         .stat-value {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 800;
             color: var(--primary);
             margin-bottom: 0.25rem;
         }
 
         .stat-label {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
         }
 
@@ -1202,103 +860,287 @@
             display: flex;
             gap: 1rem;
             justify-content: center;
-            margin-top: 2rem;
+            margin-top: 1.5rem;
         }
 
         @media (max-width: 480px) {
             .modal-actions {
                 flex-direction: column;
             }
+            
+            .modal-stats {
+                grid-template-columns: 1fr;
+            }
         }
 
-        .multi-urls {
-            margin-top: 1rem;
+        .whatsapp-float {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 12px 30px rgba(37, 211, 102, 0.3);
+            z-index: 999;
+            transition: var(--transition);
+            text-decoration: none;
         }
 
-        .url-counter {
-            text-align: right;
-            font-size: .8rem;
+        .whatsapp-float:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(37, 211, 102, 0.4);
+        }
+
+        footer {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 1.5rem 0;
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 2rem;
+        }
+
+        .lock {
+            position: absolute;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--r);
+            background: linear-gradient(0deg, rgba(15, 23, 42, 0.18), rgba(15, 23, 42, 0.18));
+            backdrop-filter: blur(1px);
+            z-index: 5;
+        }
+
+        .lock.show {
+            display: flex;
+        }
+
+        .lock-card {
+            width: min(520px, 92%);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-strong);
+            text-align: center;
+        }
+
+        .lock-title {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .lock-sub {
             color: var(--text-secondary);
-            margin-top: .5rem;
+            margin: 0.5rem 0 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: 320px;
+            height: 100vh;
+            background: var(--bg-primary);
+            border-left: 1px solid var(--border-color);
+            padding: 1.5rem;
+            transition: var(--transition);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .mobile-menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .mobile-menu-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .mobile-nav-link {
+            padding: 0.85rem;
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-weight: 600;
+            transition: var(--transition);
+            border: 1px solid transparent;
+            font-size: 0.9rem;
+        }
+
+        .mobile-nav-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--border-color);
+        }
+
+        .mobile-menu-cta {
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 1500;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        @media (max-width: 768px) {
+            nav.desktop {
+                display: none;
+            }
+
+            .mobile-toggle {
+                display: flex;
+            }
+
+            .usercard {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .user-left {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .chips {
+                justify-content: center;
+            }
+
+            .network-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .report-head {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .whatsapp-float {
+                bottom: 1.5rem;
+                right: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 0.75rem;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+            
+            .grid {
+                gap: 1rem;
+            }
+            
+            .whatsapp-float {
+                bottom: 1rem;
+                right: 1rem;
+                width: 50px;
+                height: 50px;
+                font-size: 1.25rem;
+            }
         }
 
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(6px);
+                transform: translateY(10px);
             }
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.7;
-            }
-        }
-
-        .fade-in {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
-        }
-
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .loading {
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-
-        .stats-update {
-            position: absolute;
-            bottom: 1rem;
-            right: 1rem;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="brand">
-                <div
-                    <i class="fa-solid fa-shield-check"></i>
-                </div>
-                <div class="brand-title">Reporting Bot</div>
-            </div>
-            <p class="tagline">A solução definitiva para remoção de perfis e páginas indesejadas em redes sociais</p>
-            <div class="support-bar">
-                <div class="support-msg">
-                    <i class="fa-brands fa-whatsapp"></i>
-                    <span>Teve algum problema? Fale com nosso suporte no WhatsApp. Atendimento rápido e preciso.</span>
-                </div>
-                <a href="https://wa.me/5511932820951" id="support-whatsapp" class="support-cta" target="_blank" rel="noopener noreferrer">
-                    <i class="fa-brands fa-whatsapp"></i>
-                    <span>Suporte no WhatsApp</span>
-                </a>
-            </div>
-        </header>
+    <header>
+        <div class="header-container">
+            <div class="header-inner">
+                <div class="brand">Reporting Bot</div>
 
+                <nav class="desktop">
+                    <a href="#status" class="nav-link active">Status</a>
+                    <a href="#denuncias" class="nav-link">Denúncias</a>
+                    <a href="/logout" class="btn secondary">Sair</a>
+                    <a href="/plans" class="btn primary">Atualizar Plano</a>
+                </nav>
+
+                <button class="mobile-toggle" id="mobileToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <div class="brand">Reporting Bot</div>
+            <button class="mobile-toggle" id="mobileClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="mobile-menu-nav">
+            <a href="#status" class="mobile-nav-link">Status</a>
+            <a href="#denuncias" class="mobile-nav-link">Denúncias</a>
+        </nav>
+        <div class="mobile-menu-cta">
+            <a href="/logout" class="btn secondary">Sair</a>
+            <a href="/plans" class="btn primary">Atualizar Plano</a>
+        </div>
+    </div>
+
+    <div class="container main-content">
         <div class="userbar">
             <div class="usercard">
                 <div class="user-left">
                     <div class="avatar">
                         <i class="fa-solid fa-user-shield"></i>
                     </div>
-                    <div>
-                        <div class="hello">Bem-vindo(a), <span id="user-name">{{ username or 'Usuário' }}</span></div>
+                    <div class="user-info">
+                        <h2>Bem-vindo(a), <span id="user-name">Usuário</span></h2>
                         <div class="chips">
                             <span id="user-plan" class="chip plan">Padrão</span>
                             <span id="plan-status" class="chip status limited">
@@ -1308,18 +1150,15 @@
                     </div>
                 </div>
                 <div class="btns">
-                    <a class="btn outline" id="logout-btn" href="/logout">
-                        <i class="fa-solid fa-right-from-bracket"></i> Sair
+                    <a href="/plans" class="btn primary" id="upgrade-btn-main">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Atualizar Plano
                     </a>
-                    <button class="btn" id="upgrade-btn">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Atualizar plano
-                    </button>
                 </div>
             </div>
         </div>
 
         <div class="grid">
-            <section class="card">
+            <section class="card" id="status">
                 <h2 class="section-title">
                     <i class="fa-solid fa-chart-network"></i> Status da Rede
                 </h2>
@@ -1331,12 +1170,7 @@
                         <div class="network-content">
                             <div class="network-value" id="proxy-count">25,634</div>
                             <div class="network-label">Proxies Ativas Globais</div>
-                            <div class="network-trend" id="proxy-trend">
-                                <i class="fa-solid fa-arrow-up"></i>
-                                <span>+243</span>
-                            </div>
                         </div>
-                        <div class="network-badge">LIVE</div>
                         <div class="stats-update">
                             <i class="fa-solid fa-clock"></i>
                             <span id="proxy-update">atualizado agora</span>
@@ -1350,65 +1184,22 @@
                         <div class="network-content">
                             <div class="network-value" id="countries-count">136</div>
                             <div class="network-label">Países Ativos</div>
-                            <div class="network-trend">
-                                <i class="fa-solid fa-plus"></i>
-                                <span>+2</span>
-                            </div>
                         </div>
-                        <div class="network-badge">GLOBAL</div>
                         <div class="stats-update">
                             <i class="fa-solid fa-clock"></i>
                             <span id="countries-update">atualizado agora</span>
                         </div>
                     </div>
-
-                    <div class="network-card">
-                        <div class="network-icon">
-                            <i class="fa-solid fa-bolt"></i>
-                        </div>
-                        <div class="network-content">
-                            <div class="network-value" id="success-rate">99.8%</div>
-                            <div class="network-label">Taxa de Sucesso</div>
-                            <div class="network-trend">
-                                <i class="fa-solid fa-arrow-up"></i>
-                                <span>+0.3%</span>
-                            </div>
-                        </div>
-                        <div class="network-badge">STABLE</div>
-                        <div class="stats-update">
-                            <i class="fa-solid fa-clock"></i>
-                            <span id="success-update">atualizado agora</span>
-                        </div>
-                    </div>
-
-                    <div class="network-card">
-                        <div class="network-icon">
-                            <i class="fa-solid fa-shield-check"></i>
-                        </div>
-                        <div class="network-content">
-                            <div class="network-value" id="uptime">100%</div>
-                            <div class="network-label">Uptime Mensal</div>
-                            <div class="network-trend neutral">
-                                <i class="fa-solid fa-minus"></i>
-                                <span>estável</span>
-                            </div>
-                        </div>
-                        <div class="network-badge">PERFECT</div>
-                        <div class="stats-update">
-                            <i class="fa-solid fa-clock"></i>
-                            <span id="uptime-update">atualizado agora</span>
-                        </div>
-                    </div>
                 </div>
             </section>
 
-            <section class="card form">
+            <section class="card form" id="denuncias">
                 <div class="lock" id="gate-overlay">
                     <div class="lock-card">
                         <div class="lock-title" id="gate-title">Plano Padrão ativo</div>
                         <div class="lock-sub" id="gate-sub">Para liberar todas as funcionalidades, atualize seu plano</div>
                         <div style="display:flex;gap:.6rem;justify-content:center">
-                            <button class="btn" id="upgrade-btn-overlay">
+                            <button class="btn primary" id="upgrade-btn-overlay">
                                 <i class="fa-solid fa-qrcode"></i> Atualizar plano
                             </button>
                         </div>
@@ -1422,103 +1213,78 @@
                 <div class="row">
                     <div>
                         <div class="label">
-                            <i class="fa-solid fa-mobile-screen-button"></i> Selecione a Plataforma
+                            <i class="fa-solid fa-mobile-screen-button"></i> Plataforma
                         </div>
                         <div class="select-wrap">
-                            <input type="hidden" id="platform" value="">
-                            <button type="button" class="select-trigger" id="platform-trigger" aria-haspopup="listbox" aria-expanded="false">
+                            <button type="button" class="select-trigger" id="platform-trigger">
                                 <div class="select-left">
-                                    <span class="select-icon" id="platform-icon">
+                                    <span class="select-icon">
                                         <i class="fa-solid fa-hashtag"></i>
                                     </span>
                                     <span class="select-label" id="platform-label">Selecione uma plataforma</span>
                                 </div>
-                                <i class="fa-solid fa-chevron-down chev" id="platform-chev"></i>
+                                <i class="fa-solid fa-chevron-down"></i>
                             </button>
-                            <div class="menu" id="platform-menu" role="listbox">
-                                <div class="opt" data-value="instagram" role="option">
+                            <div class="menu" id="platform-menu">
+                                <div class="opt" data-value="instagram">
                                     <i class="fa-brands fa-instagram"></i>
                                     <span>Instagram</span>
                                 </div>
-                                <div class="opt" data-value="facebook" role="option">
+                                <div class="opt" data-value="facebook">
                                     <i class="fa-brands fa-facebook"></i>
                                     <span>Facebook</span>
                                 </div>
-                                <div class="opt" data-value="tiktok" role="option">
+                                <div class="opt" data-value="tiktok">
                                     <i class="fa-brands fa-tiktok"></i>
                                     <span>TikTok</span>
                                 </div>
-                                <div class="opt" data-value="whatsapp" role="option">
+                                <div class="opt" data-value="whatsapp">
                                     <i class="fa-brands fa-whatsapp"></i>
                                     <span>WhatsApp</span>
-                                </div>
-                                <div class="opt" data-value="twitter" role="option">
-                                    <i class="fa-brands fa-x-twitter"></i>
-                                    <span>X (Twitter)</span>
-                                </div>
-                                <div class="opt" data-value="youtube" role="option">
-                                    <i class="fa-brands fa-youtube"></i>
-                                    <span>YouTube</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div>
                         <div class="label">
-                            <i class="fa-solid fa-link"></i> URLs dos Perfis/Páginas (um por linha)
+                            <i class="fa-solid fa-link"></i> URLs (um por linha)
                         </div>
-                        <textarea id="urls" class="input textarea" placeholder="Insira as URLs, uma em cada linha"></textarea>
-                        <div class="url-counter">
-                            <span id="url-count">0</span> perfis para denúncia
-                        </div>
+                        <textarea id="urls" class="input textarea" placeholder="https://instagram.com/usuario"></textarea>
                     </div>
                 </div>
 
-                <div class="row two" style="margin-top:.6rem">
+                <div class="row two">
                     <div class="slider-block">
                         <div class="slider-row">
-                            <div class="badge">
-                                <i class="fa-solid fa-bullseye"></i>
-                                <span>Quantidade de Denúncias</span>
+                            <div class="label" style="margin: 0;">
+                                <i class="fa-solid fa-bullseye"></i> Quantidade de Denúncias
                             </div>
                             <div class="slider-value" id="report-count-value">5.000</div>
                         </div>
                         <input id="report-count-slider" class="range" type="range" min="100" max="15950" value="5000">
-                        <div style="margin-top:.55rem;display:flex;gap:.55rem;align-items:center">
+                        <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; align-items: center;">
                             <span class="tag mid" id="report-count-tag">RISCO MODERADO</span>
-                            <span id="report-count-title" style="font-weight:800;font-size:.95rem;color:var(--text-primary)">Operação Moderada</span>
-                        </div>
-                        <p id="report-count-description" style="margin:.4rem 0 0 0;color:var(--text-secondary);font-size:var(--fs-sm)">
-                            Esta quantidade de denúncias pode ser eficiente sem levantar suspeitas significativas. Ajustes automáticos evitam padrões; chance de detecção de 5–15%.
-                        </p>
-                        <div id="plan-range-hint" style="margin-top:.6rem;font-weight:800;color:var(--text-primary);font-size:var(--fs-sm)">
-                            Limites do plano: 100–15.950
                         </div>
                     </div>
 
                     <div class="slider-block">
                         <div class="switch">
-                            <div class="label" style="margin:0">
-                                <i class="fa-solid fa-user-secret"></i> Ativar Rede de Proxies
+                            <div class="label" style="margin: 0;">
+                                <i class="fa-solid fa-user-secret"></i> Rede de Proxies
                             </div>
                             <label class="tog">
                                 <input type="checkbox" id="proxy-toggle" checked>
                                 <span class="knob"></span>
                             </label>
                         </div>
-                        <div id="proxy-panel" class="proxy-panel show">
+                        <div id="proxy-panel">
                             <div class="slider-row">
-                                <div class="badge">
-                                    <i class="fa-solid fa-sitemap"></i>
-                                    <span>Proxies Ativos</span>
+                                <div class="label" style="margin: 0;">
+                                    <i class="fa-solid fa-sitemap"></i> Proxies Ativos
                                 </div>
                                 <div class="slider-value" id="proxy-value">750</div>
                             </div>
                             <input id="proxy-slider" class="range" type="range" min="150" max="1065" value="750">
-                            <div style="display:flex;gap:.5rem;align-items:center;margin-top:.55rem">
-                                <span class="tag" id="proxy-tag" style="background:var(--success)">CONFIGURAÇÃO IDEAL</span>
-                                <span style="font-size:var(--fs-sm);color:var(--text-secondary)" id="proxy-hint">Rotação de IP a cada 8s com baixa detecção</span>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1527,11 +1293,6 @@
                     <button id="report-btn" class="cta">
                         <i class="fa-solid fa-bolt"></i> Iniciar Denúncias Automatizadas
                     </button>
-                    <div class="btns" style="margin-top:.6rem;justify-content:flex-end">
-                        <a id="upgrade-btn-inline" class="btn outline" href="/plans">
-                            <i class="fa-solid fa-layer-group"></i> Atualizar plano
-                        </a>
-                    </div>
                 </div>
             </section>
         </div>
@@ -1541,31 +1302,27 @@
                 <div class="report-title">
                     <i class="fa-solid fa-file-lines"></i> Relatório de Denúncias
                 </div>
-                <div style="display:flex;gap:.5rem;align-items:center">
-                    <div class="chip status ok" id="report-status">Em progresso</div>
-                    <a class="btn outline" id="upgrade-btn-report" href="/plans">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Atualizar plano
-                    </a>
-                </div>
+                <div class="chip status ok" id="report-status">Em progresso</div>
             </div>
 
             <div class="kpi">
                 <div class="box">
-                    <div class="badge" style="justify-content:center">
+                    <div class="label">Plataforma</div>
+                    <div class="badge">
                         <i id="report-icon" class="fa-brands fa-instagram"></i>
                         <span id="report-platform">Instagram</span>
                     </div>
                 </div>
                 <div class="box">
-                    <div style="font-size:var(--fs-sm);color:var(--text-secondary)">Perfis Reportados</div>
+                    <div class="label">Perfis Reportados</div>
                     <div id="report-profiles-count" class="big">1</div>
                 </div>
                 <div class="box">
-                    <div style="font-size:var(--fs-sm);color:var(--text-secondary)">Denúncias Enviadas</div>
+                    <div class="label">Denúncias Enviadas</div>
                     <div id="report-count-display" class="big">0</div>
                 </div>
                 <div class="box">
-                    <div style="font-size:var(--fs-sm);color:var(--text-secondary)">Proxies Ativos</div>
+                    <div class="label">Proxies Ativos</div>
                     <div id="report-proxy-count" class="big">750</div>
                 </div>
             </div>
@@ -1584,38 +1341,9 @@
                     <span id="eta-value">Calculando...</span>
                 </div>
             </div>
-
-            <div class="success" id="result-message">
-                <h3>
-                    <i class="fa-solid fa-circle-check"></i> Processo Concluído
-                </h3>
-                <p style="margin:0;color:var(--text-secondary)">As denúncias foram processadas com sucesso. Verifique os resultados abaixo.</p>
-            </div>
         </section>
 
-        <section class="card orders" id="orders-card">
-            <div class="orders-head">
-                <div class="orders-title">
-                    <i class="fa-solid fa-list-check"></i> Meus Últimos Pedidos
-                </div>
-                <button class="btn outline" id="orders-refresh">
-                    <i class="fa-solid fa-rotate"></i> Atualizar
-                </button>
-            </div>
-            <div class="orders-wrap">
-                <div class="orders-row h">
-                    <div>ID do Pedido</div>
-                    <div>Plataforma</div>
-                    <div>URL</div>
-                    <div>Denúncias</div>
-                    <div>Proxies</div>
-                </div>
-                <div class="orders-empty" id="orders-empty">Carregando pedidos...</div>
-                <div id="orders-list"></div>
-            </div>
-        </section>
-
-        <footer>Lucide Security © 2025 • Todos os direitos reservados</footer>
+        <footer>Reporting Bot © 2025 • Todos os direitos reservados</footer>
     </div>
 
     <div class="modal" id="success-modal">
@@ -1651,41 +1379,148 @@
                     <div class="stat-label">Tempo Total</div>
                 </div>
             </div>
-            <div class="modal-stats">
-                <div class="stat-item">
-                    <div class="stat-value" id="modal-connections">12.458</div>
-                    <div class="stat-label">Conexões Estabelecidas</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="modal-success-rate">99.3%</div>
-                    <div class="stat-label">Taxa de Sucesso</div>
-                </div>
-            </div>
             <div class="modal-actions">
-                <button class="btn outline" id="modal-close-btn">
+                <button class="btn secondary" id="modal-close-btn">
                     <i class="fas fa-times"></i> Fechar
                 </button>
-                <button class="btn" id="modal-refresh">
+                <button class="btn primary" id="modal-refresh">
                     <i class="fas fa-rotate"></i> Atualizar Página
                 </button>
             </div>
         </div>
     </div>
+
+    <a href="https://wa.me/5511932820951" class="whatsapp-float" target="_blank" rel="noopener noreferrer">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const mobileToggle = document.getElementById('mobileToggle');
+            const mobileClose = document.getElementById('mobileClose');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('overlay');
+
+            function toggleMobileMenu() {
+                mobileMenu.classList.toggle('active');
+                overlay.classList.toggle('active');
+                document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+            }
+
+            mobileToggle.addEventListener('click', toggleMobileMenu);
+            mobileClose.addEventListener('click', toggleMobileMenu);
+            overlay.addEventListener('click', toggleMobileMenu);
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && mobileMenu.classList.contains('active')) {
+                    toggleMobileMenu();
+                }
+            });
+
+            const networkState = JSON.parse(localStorage.getItem('lucide_network_state')) || {
+                proxies: 23000 + Math.floor(Math.random() * 4000),
+                countries: 130 + Math.floor(Math.random() * 10),
+                lastUpdate: Date.now()
+            };
+
+            function updateNetworkDisplay() {
+                document.getElementById('proxy-count').textContent = Math.round(networkState.proxies).toLocaleString('pt-BR');
+                document.getElementById('countries-count').textContent = Math.round(networkState.countries);
+                const minutesSinceUpdate = Math.floor((Date.now() - networkState.lastUpdate) / (1000 * 60));
+                let timeText = 'atualizado agora';
+                if (minutesSinceUpdate === 1) timeText = 'há 1 minuto';
+                else if (minutesSinceUpdate > 1 && minutesSinceUpdate < 60) timeText = `há ${minutesSinceUpdate} minutos`;
+                else if (minutesSinceUpdate >= 60) {
+                    const hours = Math.floor(minutesSinceUpdate / 60);
+                    timeText = `há ${hours} hora${hours > 1 ? 's' : ''}`;
+                }
+                document.getElementById('proxy-update').textContent = timeText;
+                document.getElementById('countries-update').textContent = timeText;
+            }
+
+            function simulateNetworkChanges() {
+                const now = Date.now();
+                const hoursSinceLastUpdate = (now - networkState.lastUpdate) / (1000 * 60 * 60);
+                if (hoursSinceLastUpdate < 0.016) return;
+                networkState.proxies += Math.floor((Math.random() - 0.4) * hoursSinceLastUpdate * 100);
+                networkState.proxies = Math.max(23000, Math.min(27000, networkState.proxies));
+                if (Math.random() < 0.1 * hoursSinceLastUpdate) {
+                    networkState.countries += Math.random() < 0.5 ? 1 : -1;
+                    networkState.countries = Math.max(130, Math.min(140, networkState.countries));
+                }
+                networkState.lastUpdate = now;
+                localStorage.setItem('lucide_network_state', JSON.stringify(networkState));
+                updateNetworkDisplay();
+            }
+
+            updateNetworkDisplay();
+            setInterval(simulateNetworkChanges, 60000);
+
+            const platformTrigger = document.getElementById('platform-trigger');
+            const platformMenu = document.getElementById('platform-menu');
+            const platformLabel = document.getElementById('platform-label');
+
+            platformTrigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                platformMenu.classList.toggle('open');
+            });
+
+            platformMenu.querySelectorAll('.opt').forEach(opt => {
+                opt.addEventListener('click', function() {
+                    platformLabel.textContent = this.querySelector('span').textContent;
+                    platformTrigger.querySelector('.select-icon i').className = this.querySelector('i').className;
+                    platformMenu.classList.remove('open');
+                });
+            });
+
+            document.addEventListener('click', function() {
+                platformMenu.classList.remove('open');
+            });
+
+            const reportSlider = document.getElementById('report-count-slider');
+            const reportValue = document.getElementById('report-count-value');
+            const reportTag = document.getElementById('report-count-tag');
+
+            function updateRisk(value) {
+                reportValue.textContent = parseInt(value).toLocaleString('pt-BR');
+                if (value < 2000) {
+                    reportTag.className = 'tag low';
+                    reportTag.textContent = 'BAIXO RISCO';
+                } else if (value < 6000) {
+                    reportTag.className = 'tag mid';
+                    reportTag.textContent = 'RISCO MODERADO';
+                } else if (value < 12000) {
+                    reportTag.className = 'tag high';
+                    reportTag.textContent = 'ALTO RISCO';
+                } else {
+                    reportTag.className = 'tag crit';
+                    reportTag.textContent = 'RISCO CRÍTICO';
+                }
+            }
+
+            updateRisk(reportSlider.value);
+            reportSlider.addEventListener('input', function() {
+                updateRisk(this.value);
+            });
+
+            const proxyToggle = document.getElementById('proxy-toggle');
+            const proxySlider = document.getElementById('proxy-slider');
+            const proxyValue = document.getElementById('proxy-value');
+
+            proxyToggle.addEventListener('change', function() {
+                proxySlider.disabled = !this.checked;
+                proxyValue.textContent = this.checked ? proxySlider.value : '0';
+            });
+
+            proxySlider.addEventListener('input', function() {
+                proxyValue.textContent = this.value;
+            });
+
             const state = {
                 plan: 'padrao',
                 daily_limit: 0,
                 remaining_today: 0,
                 expires_at: null
-            };
-
-            const networkState = {
-                proxies: 25634,
-                countries: 136,
-                successRate: 99.8,
-                uptime: 100,
-                lastUpdate: Date.now()
             };
 
             const rangeByPlan = {
@@ -1695,242 +1530,9 @@
                 vitalicio: [100, 15950]
             };
 
-            const platformData = {
-                instagram: {
-                    placeholder: 'https://www.instagram.com/usuario',
-                    icon: 'fa-brands fa-instagram',
-                    label: 'Instagram'
-                },
-                facebook: {
-                    placeholder: 'https://www.facebook.com/pagina',
-                    icon: 'fa-brands fa-facebook',
-                    label: 'Facebook'
-                },
-                tiktok: {
-                    placeholder: 'https://www.tiktok.com/@usuario',
-                    icon: 'fa-brands fa-tiktok',
-                    label: 'TikTok'
-                },
-                whatsapp: {
-                    placeholder: 'https://wa.me/5511999999999',
-                    icon: 'fa-brands fa-whatsapp',
-                    label: 'WhatsApp'
-                },
-                twitter: {
-                    placeholder: 'https://x.com/usuario',
-                    icon: 'fa-brands fa-x-twitter',
-                    label: 'X (Twitter)'
-                },
-                youtube: {
-                    placeholder: 'https://www.youtube.com/channel/UC_XXXXXXXX',
-                    icon: 'fa-brands fa-youtube',
-                    label: 'YouTube'
-                }
-            };
-
-            const elements = {
-                platform: document.getElementById('platform'),
-                platformTrigger: document.getElementById('platform-trigger'),
-                platformMenu: document.getElementById('platform-menu'),
-                platformLabel: document.getElementById('platform-label'),
-                platformIcon: document.getElementById('platform-icon'),
-                platformChev: document.getElementById('platform-chev'),
-                urls: document.getElementById('urls'),
-                urlCount: document.getElementById('url-count'),
-                proxyToggle: document.getElementById('proxy-toggle'),
-                proxyPanel: document.getElementById('proxy-panel'),
-                proxySlider: document.getElementById('proxy-slider'),
-                proxyValue: document.getElementById('proxy-value'),
-                proxyTag: document.getElementById('proxy-tag'),
-                proxyHint: document.getElementById('proxy-hint'),
-                reportCountSlider: document.getElementById('report-count-slider'),
-                reportCountValue: document.getElementById('report-count-value'),
-                reportCountTag: document.getElementById('report-count-tag'),
-                reportCountTitle: document.getElementById('report-count-title'),
-                reportCountDescription: document.getElementById('report-count-description'),
-                planRangeHint: document.getElementById('plan-range-hint'),
-                reportBtn: document.getElementById('report-btn'),
-                gateOverlay: document.getElementById('gate-overlay'),
-                gateTitle: document.getElementById('gate-title'),
-                gateSub: document.getElementById('gate-sub'),
-                userPlan: document.getElementById('user-plan'),
-                planStatus: document.getElementById('plan-status'),
-                upgradeBtn: document.getElementById('upgrade-btn'),
-                upgradeBtnOverlay: document.getElementById('upgrade-btn-overlay'),
-                upgradeBtnInline: document.getElementById('upgrade-btn-inline'),
-                upgradeBtnReport: document.getElementById('upgrade-btn-report'),
-                reportContainer: document.getElementById('report-container'),
-                reportIcon: document.getElementById('report-icon'),
-                reportPlatform: document.getElementById('report-platform'),
-                reportProfilesCount: document.getElementById('report-profiles-count'),
-                reportCountDisplay: document.getElementById('report-count-display'),
-                reportProxyCount: document.getElementById('report-proxy-count'),
-                progressFill: document.getElementById('progress-fill'),
-                progressPercent: document.getElementById('progress-percent'),
-                etaValue: document.getElementById('eta-value'),
-                resultMessage: document.getElementById('result-message'),
-                ordersList: document.getElementById('orders-list'),
-                ordersEmpty: document.getElementById('orders-empty'),
-                ordersRefresh: document.getElementById('orders-refresh'),
-                successModal: document.getElementById('success-modal'),
-                modalClose: document.getElementById('modal-close'),
-                modalCloseBtn: document.getElementById('modal-close-btn'),
-                modalRefresh: document.getElementById('modal-refresh'),
-                modalProfiles: document.getElementById('modal-profiles'),
-                modalReports: document.getElementById('modal-reports'),
-                modalProxies: document.getElementById('modal-proxies'),
-                modalTime: document.getElementById('modal-time'),
-                modalConnections: document.getElementById('modal-connections'),
-                modalSuccessRate: document.getElementById('modal-success-rate'),
-                proxyCount: document.getElementById('proxy-count'),
-                proxyTrend: document.getElementById('proxy-trend'),
-                countriesCount: document.getElementById('countries-count'),
-                successRate: document.getElementById('success-rate'),
-                uptime: document.getElementById('uptime'),
-                proxyUpdate: document.getElementById('proxy-update'),
-                countriesUpdate: document.getElementById('countries-update'),
-                successUpdate: document.getElementById('success-update'),
-                uptimeUpdate: document.getElementById('uptime-update')
-            };
-
-            function formatNumber(num) {
-                return Number(num).toLocaleString('pt-BR');
-            }
-
-            function loadNetworkState() {
-                const saved = localStorage.getItem('lucide_network_state');
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    const now = Date.now();
-                    const hoursSinceUpdate = (now - parsed.lastUpdate) / (1000 * 60 * 60);
-                    
-                    if (hoursSinceUpdate < 24) {
-                        Object.assign(networkState, parsed);
-                        updateNetworkDisplay();
-                        return;
-                    }
-                }
-                initializeNetworkState();
-            }
-
-            function saveNetworkState() {
-                localStorage.setItem('lucide_network_state', JSON.stringify(networkState));
-            }
-
-            function initializeNetworkState() {
-                networkState.proxies = 23000 + Math.floor(Math.random() * 4000);
-                networkState.countries = 130 + Math.floor(Math.random() * 10);
-                networkState.successRate = 99.0 + (Math.random() * 0.9);
-                networkState.uptime = 99.8 + (Math.random() * 0.2);
-                networkState.lastUpdate = Date.now();
-                saveNetworkState();
-                updateNetworkDisplay();
-            }
-
-            function updateNetworkDisplay() {
-                elements.proxyCount.textContent = formatNumber(Math.round(networkState.proxies));
-                elements.countriesCount.textContent = Math.round(networkState.countries);
-                elements.successRate.textContent = networkState.successRate.toFixed(1) + '%';
-                elements.uptime.textContent = networkState.uptime.toFixed(1) + '%';
-                
-                updateTimestamps();
-            }
-
-            function updateTimestamps() {
-                const now = Date.now();
-                const minutesSinceUpdate = Math.floor((now - networkState.lastUpdate) / (1000 * 60));
-                
-                let timeText = 'atualizado agora';
-                if (minutesSinceUpdate === 1) {
-                    timeText = 'atualizado há 1 minuto';
-                } else if (minutesSinceUpdate > 1 && minutesSinceUpdate < 60) {
-                    timeText = `atualizado há ${minutesSinceUpdate} minutos`;
-                } else if (minutesSinceUpdate >= 60) {
-                    const hours = Math.floor(minutesSinceUpdate / 60);
-                    timeText = `atualizado há ${hours} hora${hours > 1 ? 's' : ''}`;
-                }
-                
-                [elements.proxyUpdate, elements.countriesUpdate, elements.successUpdate, elements.uptimeUpdate]
-                    .forEach(el => el.textContent = timeText);
-            }
-
-            function simulateRealisticNetworkChanges() {
-                const now = Date.now();
-                const hoursSinceLastUpdate = (now - networkState.lastUpdate) / (1000 * 60 * 60);
-                
-                if (hoursSinceLastUpdate < 0.016) {
-                    return;
-                }
-
-                const baseChange = hoursSinceLastUpdate * 2;
-
-                networkState.proxies += Math.floor((Math.random() - 0.4) * baseChange * 100);
-                networkState.proxies = Math.max(23000, Math.min(27000, networkState.proxies));
-
-                if (Math.random() < 0.1 * baseChange) {
-                    networkState.countries += Math.random() < 0.5 ? 1 : -1;
-                    networkState.countries = Math.max(130, Math.min(140, networkState.countries));
-                }
-
-                networkState.successRate += (Math.random() - 0.45) * baseChange * 0.1;
-                networkState.successRate = Math.max(99.0, Math.min(99.9, networkState.successRate));
-
-                networkState.uptime += (Math.random() - 0.48) * baseChange * 0.05;
-                networkState.uptime = Math.max(99.8, Math.min(100, networkState.uptime));
-
-                networkState.lastUpdate = now;
-
-                updateNetworkDisplay();
-                saveNetworkState();
-
-                updateNetworkTrends();
-            }
-
-            function updateNetworkTrends() {
-                const saved = localStorage.getItem('lucide_network_previous');
-                const previous = saved ? JSON.parse(saved) : {...networkState};
-                
-                const proxyChange = networkState.proxies - previous.proxies;
-                const countryChange = networkState.countries - previous.countries;
-                const successChange = networkState.successRate - previous.successRate;
-                const uptimeChange = networkState.uptime - previous.uptime;
-
-                updateTrendElement(elements.proxyTrend, proxyChange, 'proxies');
-                
-                const countryTrend = elements.proxyTrend.cloneNode(true);
-                countryTrend.innerHTML = countryChange > 0 ? 
-                    '<i class="fa-solid fa-plus"></i><span>+' + countryChange + '</span>' :
-                    countryChange < 0 ? 
-                    '<i class="fa-solid fa-minus"></i><span>' + countryChange + '</span>' :
-                    '<i class="fa-solid fa-minus"></i><span>estável</span>';
-                countryTrend.className = countryChange > 0 ? 'network-trend' : 
-                                       countryChange < 0 ? 'network-trend down' : 'network-trend neutral';
-                elements.proxyTrend.parentNode.replaceChild(countryTrend, elements.proxyTrend);
-
-                localStorage.setItem('lucide_network_previous', JSON.stringify(networkState));
-            }
-
-            function updateTrendElement(element, change, type) {
-                if (change > 0) {
-                    element.className = 'network-trend';
-                    element.innerHTML = '<i class="fa-solid fa-arrow-up"></i><span>+' + Math.abs(change) + '</span>';
-                } else if (change < 0) {
-                    element.className = 'network-trend down';
-                    element.innerHTML = '<i class="fa-solid fa-arrow-down"></i><span>' + change + '</span>';
-                } else {
-                    element.className = 'network-trend neutral';
-                    element.innerHTML = '<i class="fa-solid fa-minus"></i><span>estável</span>';
-                }
-            }
-
-            loadNetworkState();
-            setInterval(simulateRealisticNetworkChanges, 60000);
-            setInterval(updateTimestamps, 30000);
-
             function setPlanBadge(plan, remaining, limit, expires) {
                 let planName = 'Padrão';
                 let planClass = '';
-                
                 if (plan === 'essencial') {
                     planName = 'Essencial';
                     planClass = 'essencial';
@@ -1941,47 +1543,48 @@
                     planName = 'Vitalício';
                     planClass = 'vitalicio';
                 }
-
-                elements.userPlan.textContent = planName;
-                elements.userPlan.className = `chip plan ${planClass}`;
-
+                document.getElementById('user-plan').textContent = planName;
+                document.getElementById('user-plan').className = `chip plan ${planClass}`;
                 if (plan === 'padrao') {
-                    elements.planStatus.className = 'chip status limited';
-                    elements.planStatus.innerHTML = '<i class="fa-solid fa-lock"></i> Acesso limitado';
+                    document.getElementById('plan-status').className = 'chip status limited';
+                    document.getElementById('plan-status').innerHTML = '<i class="fa-solid fa-lock"></i> Acesso limitado';
                 } else {
-                    elements.planStatus.className = 'chip status ok';
-                    elements.planStatus.textContent = limit !== null ? `Hoje: ${formatNumber(remaining)} restante(s)` : 'Acesso liberado';
+                    document.getElementById('plan-status').className = 'chip status ok';
+                    document.getElementById('plan-status').textContent = limit !== null ? `Hoje: ${remaining} restante(s)` : 'Acesso liberado';
                 }
-
-                elements.upgradeBtnReport.style.display = 'inline-flex';
-                elements.upgradeBtnInline.style.display = 'inline-flex';
-                
-                if (plan !== 'padrao') {
-                    elements.upgradeBtnReport.style.display = 'none';
-                }
-
                 setSliderBounds(plan);
             }
 
             function guard(enable, reason) {
-                elements.gateOverlay.classList.toggle('show', !enable);
-                
-                [elements.platform, elements.urls, elements.reportCountSlider, elements.proxyToggle, elements.proxySlider, elements.reportBtn].forEach(el => {
+                const gateOverlay = document.getElementById('gate-overlay');
+                gateOverlay.classList.toggle('show', !enable);
+                const elements = [platformTrigger, document.getElementById('urls'), reportSlider, proxyToggle, proxySlider, document.getElementById('report-btn')];
+                elements.forEach(el => {
                     if (el) el.disabled = !enable;
                 });
-
                 if (!enable) {
                     if (reason === 'padrao') {
-                        elements.gateTitle.textContent = 'Plano Padrão ativo';
-                        elements.gateSub.textContent = 'Para liberar todas as funcionalidades, atualize seu plano';
+                        document.getElementById('gate-title').textContent = 'Plano Padrão ativo';
+                        document.getElementById('gate-sub').textContent = 'Para liberar todas as funcionalidades, atualize seu plano';
                     } else if (reason === 'sem_cota') {
-                        elements.gateTitle.textContent = 'Limite diário esgotado';
-                        elements.gateSub.textContent = 'Aguarde a renovação diária ou atualize seu plano';
+                        document.getElementById('gate-title').textContent = 'Limite diário esgotado';
+                        document.getElementById('gate-sub').textContent = 'Aguarde a renovação diária ou atualize seu plano';
                     } else {
-                        elements.gateTitle.textContent = 'Acesso indisponível';
-                        elements.gateSub.textContent = 'Verifique seu plano em /plans';
+                        document.getElementById('gate-title').textContent = 'Acesso indisponível';
+                        document.getElementById('gate-sub').textContent = 'Verifique seu plano em /plans';
                     }
                 }
+            }
+
+            function setSliderBounds(plan) {
+                const range = rangeByPlan[plan] || [100, 15950];
+                reportSlider.min = range[0];
+                reportSlider.max = range[1];
+                const currentValue = parseInt(reportSlider.value, 10);
+                if (currentValue < range[0] || currentValue > range[1]) {
+                    reportSlider.value = Math.min(Math.max(currentValue || range[0], range[0]), range[1]);
+                }
+                updateRisk(parseInt(reportSlider.value, 10));
             }
 
             async function getStatus() {
@@ -1989,14 +1592,11 @@
                     const response = await fetch('/api/plan/status', {
                         credentials: 'same-origin'
                     });
-
                     if (response.status === 401) {
                         window.location.href = '/login';
                         return;
                     }
-
                     const data = await response.json();
-
                     if (!response.ok || !data || data.plan === 'padrao') {
                         state.plan = 'padrao';
                         state.daily_limit = 0;
@@ -2006,14 +1606,11 @@
                         guard(false, 'padrao');
                         return;
                     }
-
                     state.plan = data.plan || 'padrao';
                     state.daily_limit = data.daily_limit !== null ? data.daily_limit : 0;
                     state.remaining_today = data.remaining_today !== null ? data.remaining_today : 0;
                     state.expires_at = data.expires_at || null;
-
                     setPlanBadge(state.plan, state.remaining_today, state.daily_limit, state.expires_at);
-
                     if (state.plan === 'padrao') {
                         guard(false, 'padrao');
                     } else if (state.daily_limit !== null && state.remaining_today <= 0) {
@@ -2027,189 +1624,59 @@
                     setSliderBounds('padrao');
                     guard(false, 'padrao');
                 }
-
-                loadOrders();
-            }
-
-            function setSliderBounds(plan) {
-                const range = rangeByPlan[plan] || [100, 15950];
-                elements.reportCountSlider.min = range[0];
-                elements.reportCountSlider.max = range[1];
-
-                const currentValue = parseInt(elements.reportCountSlider.value, 10);
-                if (currentValue < range[0] || currentValue > range[1]) {
-                    elements.reportCountSlider.value = Math.min(Math.max(currentValue || range[0], range[0]), range[1]);
-                }
-
-                elements.planRangeHint.textContent = `Limites do plano: ${range[0].toLocaleString('pt-BR')}–${range[1].toLocaleString('pt-BR')}`;
-                updateRisk(parseInt(elements.reportCountSlider.value, 10));
             }
 
             function goPlans() {
                 window.location.href = '/plans';
             }
 
-            elements.upgradeBtn.addEventListener('click', goPlans);
-            elements.upgradeBtnOverlay.addEventListener('click', goPlans);
-            elements.upgradeBtnInline.addEventListener('click', function(e) {
-                e.preventDefault();
-                goPlans();
-            });
-            elements.upgradeBtnReport.addEventListener('click', function(e) {
+            document.getElementById('upgrade-btn-main').addEventListener('click', function(e) {
                 e.preventDefault();
                 goPlans();
             });
 
-            function toggleMenu() {
-                elements.platformMenu.classList.toggle('open');
-                elements.platformTrigger.setAttribute('aria-expanded', elements.platformMenu.classList.contains('open'));
-                elements.platformChev.style.transform = elements.platformMenu.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0)';
-            }
-
-            elements.platformTrigger.addEventListener('pointerdown', function(e) {
+            document.getElementById('upgrade-btn-overlay').addEventListener('click', function(e) {
                 e.preventDefault();
-                e.stopPropagation();
-                toggleMenu();
+                goPlans();
             });
 
-            elements.platformTrigger.addEventListener('click', function(e) {
-                e.preventDefault();
-            });
+            const reportBtn = document.getElementById('report-btn');
+            const reportContainer = document.getElementById('report-container');
+            const successModal = document.getElementById('success-modal');
 
-            document.addEventListener('pointerdown', function(e) {
-                if (elements.platformMenu.classList.contains('open') && !elements.platformTrigger.contains(e.target) && !elements.platformMenu.contains(e.target)) {
-                    elements.platformMenu.classList.remove('open');
-                    elements.platformTrigger.setAttribute('aria-expanded', 'false');
-                    elements.platformChev.style.transform = 'rotate(0)';
+            reportBtn.addEventListener('click', async function() {
+                if (state.plan === 'padrao') {
+                    goPlans();
+                    return;
                 }
-            });
-
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && elements.platformMenu.classList.contains('open')) {
-                    elements.platformMenu.classList.remove('open');
-                    elements.platformTrigger.setAttribute('aria-expanded', 'false');
-                    elements.platformChev.style.transform = 'rotate(0)';
+                const platform = platformLabel.textContent;
+                if (platform === 'Selecione uma plataforma') {
+                    alert('Por favor, selecione uma plataforma');
+                    return;
                 }
-            });
-
-            Array.from(elements.platformMenu.querySelectorAll('.opt')).forEach(function(opt) {
-                opt.addEventListener('pointerdown', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const value = this.getAttribute('data-value');
-                    elements.platform.value = value;
-                    elements.platformLabel.textContent = this.innerText.trim();
-                    elements.platformIcon.innerHTML = '<i class="' + platformData[value].icon + '"></i>';
-                    elements.urls.placeholder = platformData[value].placeholder + '\n' + platformData[value].placeholder;
-                    elements.platformMenu.classList.remove('open');
-                    elements.platformTrigger.setAttribute('aria-expanded', 'false');
-                    elements.platformChev.style.transform = 'rotate(0)';
-                });
-            });
-
-            function updateUrlCounter() {
-                const urls = elements.urls.value.split('\n').filter(function(url) {
-                    return url.trim() !== '';
-                });
-                elements.urlCount.textContent = urls.length;
-            }
-
-            elements.urls.addEventListener('input', updateUrlCounter);
-
-            elements.proxyToggle.addEventListener('change', function() {
-                const enabled = this.checked;
-                elements.proxyPanel.classList.toggle('show', enabled);
-                elements.proxySlider.disabled = !enabled;
-
-                if (enabled) {
-                    elements.proxyValue.textContent = parseInt(elements.proxySlider.value, 10);
-                    updateProxyStatus(parseInt(elements.proxySlider.value, 10));
-                } else {
-                    elements.proxyValue.textContent = '0';
-                    elements.proxyTag.textContent = 'DESATIVADO';
-                    elements.proxyTag.style.background = '#9aa1b6';
-                    elements.proxyHint.textContent = 'Nenhum proxy será utilizado';
+                const urls = document.getElementById('urls').value.trim();
+                if (!urls) {
+                    alert('Por favor, insira pelo menos uma URL');
+                    return;
                 }
-            });
-
-            function updateProxyStatus(value) {
-                if (value >= 700 && value <= 800) {
-                    elements.proxyTag.textContent = 'CONFIGURAÇÃO IDEAL';
-                    elements.proxyTag.style.background = 'var(--success)';
-                    elements.proxyHint.textContent = 'Rotação de IP a cada 8s com baixa detecção';
-                } else if (value >= 500 && value < 700) {
-                    elements.proxyTag.textContent = 'VELOCIDADE MODERADA';
-                    elements.proxyTag.style.background = 'var(--warning)';
-                    elements.proxyHint.textContent = 'Bom equilíbrio entre velocidade e sigilo';
-                } else if (value > 800 && value <= 950) {
-                    elements.proxyTag.textContent = 'ALTO DESEMPENHO';
-                    elements.proxyTag.style.background = 'var(--primary)';
-                    elements.proxyHint.textContent = 'Mais velocidade com leve aumento de risco';
-                } else if (value > 950) {
-                    elements.proxyTag.textContent = 'RISCO DE DETECÇÃO';
-                    elements.proxyTag.style.background = 'var(--error)';
-                    elements.proxyHint.textContent = 'Risco elevado; use com cautela';
-                } else {
-                    elements.proxyTag.textContent = 'CONFIGURAÇÃO LEVE';
-                    elements.proxyTag.style.background = '#6b7280';
-                    elements.proxyHint.textContent = 'Menor carga e sigilo elevado';
-                }
-            }
-
-            elements.proxySlider.addEventListener('input', function() {
-                const value = parseInt(this.value, 10);
-                elements.proxyValue.textContent = value;
-                updateProxyStatus(value);
-            });
-
-            function updateRisk(value) {
-                elements.reportCountValue.textContent = formatNumber(value);
-
-                if (value < 2000) {
-                    elements.reportCountTag.className = 'tag low';
-                    elements.reportCountTag.textContent = 'BAIXO RISCO';
-                    elements.reportCountTitle.textContent = 'Operação de Baixo Risco';
-                    elements.reportCountDescription.textContent = 'Distribuição suave ao longo de horas; chance de detecção inferior a 5%.';
-                } else if (value < 6000) {
-                    elements.reportCountTag.className = 'tag mid';
-                    elements.reportCountTag.textContent = 'RISCO MODERADO';
-                    elements.reportCountTitle.textContent = 'Operação Moderada';
-                    elements.reportCountDescription.textContent = 'Ajustes automáticos evitam padrões; chance de detecção de 5–15%.';
-                } else if (value < 12000) {
-                    elements.reportCountTag.className = 'tag high';
-                    elements.reportCountTag.textContent = 'ALTO RISCO';
-                    elements.reportCountTitle.textContent = 'Operação de Alto Impacto';
-                    elements.reportCountDescription.textContent = 'Ofuscação e distribuição avançadas; detecção 15–30%.';
-                } else {
-                    elements.reportCountTag.className = 'tag crit';
-                    elements.reportCountTag.textContent = 'RISCO CRÍTICO';
-                    elements.reportCountTitle.textContent = 'Operação de Máxima Intensidade';
-                    elements.reportCountDescription.textContent = 'Protocolos máximos e proxies premium; detecção 30–50%.';
-                }
-            }
-
-            updateRisk(parseInt(elements.reportCountSlider.value, 10));
-            elements.reportCountSlider.addEventListener('input', function(e) {
-                updateRisk(parseInt(e.target.value, 10));
-            });
-
-            async function createOrder(platform, urls, reports, proxies) {
-                const urlList = Array.isArray(urls) ? urls.map(u => String(u).trim()).filter(u => u !== '') : [String(urls || '').trim()];
-                if (!urlList.length) {
-                    alert('Por favor, insira pelo menos uma URL válida.');
-                    return null;
-                }
-
+                const reports = parseInt(reportSlider.value);
+                const proxies = proxyToggle.checked ? parseInt(proxySlider.value) : 0;
                 const range = rangeByPlan[state.plan] || [100, 15950];
-                const minPerOrder = range[0];
-                const maxPerOrder = range[1];
-
-                if (urlList.length === 1) {
+                if (reports < range[0] || reports > range[1]) {
+                    alert('Para o seu plano, a quantidade deve estar entre ' + range[0] + ' e ' + range[1] + '.');
+                    return;
+                }
+                if (state.daily_limit !== null && state.remaining_today <= 0) {
+                    guard(false, 'sem_cota');
+                    return;
+                }
+                try {
+                    const urlList = urls.split('\n').map(u => u.trim()).filter(u => u !== '');
                     const payload = {
-                        platform: platform,
-                        url: urlList[0],
-                        reports: parseInt(reports, 10),
-                        proxies: parseInt(proxies, 10)
+                        platform: platform.toLowerCase().replace(/[^a-z]/g, ''),
+                        urls: urlList,
+                        reports: reports,
+                        proxies: proxies
                     };
                     const response = await fetch('/api/orders/create', {
                         method: 'POST',
@@ -2223,428 +1690,85 @@
                     if (!response.ok || !data || !data.ok) {
                         if (data && data.error === 'Plano insuficiente') {
                             goPlans();
-                            return null;
+                            return;
                         }
                         if (data && data.error === 'Limite diário excedido') {
                             state.remaining_today = 0;
                             setPlanBadge(state.plan, 0, state.daily_limit, null);
                             guard(false, 'sem_cota');
                             alert('Limite diário excedido.');
-                            return null;
-                        }
-                        if (data && data.error && data.error.startsWith('Quantidade permitida')) {
-                            alert(data.error);
-                            return null;
-                        }
-                        if (data && data.error === 'URL inválida') {
-                            alert('URL inválida: verifique se a URL fornecida está completa (inclua https://) e válida.');
-                            return null;
+                            return;
                         }
                         alert('Não foi possível iniciar.');
-                        return null;
+                        return;
                     }
                     if (state.daily_limit !== null) {
                         state.remaining_today = typeof data.remaining_today === 'number' ? data.remaining_today : state.remaining_today - 1;
                         setPlanBadge(state.plan, state.remaining_today, state.daily_limit, null);
                     }
-                    return data;
-                }
-
-                const totalReports = parseInt(reports, 10);
-                if (totalReports < urlList.length * minPerOrder) {
-                    alert(`Ao dividir ${totalReports} denúncias por ${urlList.length} URLs, cada URL teria menos do que o mínimo permitido (${minPerOrder}). Diminua o número de URLs ou aumente as denúncias.`);
-                    return null;
-                }
-
-                const basePer = Math.floor(totalReports / urlList.length);
-                let remainder = totalReports % urlList.length;
-                const proxyBase = Math.floor(Math.max(0, parseInt(proxies, 10) || 0) / urlList.length);
-                let proxyRem = Math.max(0, parseInt(proxies, 10) || 0) % urlList.length;
-
-                const results = [];
-                for (let i = 0; i < urlList.length; i++) {
-                    const url = urlList[i];
-                    const reportsForThis = basePer + (remainder > 0 ? 1 : 0);
-                    if (remainder > 0) remainder--;
-                    if (reportsForThis < minPerOrder || reportsForThis > maxPerOrder) {
-                        alert('Divisão de denúncias por URL resultaria em valores fora dos limites do plano. Ajuste URLs ou quantidade.');
-                        return null;
-                    }
-                    const proxiesForThis = proxyBase + (proxyRem > 0 ? 1 : 0);
-                    if (proxyRem > 0) proxyRem--;
-                    const payload = {
-                        platform: platform,
-                        url: url,
-                        reports: reportsForThis,
-                        proxies: proxiesForThis
-                    };
-                    const response = await fetch('/api/orders/create', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        credentials: 'same-origin',
-                        body: JSON.stringify(payload)
-                    });
-                    const data = await response.json();
-                    if (!response.ok || !data || !data.ok) {
-                        if (data && data.error === 'Plano insuficiente') {
-                            goPlans();
-                            return null;
-                        }
-                        if (data && data.error === 'Limite diário excedido') {
-                            state.remaining_today = 0;
-                            setPlanBadge(state.plan, 0, state.daily_limit, null);
-                            guard(false, 'sem_cota');
-                            alert('Limite diário excedido durante criação de pedidos.');
-                            return null;
-                        }
-                        if (data && data.error === 'URL inválida') {
-                            alert(`URL inválida enviada ao servidor: "${url}". Verifique se está correta e inclui o protocolo (https://).`);
-                            return null;
-                        }
-                        alert('Falha ao criar pedido para: ' + url);
-                        return null;
-                    }
-                    results.push(data);
-                }
-
-                if (state.daily_limit !== null) {
-                    if (results.length) {
-                        const last = results[results.length - 1];
-                        state.remaining_today = typeof last.remaining_today === 'number' ? last.remaining_today : Math.max(0, state.remaining_today - results.length);
-                        setPlanBadge(state.plan, state.remaining_today, state.daily_limit, null);
-                    }
-                }
-
-                return results;
-            }
-
-            function getPlatformLabel(platform) {
-                if (platform === 'instagram') return 'Instagram';
-                if (platform === 'facebook') return 'Facebook';
-                if (platform === 'tiktok') return 'TikTok';
-                if (platform === 'whatsapp') return 'WhatsApp';
-                if (platform === 'youtube') return 'YouTube';
-                return 'X (Twitter)';
-            }
-
-            function getPlatformIcon(platform) {
-                return platformData[platform] ? platformData[platform].icon : 'fa-solid fa-hashtag';
-            }
-
-            function renderOrders(orders) {
-                elements.ordersList.innerHTML = '';
-
-                if (!orders || !orders.length) {
-                    elements.ordersEmpty.style.display = 'block';
-                    return;
-                }
-
-                elements.ordersEmpty.style.display = 'none';
-                const fragment = document.createDocumentFragment();
-
-                orders.forEach(function(order) {
-                    const row = document.createElement('div');
-                    row.className = 'orders-row';
-
-                    const idCell = document.createElement('div');
-                    idCell.className = 'orders-id orders-cell';
-                    idCell.textContent = order.id;
-
-                    const platformCell = document.createElement('div');
-                    platformCell.className = 'orders-plat orders-cell';
-                    const platformIcon = document.createElement('i');
-                    platformIcon.className = getPlatformIcon(order.platform);
-                    const platformText = document.createElement('span');
-                    platformText.textContent = ' ' + getPlatformLabel(order.platform);
-                    platformCell.appendChild(platformIcon);
-                    platformCell.appendChild(platformText);
-
-                    const urlCell = document.createElement('div');
-                    urlCell.className = 'orders-url orders-cell';
-                    const urlLink = document.createElement('a');
-                    urlLink.href = order.url || '#';
-                    urlLink.target = '_blank';
-                    urlLink.rel = 'noopener';
-                    urlLink.textContent = order.url || '';
-                    urlCell.appendChild(urlLink);
-
-                    const reportsCell = document.createElement('div');
-                    reportsCell.className = 'orders-cell';
-                    reportsCell.textContent = formatNumber(order.reports || 0);
-
-                    const proxiesCell = document.createElement('div');
-                    proxiesCell.className = 'orders-cell';
-                    proxiesCell.textContent = formatNumber(order.proxies || 0);
-
-                    if (window.matchMedia && window.matchMedia('(max-width: 720px)').matches) {
-                        const createMobileCell = function(label, content) {
-                            const cell = document.createElement('div');
-                            cell.className = 'orders-cell';
-                            const bold = document.createElement('b');
-                            bold.textContent = label;
-                            const span = document.createElement('span');
-                            span.textContent = content;
-                            cell.appendChild(bold);
-                            cell.appendChild(span);
-                            return cell;
-                        };
-
-                        const mobileRow = document.createElement('div');
-                        mobileRow.className = 'orders-row';
-
-                        const p1 = createMobileCell('ID: ', idCell.textContent);
-                        const p2 = createMobileCell('Plataforma: ', platformText.textContent.trim());
-                        const p3 = createMobileCell('URL: ', '');
-                        const a3 = document.createElement('a');
-                        a3.href = urlLink.href;
-                        a3.target = '_blank';
-                        a3.rel = 'noopener';
-                        a3.textContent = urlLink.textContent;
-                        p3.lastChild.appendChild(a3);
-                        const p4 = createMobileCell('Denúncias: ', reportsCell.textContent);
-                        const p5 = createMobileCell('Proxies: ', proxiesCell.textContent);
-
-                        fragment.appendChild(p1);
-                        fragment.appendChild(p2);
-                        fragment.appendChild(p3);
-                        fragment.appendChild(p4);
-                        fragment.appendChild(p5);
-                    } else {
-                        row.appendChild(idCell);
-                        row.appendChild(platformCell);
-                        row.appendChild(urlCell);
-                        row.appendChild(reportsCell);
-                        row.appendChild(proxiesCell);
-                        fragment.appendChild(row);
-                    }
-                });
-
-                elements.ordersList.appendChild(fragment);
-            }
-
-            async function loadOrders() {
-                try {
-                    const response = await fetch('/api/orders/list', {
-                        credentials: 'same-origin'
-                    });
-
-                    if (response.status === 401) return;
-
-                    const data = await response.json();
-                    if (data && data.ok) {
-                        renderOrders(data.items || []);
-                    } else {
-                        renderOrders([]);
-                    }
-                } catch (error) {
-                    renderOrders([]);
-                }
-            }
-
-            elements.ordersRefresh.addEventListener('click', function(e) {
-                e.preventDefault();
-                loadOrders();
-            });
-
-            function showSuccessModal(profiles, reports, proxies, time, connections, successRate) {
-                elements.modalProfiles.textContent = formatNumber(profiles);
-                elements.modalReports.textContent = formatNumber(reports);
-                elements.modalProxies.textContent = formatNumber(proxies);
-                elements.modalTime.textContent = time;
-                elements.modalConnections.textContent = formatNumber(connections);
-                elements.modalSuccessRate.textContent = successRate;
-
-                elements.successModal.classList.add('show');
-            }
-
-            elements.modalClose.addEventListener('click', function() {
-                elements.successModal.classList.remove('show');
-            });
-
-            elements.modalCloseBtn.addEventListener('click', function() {
-                elements.successModal.classList.remove('show');
-            });
-
-            elements.modalRefresh.addEventListener('click', function() {
-                window.location.reload();
-            });
-
-            elements.successModal.addEventListener('click', function(e) {
-                if (e.target === elements.successModal) {
-                    elements.successModal.classList.remove('show');
-                }
-            });
-
-            elements.reportBtn.addEventListener('click', async function() {
-                if (state.plan === 'padrao') {
-                    goPlans();
-                    return;
-                }
-
-                const platform = elements.platform.value.trim();
-                const urlsText = elements.urls.value.trim();
-                const proxies = elements.proxyToggle.checked ? parseInt(elements.proxySlider.value, 10) : 0;
-                const reports = parseInt(elements.reportCountSlider.value, 10);
-
-                if (!platform) {
-                    alert('Por favor, selecione uma plataforma');
-                    return;
-                }
-
-                if (!urlsText) {
-                    alert('Por favor, insira pelo menos uma URL');
-                    return;
-                }
-
-                const urls = urlsText.split('\n').map(u => u.trim()).filter(u => u !== '');
-                const range = rangeByPlan[state.plan] || [100, 15950];
-
-                if (reports < range[0] || reports > range[1]) {
-                    alert('Para o seu plano, a quantidade deve estar entre ' + range[0] + ' e ' + range[1] + '.');
-                    return;
-                }
-
-                if (reports > 15950) {
-                    alert('A quantidade máxima de denúncias é 15.950');
-                    return;
-                }
-
-                if (state.daily_limit !== null && state.remaining_today <= 0) {
-                    guard(false, 'sem_cota');
-                    return;
-                }
-
-                try {
-                    const result = await createOrder(platform, urls, reports, proxies);
-                    if (!result) return;
-
-                    loadOrders();
-
-                    elements.reportContainer.classList.add('show');
-                    elements.resultMessage.classList.remove('show');
-
-                    if (platform === 'instagram') {
-                        elements.reportIcon.className = platformData.instagram.icon;
-                        elements.reportPlatform.textContent = 'Instagram';
-                    } else if (platform === 'facebook') {
-                        elements.reportIcon.className = platformData.facebook.icon;
-                        elements.reportPlatform.textContent = 'Facebook';
-                    } else if (platform === 'tiktok') {
-                        elements.reportIcon.className = platformData.tiktok.icon;
-                        elements.reportPlatform.textContent = 'TikTok';
-                    } else if (platform === 'whatsapp') {
-                        elements.reportIcon.className = platformData.whatsapp.icon;
-                        elements.reportPlatform.textContent = 'WhatsApp';
-                    } else if (platform === 'youtube') {
-                        elements.reportIcon.className = platformData.youtube.icon;
-                        elements.reportPlatform.textContent = 'YouTube';
-                    } else if (platform === 'twitter') {
-                        elements.reportIcon.className = platformData.twitter.icon;
-                        elements.reportPlatform.textContent = 'X (Twitter)';
-                    }
-
-                    elements.reportProfilesCount.textContent = formatNumber(urls.length);
-                    elements.reportCountDisplay.textContent = '0';
-                    elements.reportProxyCount.textContent = formatNumber(proxies);
-
-                    const baseTime = Math.max(30000, 15 * reports);
-                    const variance = 0.4 * baseTime;
-                    const totalTime = baseTime + Math.floor(Math.random() * variance) - variance / 2;
+                    reportContainer.classList.add('show');
+                    const urlCount = urlList.length;
+                    document.getElementById('report-profiles-count').textContent = urlCount;
+                    document.getElementById('report-count-display').textContent = '0';
+                    document.getElementById('report-proxy-count').textContent = proxies.toLocaleString('pt-BR');
+                    document.getElementById('report-platform').textContent = platform;
+                    document.getElementById('report-icon').className = platformTrigger.querySelector('.select-icon i').className;
                     const startTime = Date.now();
-                    const endTime = startTime + totalTime;
-
-                    let etaText = '';
-                    function updateEta() {
-                        const now = Date.now();
-                        if (now < endTime) {
-                            const remaining = endTime - now;
-                            const minutes = Math.max(0, Math.floor(remaining / 60000));
-                            const seconds = Math.max(0, Math.floor((remaining % 60000) / 1000));
-                            const text = `${minutes}m ${String(seconds).padStart(2, '0')}s`;
-                            
-                            if (text !== etaText) {
-                                elements.etaValue.textContent = text;
-                                etaText = text;
-                            }
-                            setTimeout(updateEta, 1000);
-                        } else {
-                            elements.etaValue.textContent = 'Processo concluído';
-                        }
-                    }
-
+                    const totalTime = 30000 + (reports * 15);
+                    let sentReports = 0;
+                    const reportsPerSecond = Math.ceil(reports / (totalTime / 1000));
                     function updateProgress() {
                         const now = Date.now();
                         const progress = Math.min(100, ((now - startTime) / totalTime) * 100);
-                        elements.progressFill.style.width = progress + '%';
-                        elements.progressPercent.textContent = Math.floor(progress) + '%';
-
+                        document.getElementById('progress-fill').style.width = progress + '%';
+                        document.getElementById('progress-percent').textContent = Math.floor(progress) + '%';
+                        sentReports = Math.min(reports, sentReports + reportsPerSecond);
+                        document.getElementById('report-count-display').textContent = sentReports.toLocaleString('pt-BR');
+                        const remaining = Math.max(0, totalTime - (now - startTime));
+                        const minutes = Math.floor(remaining / 60000);
+                        const seconds = Math.floor((remaining % 60000) / 1000);
+                        document.getElementById('eta-value').textContent = `${minutes}m ${seconds.toString().padStart(2, '0')}s`;
                         if (progress < 100) {
                             requestAnimationFrame(updateProgress);
-                        }
-                    }
-
-                    let sentReports = 0;
-                    const reportsPerUpdate = Math.ceil(reports / (totalTime / 100));
-
-                    function updateReports() {
-                        const now = Date.now();
-                        if (now < endTime) {
-                            sentReports = Math.min(reports, sentReports + reportsPerUpdate);
-                            elements.reportCountDisplay.textContent = formatNumber(sentReports);
-                            setTimeout(updateReports, 100);
                         } else {
-                            elements.reportCountDisplay.textContent = formatNumber(reports);
-                            elements.progressFill.style.width = '100%';
-                            elements.progressPercent.textContent = '100%';
-
-                            setTimeout(function() {
-                                elements.resultMessage.classList.add('show');
-                                
-                                const timeTaken = (totalTime / 3600000).toFixed(1) + 'h';
-                                const connectionsEstablished = Math.floor(reports * 1.2);
-                                const successRateValue = (99.3 + (Math.random() * 0.4)).toFixed(1) + '%';
-                                
-                                showSuccessModal(
-                                    urls.length,
-                                    reports,
-                                    proxies,
-                                    timeTaken,
-                                    connectionsEstablished,
-                                    successRateValue
-                                );
-
-                                if (state.daily_limit !== null && state.remaining_today <= 0) {
-                                    guard(false, 'sem_cota');
-                                }
-                            }, 1000);
+                            document.getElementById('report-status').textContent = 'Concluído';
+                            document.getElementById('eta-value').textContent = 'Processo finalizado';
+                            document.getElementById('modal-profiles').textContent = urlCount;
+                            document.getElementById('modal-reports').textContent = reports.toLocaleString('pt-BR');
+                            document.getElementById('modal-proxies').textContent = proxies.toLocaleString('pt-BR');
+                            document.getElementById('modal-time').textContent = (totalTime / 3600000).toFixed(1) + 'h';
+                            successModal.classList.add('show');
+                            if (state.daily_limit !== null && state.remaining_today <= 0) {
+                                guard(false, 'sem_cota');
+                            }
                         }
                     }
-
-                    updateEta();
                     updateProgress();
-                    updateReports();
-
                 } catch (error) {
                     alert('Erro ao iniciar. Tente novamente.');
                 }
             });
 
-            window.addEventListener('load', function() {
-                getStatus();
+            document.getElementById('modal-close').addEventListener('click', function() {
+                successModal.classList.remove('show');
             });
 
-            const observer = new IntersectionObserver(function(entries) {
-                entries.forEach(function(entry) {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, { threshold: 0.1 });
+            document.getElementById('modal-close-btn').addEventListener('click', function() {
+                successModal.classList.remove('show');
+            });
 
-            document.querySelectorAll('.fade-in').forEach(function(el) {
-                observer.observe(el);
+            document.getElementById('modal-refresh').addEventListener('click', function() {
+                window.location.reload();
+            });
+
+            successModal.addEventListener('click', function(e) {
+                if (e.target === successModal) {
+                    successModal.classList.remove('show');
+                }
+            });
+
+            window.addEventListener('load', function() {
+                getStatus();
             });
         });
     </script>
