@@ -1216,9 +1216,10 @@
                             <i class="fa-solid fa-mobile-screen-button"></i> Plataforma
                         </div>
                         <div class="select-wrap">
+                            <input type="hidden" id="platform" value="">
                             <button type="button" class="select-trigger" id="platform-trigger">
                                 <div class="select-left">
-                                    <span class="select-icon">
+                                    <span class="select-icon" id="platform-icon">
                                         <i class="fa-solid fa-hashtag"></i>
                                     </span>
                                     <span class="select-label" id="platform-label">Selecione uma plataforma</span>
@@ -1241,6 +1242,14 @@
                                 <div class="opt" data-value="whatsapp">
                                     <i class="fa-brands fa-whatsapp"></i>
                                     <span>WhatsApp</span>
+                                </div>
+                                <div class="opt" data-value="twitter">
+                                    <i class="fa-brands fa-x-twitter"></i>
+                                    <span>X (Twitter)</span>
+                                </div>
+                                <div class="opt" data-value="youtube">
+                                    <i class="fa-brands fa-youtube"></i>
+                                    <span>YouTube</span>
                                 </div>
                             </div>
                         </div>
@@ -1459,6 +1468,8 @@
             const platformTrigger = document.getElementById('platform-trigger');
             const platformMenu = document.getElementById('platform-menu');
             const platformLabel = document.getElementById('platform-label');
+            const platformIcon = document.getElementById('platform-icon');
+            const platformInput = document.getElementById('platform');
 
             platformTrigger.addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -1467,8 +1478,12 @@
 
             platformMenu.querySelectorAll('.opt').forEach(opt => {
                 opt.addEventListener('click', function() {
-                    platformLabel.textContent = this.querySelector('span').textContent;
-                    platformTrigger.querySelector('.select-icon i').className = this.querySelector('i').className;
+                    const value = this.getAttribute('data-value');
+                    const label = this.querySelector('span').textContent;
+                    const iconClass = this.querySelector('i').className;
+                    platformInput.value = value;
+                    platformLabel.textContent = label;
+                    platformIcon.innerHTML = `<i class="${iconClass}"></i>`;
                     platformMenu.classList.remove('open');
                 });
             });
@@ -1640,43 +1655,23 @@
                 goPlans();
             });
 
-            const reportBtn = document.getElementById('report-btn');
-            const reportContainer = document.getElementById('report-container');
-            const successModal = document.getElementById('success-modal');
+            async function createOrder(platform, urls, reports, proxies) {
+                const urlList = Array.isArray(urls) ? urls.map(u => String(u).trim()).filter(u => u !== '') : [String(urls || '').trim()];
+                if (!urlList.length) {
+                    alert('Por favor, insira pelo menos uma URL válida.');
+                    return null;
+                }
 
-            reportBtn.addEventListener('click', async function() {
-                if (state.plan === 'padrao') {
-                    goPlans();
-                    return;
-                }
-                const platform = platformLabel.textContent;
-                if (platform === 'Selecione uma plataforma') {
-                    alert('Por favor, selecione uma plataforma');
-                    return;
-                }
-                const urls = document.getElementById('urls').value.trim();
-                if (!urls) {
-                    alert('Por favor, insira pelo menos uma URL');
-                    return;
-                }
-                const reports = parseInt(reportSlider.value);
-                const proxies = proxyToggle.checked ? parseInt(proxySlider.value) : 0;
                 const range = rangeByPlan[state.plan] || [100, 15950];
-                if (reports < range[0] || reports > range[1]) {
-                    alert('Para o seu plano, a quantidade deve estar entre ' + range[0] + ' e ' + range[1] + '.');
-                    return;
-                }
-                if (state.daily_limit !== null && state.remaining_today <= 0) {
-                    guard(false, 'sem_cota');
-                    return;
-                }
-                try {
-                    const urlList = urls.split('\n').map(u => u.trim()).filter(u => u !== '');
+                const minPerOrder = range[0];
+                const maxPerOrder = range[1];
+
+                if (urlList.length === 1) {
                     const payload = {
-                        platform: platform.toLowerCase().replace(/[^a-z]/g, ''),
-                        urls: urlList,
-                        reports: reports,
-                        proxies: proxies
+                        platform: platform,
+                        url: urlList[0],
+                        reports: parseInt(reports, 10),
+                        proxies: parseInt(proxies, 10)
                     };
                     const response = await fetch('/api/orders/create', {
                         method: 'POST',
@@ -1690,33 +1685,158 @@
                     if (!response.ok || !data || !data.ok) {
                         if (data && data.error === 'Plano insuficiente') {
                             goPlans();
-                            return;
+                            return null;
                         }
                         if (data && data.error === 'Limite diário excedido') {
                             state.remaining_today = 0;
                             setPlanBadge(state.plan, 0, state.daily_limit, null);
                             guard(false, 'sem_cota');
                             alert('Limite diário excedido.');
-                            return;
+                            return null;
+                        }
+                        if (data && data.error && data.error.startsWith('Quantidade permitida')) {
+                            alert(data.error);
+                            return null;
+                        }
+                        if (data && data.error === 'URL inválida') {
+                            alert('URL inválida: verifique se a URL fornecida está completa (inclua https://) e válida.');
+                            return null;
                         }
                         alert('Não foi possível iniciar.');
-                        return;
+                        return null;
                     }
                     if (state.daily_limit !== null) {
                         state.remaining_today = typeof data.remaining_today === 'number' ? data.remaining_today : state.remaining_today - 1;
                         setPlanBadge(state.plan, state.remaining_today, state.daily_limit, null);
                     }
+                    return data;
+                }
+
+                const totalReports = parseInt(reports, 10);
+                if (totalReports < urlList.length * minPerOrder) {
+                    alert(`Ao dividir ${totalReports} denúncias por ${urlList.length} URLs, cada URL teria menos do que o mínimo permitido (${minPerOrder}). Diminua o número de URLs ou aumente as denúncias.`);
+                    return null;
+                }
+
+                const basePer = Math.floor(totalReports / urlList.length);
+                let remainder = totalReports % urlList.length;
+                const proxyBase = Math.floor(Math.max(0, parseInt(proxies, 10) || 0) / urlList.length);
+                let proxyRem = Math.max(0, parseInt(proxies, 10) || 0) % urlList.length;
+
+                const results = [];
+                for (let i = 0; i < urlList.length; i++) {
+                    const url = urlList[i];
+                    const reportsForThis = basePer + (remainder > 0 ? 1 : 0);
+                    if (remainder > 0) remainder--;
+                    if (reportsForThis < minPerOrder || reportsForThis > maxPerOrder) {
+                        alert('Divisão de denúncias por URL resultaria em valores fora dos limites do plano. Ajuste URLs ou quantidade.');
+                        return null;
+                    }
+                    const proxiesForThis = proxyBase + (proxyRem > 0 ? 1 : 0);
+                    if (proxyRem > 0) proxyRem--;
+                    const payload = {
+                        platform: platform,
+                        url: url,
+                        reports: reportsForThis,
+                        proxies: proxiesForThis
+                    };
+                    const response = await fetch('/api/orders/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'same-origin',
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await response.json();
+                    if (!response.ok || !data || !data.ok) {
+                        if (data && data.error === 'Plano insuficiente') {
+                            goPlans();
+                            return null;
+                        }
+                        if (data && data.error === 'Limite diário excedido') {
+                            state.remaining_today = 0;
+                            setPlanBadge(state.plan, 0, state.daily_limit, null);
+                            guard(false, 'sem_cota');
+                            alert('Limite diário excedido durante criação de pedidos.');
+                            return null;
+                        }
+                        if (data && data.error === 'URL inválida') {
+                            alert(`URL inválida enviada ao servidor: "${url}". Verifique se está correta e inclui o protocolo (https://).`);
+                            return null;
+                        }
+                        alert('Falha ao criar pedido para: ' + url);
+                        return null;
+                    }
+                    results.push(data);
+                }
+
+                if (state.daily_limit !== null) {
+                    if (results.length) {
+                        const last = results[results.length - 1];
+                        state.remaining_today = typeof last.remaining_today === 'number' ? last.remaining_today : Math.max(0, state.remaining_today - results.length);
+                        setPlanBadge(state.plan, state.remaining_today, state.daily_limit, null);
+                    }
+                }
+
+                return results;
+            }
+
+            const reportBtn = document.getElementById('report-btn');
+            const reportContainer = document.getElementById('report-container');
+            const successModal = document.getElementById('success-modal');
+
+            reportBtn.addEventListener('click', async function() {
+                if (state.plan === 'padrao') {
+                    goPlans();
+                    return;
+                }
+
+                const platform = platformInput.value;
+                const urlsText = document.getElementById('urls').value.trim();
+                const proxies = proxyToggle.checked ? parseInt(proxySlider.value, 10) : 0;
+                const reports = parseInt(reportSlider.value, 10);
+
+                if (!platform) {
+                    alert('Por favor, selecione uma plataforma');
+                    return;
+                }
+
+                if (!urlsText) {
+                    alert('Por favor, insira pelo menos uma URL');
+                    return;
+                }
+
+                const urls = urlsText.split('\n').map(u => u.trim()).filter(u => u !== '');
+                const range = rangeByPlan[state.plan] || [100, 15950];
+
+                if (reports < range[0] || reports > range[1]) {
+                    alert('Para o seu plano, a quantidade deve estar entre ' + range[0] + ' e ' + range[1] + '.');
+                    return;
+                }
+
+                if (state.daily_limit !== null && state.remaining_today <= 0) {
+                    guard(false, 'sem_cota');
+                    return;
+                }
+
+                try {
+                    const result = await createOrder(platform, urls, reports, proxies);
+                    if (!result) return;
+
                     reportContainer.classList.add('show');
-                    const urlCount = urlList.length;
+                    const urlCount = urls.length;
                     document.getElementById('report-profiles-count').textContent = urlCount;
                     document.getElementById('report-count-display').textContent = '0';
                     document.getElementById('report-proxy-count').textContent = proxies.toLocaleString('pt-BR');
-                    document.getElementById('report-platform').textContent = platform;
-                    document.getElementById('report-icon').className = platformTrigger.querySelector('.select-icon i').className;
+                    document.getElementById('report-platform').textContent = platformLabel.textContent;
+                    document.getElementById('report-icon').className = platformIcon.querySelector('i').className;
+
                     const startTime = Date.now();
                     const totalTime = 30000 + (reports * 15);
                     let sentReports = 0;
                     const reportsPerSecond = Math.ceil(reports / (totalTime / 1000));
+
                     function updateProgress() {
                         const now = Date.now();
                         const progress = Math.min(100, ((now - startTime) / totalTime) * 100);
@@ -1743,6 +1863,7 @@
                             }
                         }
                     }
+
                     updateProgress();
                 } catch (error) {
                     alert('Erro ao iniciar. Tente novamente.');
