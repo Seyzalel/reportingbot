@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Reporting Bot - Remoção Automatizada de Perfis</title>
-    <meta name="description" content="Reporting Bot — remoção automática de perfis indesejados em redes sociais. Landing page com recursos, funcionamento, FAQ e demonstração.">
+    <meta name="description" content="Sistema avançado para remoção automatizada de perfis indesejados em redes sociais através de tecnologia proprietária de reporting.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         :root {
@@ -30,7 +30,6 @@
             --shadow-soft: 0 10px 30px -12px rgba(0, 0, 0, 0.4);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --gradient-primary: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            --gradient-secondary: linear-gradient(135deg, var(--accent-secondary), var(--accent-tertiary));
             --gradient-dark: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary));
         }
 
@@ -42,12 +41,13 @@
 
         html, body {
             height: 100%;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             -webkit-font-smoothing: antialiased;
             text-rendering: optimizeLegibility;
             scroll-behavior: smooth;
+            line-height: 1.5;
         }
 
         img, video {
@@ -67,151 +67,129 @@
             padding: 0 clamp(1rem, 3vw, 2rem);
         }
 
+        /* HEADER MINIMALISTA E PROFISSIONAL */
         header {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: 1000;
-            background: rgba(10, 10, 10, 0.85);
+            background: rgba(10, 10, 10, 0.95);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.25rem 0;
         }
 
         .header-inner {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 1rem 0;
         }
 
+        /* LOGO APENAS TEXTO - MAIS PROFISSIONAL */
         .brand {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .brand-badge {
-            width: 50px;
-            height: 50px;
-            border-radius: 14px;
-            background: var(--gradient-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.25);
-            transition: var(--transition);
-        }
-
-        .brand-badge:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(139, 92, 246, 0.35);
-        }
-
-        .brand-badge i {
-            color: white;
-            font-size: 1.25rem;
-        }
-
-        .brand-title {
-            font-weight: 900;
-            font-size: 1.2rem;
-            background: var(--gradient-primary);
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 100%);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
         }
 
+        /* NAVEGAÇÃO DISCRETA */
         nav.desktop {
             display: flex;
             align-items: center;
-            gap: 2rem;
+            gap: 2.5rem;
         }
 
         .nav-link {
             font-weight: 600;
             color: var(--text-secondary);
-            padding: 0.5rem 0.75rem;
-            border-radius: var(--radius-sm);
-            transition: var(--transition);
+            padding: 0.5rem 0;
             position: relative;
+            transition: var(--transition);
+            font-size: 0.95rem;
         }
 
         .nav-link:hover {
             color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.05);
         }
 
         .nav-link::after {
             content: '';
             position: absolute;
             bottom: 0;
-            left: 50%;
+            left: 0;
             width: 0;
             height: 2px;
-            background: var(--gradient-primary);
+            background: var(--accent-primary);
             transition: var(--transition);
-            transform: translateX(-50%);
         }
 
         .nav-link:hover::after {
-            width: 80%;
+            width: 100%;
         }
 
+        /* BOTÕES REFINADOS */
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 0.75rem 1.5rem;
+            padding: 0.85rem 2rem;
             border: none;
             border-radius: var(--radius-md);
-            font-weight: 700;
+            font-weight: 600;
             font-size: 0.9rem;
             cursor: pointer;
             transition: var(--transition);
             gap: 0.5rem;
+            letter-spacing: 0.5px;
         }
 
         .btn.primary {
-            background: var(--gradient-primary);
+            background: var(--accent-primary);
             color: white;
-            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn.primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: 0.6s;
+        }
+
+        .btn.primary:hover::before {
+            left: 100%;
         }
 
         .btn.primary:hover {
+            background: #7c3aed;
             transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(139, 92, 246, 0.4);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
         }
 
         .btn.secondary {
-            background: rgba(255, 255, 255, 0.1);
+            background: transparent;
             color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .btn.secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.2);
+            border-color: var(--accent-primary);
+            background: rgba(139, 92, 246, 0.05);
         }
 
-        .mobile-toggle {
-            display: none;
-            background: transparent;
-            border: none;
-            color: var(--text-primary);
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: var(--radius-sm);
-        }
-
-        .mobile-toggle:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
+        /* HERO SECTION - TÍTULO PROFISSIONAL E IMPACTANTE */
         .hero {
-            padding: 140px 0 100px;
+            padding: 160px 0 100px;
             position: relative;
             overflow: hidden;
         }
@@ -219,12 +197,14 @@
         .hero::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at center, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
-            animation: pulse 8s ease-in-out infinite;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 50%);
+            z-index: 1;
         }
 
         .hero-inner {
@@ -235,23 +215,26 @@
             z-index: 2;
         }
 
+        /* TÍTULO PRINCIPAL - MAIS IMPACTANTE E PROFISSIONAL */
         .hero-title {
-            font-weight: 900;
-            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 800;
+            font-size: clamp(2.75rem, 6.5vw, 4.5rem);
             line-height: 1.1;
             margin-bottom: 1.5rem;
-            background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-primary) 70%);
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 50%, var(--accent-secondary) 100%);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            letter-spacing: -1px;
         }
 
         .hero-subtitle {
-            font-size: clamp(1rem, 2vw, 1.25rem);
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
             color: var(--text-secondary);
             max-width: 700px;
-            margin: 0 auto 2.5rem;
+            margin: 0 auto 3rem;
             line-height: 1.6;
+            font-weight: 400;
         }
 
         .hero-cta {
@@ -261,8 +244,10 @@
             flex-wrap: wrap;
         }
 
+        /* SECTION STYLES - CLEAN E PROFISSIONAL */
         .section {
-            padding: clamp(4rem, 8vw, 8rem) 0;
+            padding: clamp(5rem, 10vw, 8rem) 0;
+            position: relative;
         }
 
         .section-title {
@@ -274,6 +259,7 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            letter-spacing: -0.5px;
         }
 
         .section-subtitle {
@@ -281,59 +267,42 @@
             color: var(--text-secondary);
             font-size: clamp(1rem, 1.5vw, 1.1rem);
             max-width: 700px;
-            margin: 0 auto 3rem;
+            margin: 0 auto 4rem;
             line-height: 1.6;
         }
 
+        /* FEATURES GRID - DESIGN MINIMALISTA */
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
+            gap: 2rem;
         }
 
         .feature-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
-            padding: 2rem;
+            padding: 2.5rem 2rem;
             transition: var(--transition);
             position: relative;
             overflow: hidden;
         }
 
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--gradient-primary);
-            transform: scaleX(0);
-            transition: var(--transition);
-        }
-
         .feature-card:hover {
             transform: translateY(-5px);
+            border-color: var(--accent-primary);
             box-shadow: var(--shadow-strong);
         }
 
-        .feature-card:hover::before {
-            transform: scaleX(1);
-        }
-
         .feature-icon {
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             border-radius: var(--radius-md);
-            background: var(--gradient-primary);
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 1.5rem;
-        }
-
-        .feature-icon i {
             font-size: 1.5rem;
             color: white;
         }
@@ -341,132 +310,90 @@
         .feature-card h3 {
             font-size: 1.25rem;
             font-weight: 700;
-            margin-bottom: 0.75rem;
+            margin-bottom: 1rem;
             color: var(--text-primary);
         }
 
         .feature-card p {
             color: var(--text-secondary);
             line-height: 1.6;
+            font-size: 0.95rem;
         }
 
-        .tech-grid {
-            display: grid;
-            gap: 1.5rem;
+        /* HOW IT WORKS - DESIGN LIMPO E DIRETO */
+        .workflow {
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+            max-width: 1000px;
+            margin: 0 auto;
         }
 
-        .tech-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
+        .workflow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 2rem;
             padding: 2rem;
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
             transition: var(--transition);
         }
 
-        .tech-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-soft);
+        .workflow-step:hover {
+            transform: translateX(5px);
+            border-color: var(--accent-primary);
         }
 
-        .tech-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .tech-icon {
-            width: 50px;
-            height: 50px;
+        .step-number {
+            width: 60px;
+            height: 60px;
             border-radius: var(--radius-md);
-            background: var(--gradient-primary);
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        .tech-icon i {
+            font-weight: 800;
+            font-size: 1.5rem;
             color: white;
-            font-size: 1.25rem;
+            flex-shrink: 0;
         }
 
-        .tech-card h3 {
+        .step-content h3 {
             font-size: 1.25rem;
             font-weight: 700;
+            margin-bottom: 0.75rem;
             color: var(--text-primary);
         }
 
-        .tech-card p, .tech-card li {
+        .step-content p {
             color: var(--text-secondary);
             line-height: 1.6;
-            margin-bottom: 0.75rem;
-        }
-
-        .tech-card ul {
-            padding-left: 1.5rem;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin: 3rem 0;
-        }
-
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 2rem;
-            text-align: center;
-            transition: var(--transition);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-soft);
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
             margin-bottom: 0.5rem;
         }
 
-        .stat-label {
+        .step-content ul {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0 0 0;
+        }
+
+        .step-content li {
             color: var(--text-secondary);
-            font-weight: 600;
-        }
-
-        .video-container {
+            padding: 0.25rem 0;
+            padding-left: 1.5rem;
             position: relative;
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-strong);
         }
 
-        .video-wrapper {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-        }
-
-        .video-wrapper iframe,
-        .video-wrapper video {
+        .step-content li::before {
+            content: '→';
             position: absolute;
-            top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            color: var(--accent-primary);
+            font-weight: bold;
         }
 
+        /* FAQ - DESIGN MAIS LIMPO */
         .faq-container {
             max-width: 900px;
             margin: 0 auto;
@@ -507,6 +434,7 @@
 
         .accordion-icon {
             transition: var(--transition);
+            color: var(--accent-primary);
         }
 
         .accordion.active .accordion-icon {
@@ -530,10 +458,11 @@
             line-height: 1.6;
         }
 
+        /* CTA SECTION - PROFISSIONAL E DIRETO */
         .cta-section {
             background: var(--gradient-dark);
             border-radius: var(--radius-lg);
-            padding: 4rem 2rem;
+            padding: 5rem 2rem;
             text-align: center;
             border: 1px solid var(--border-color);
             position: relative;
@@ -555,6 +484,7 @@
             z-index: 2;
         }
 
+        /* FOOTER MINIMALISTA */
         footer {
             background: var(--bg-secondary);
             border-top: 1px solid var(--border-color);
@@ -570,25 +500,10 @@
         }
 
         .footer-logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .footer-logo-badge {
-            width: 50px;
-            height: 50px;
-            border-radius: var(--radius-md);
-            background: var(--gradient-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .footer-logo-text {
-            font-weight: 900;
-            font-size: 1.2rem;
-            background: var(--gradient-primary);
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 100%);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -599,6 +514,7 @@
             color: var(--text-secondary);
             max-width: 600px;
             line-height: 1.6;
+            font-size: 0.95rem;
         }
 
         .footer-bottom {
@@ -606,8 +522,10 @@
             color: var(--text-muted);
             padding-top: 2rem;
             border-top: 1px solid var(--border-color);
+            font-size: 0.9rem;
         }
 
+        /* BACK TO TOP REFINADO */
         .back-to-top {
             position: fixed;
             bottom: 2rem;
@@ -615,7 +533,7 @@
             width: 50px;
             height: 50px;
             border-radius: var(--radius-md);
-            background: var(--gradient-primary);
+            background: var(--accent-primary);
             color: white;
             border: none;
             cursor: pointer;
@@ -637,6 +555,22 @@
         .back-to-top:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+        }
+
+        /* MOBILE MENU - PROFISSIONAL */
+        .mobile-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+        }
+
+        .mobile-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .mobile-menu {
@@ -713,15 +647,11 @@
             visibility: visible;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 0.8; }
-        }
-
+        /* ANIMAÇÕES SUBTIS */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
@@ -731,7 +661,7 @@
 
         .fade-in {
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(20px);
             transition: opacity 0.6s ease, transform 0.6s ease;
         }
 
@@ -740,9 +670,21 @@
             transform: translateY(0);
         }
 
+        /* RESPONSIVIDADE */
         @media (max-width: 1024px) {
             .features-grid {
                 grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            }
+            
+            .workflow-step {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            
+            .step-number {
+                width: 50px;
+                height: 50px;
+                font-size: 1.25rem;
             }
         }
 
@@ -756,7 +698,7 @@
             }
 
             .hero {
-                padding: 120px 0 80px;
+                padding: 140px 0 80px;
             }
 
             .hero-cta {
@@ -770,17 +712,12 @@
             }
 
             .section {
-                padding: 3rem 0;
+                padding: 4rem 0;
             }
 
             .feature-card,
-            .tech-card,
-            .stat-card {
-                padding: 1.5rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .workflow-step {
+                padding: 1.75rem;
             }
         }
 
@@ -790,21 +727,11 @@
             }
 
             .hero-title {
-                font-size: 2rem;
+                font-size: 2.25rem;
             }
 
             .features-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .tech-header {
-                flex-direction: column;
-                text-align: center;
-                gap: 0.75rem;
             }
 
             .accordion-header {
@@ -812,7 +739,7 @@
             }
 
             .cta-section {
-                padding: 2.5rem 1.5rem;
+                padding: 3rem 1.5rem;
             }
         }
     </style>
@@ -821,15 +748,10 @@
     <header>
         <div class="container">
             <div class="header-inner">
-                <div class="brand">
-                    <div class="brand-badge">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <div class="brand-title">Reporting Bot</div>
-                </div>
+                <div class="brand">Reporting Bot</div>
 
                 <nav class="desktop">
-                    <a href="#features" class="nav-link">Recursos</a>
+                    <a href="#features" class="nav-link">Plataformas</a>
                     <a href="#how-it-works" class="nav-link">Como Funciona</a>
                     <a href="#faq" class="nav-link">FAQ</a>
                     <a href="/login" class="btn secondary">Entrar</a>
@@ -847,18 +769,13 @@
 
     <div class="mobile-menu" id="mobileMenu">
         <div class="mobile-menu-header">
-            <div class="brand">
-                <div class="brand-badge">
-                    <i class="fas fa-robot"></i>
-                </div>
-                <div class="brand-title">Reporting Bot</div>
-            </div>
+            <div class="brand">Reporting Bot</div>
             <button class="mobile-toggle" id="mobileClose">
                 <i class="fas fa-times"></i>
             </button>
         </div>
         <nav class="mobile-menu-nav">
-            <a href="#features" class="mobile-nav-link">Recursos</a>
+            <a href="#features" class="mobile-nav-link">Plataformas</a>
             <a href="#how-it-works" class="mobile-nav-link">Como Funciona</a>
             <a href="#faq" class="mobile-nav-link">FAQ</a>
         </nav>
@@ -873,10 +790,10 @@
             <div class="container">
                 <div class="hero-inner">
                     <h1 class="hero-title">Remoção Imediata de Perfis Indesejados</h1>
-                    <p class="hero-subtitle">A solução mais avançada tecnologicamente para remoção automatizada de perfis e páginas em redes sociais através de nosso sistema de denúncias em massa.</p>
+                    <p class="hero-subtitle">Sistema avançado de denúncias automatizadas para remoção definitiva de perfis, páginas e conteúdos em redes sociais. Tecnologia proprietária com operação discreta e eficiente.</p>
                     <div class="hero-cta">
-                        <a href="/register" class="btn primary">Comece Agora</a>
-                        <a href="#how-it-works" class="btn secondary">Saiba Mais</a>
+                        <a href="/register" class="btn primary">Iniciar Processo</a>
+                        <a href="#how-it-works" class="btn secondary">Ver Detalhes</a>
                     </div>
                 </div>
             </div>
@@ -885,7 +802,7 @@
         <section class="section" id="features">
             <div class="container">
                 <h2 class="section-title">Plataformas Compatíveis</h2>
-                <p class="section-subtitle">Nosso sistema avançado de reporting trabalha com as principais redes sociais para garantir a remoção eficiente de conteúdos indesejados</p>
+                <p class="section-subtitle">Operamos nas principais redes sociais com tecnologia adaptada para cada ambiente</p>
 
                 <div class="features-grid">
                     <div class="feature-card fade-in">
@@ -893,7 +810,7 @@
                             <i class="fab fa-instagram"></i>
                         </div>
                         <h3>Instagram</h3>
-                        <p>Remoção de perfis, páginas, stories e publicações através de nosso sistema de bypass avançado.</p>
+                        <p>Remoção de perfis, páginas e publicações através de sistema especializado em bypass de algoritmos de detecção.</p>
                     </div>
 
                     <div class="feature-card fade-in">
@@ -901,7 +818,7 @@
                             <i class="fab fa-facebook"></i>
                         </div>
                         <h3>Facebook</h3>
-                        <p>Eliminação de perfis, páginas, grupos e anúncios com nossa tecnologia de múltiplas identidades.</p>
+                        <p>Eliminação de perfis, páginas comerciais e grupos com tecnologia de múltiplas identidades verificadas.</p>
                     </div>
 
                     <div class="feature-card fade-in">
@@ -909,7 +826,7 @@
                             <i class="fab fa-whatsapp"></i>
                         </div>
                         <h3>WhatsApp</h3>
-                        <p>Reporte de números indesejados através de sistema automatizado de denúncias em massa.</p>
+                        <p>Reporte automatizado de números indesejados com sistema de denúncias em massa não detectável.</p>
                     </div>
 
                     <div class="feature-card fade-in">
@@ -917,7 +834,7 @@
                             <i class="fab fa-tiktok"></i>
                         </div>
                         <h3>TikTok</h3>
-                        <p>Remoção de perfis, vídeos e comentários utilizando nossa rede global de proxies.</p>
+                        <p>Remoção de perfis e conteúdos utilizando rede distribuída de proxies residenciais globais.</p>
                     </div>
                 </div>
             </div>
@@ -925,133 +842,60 @@
 
         <section class="section" id="how-it-works">
             <div class="container">
-                <h2 class="section-title">Como o Sistema Funciona</h2>
-                <p class="section-subtitle">Uma explicação técnica detalhada sobre nossa operação avançada de reporting automatizado</p>
+                <h2 class="section-title">Processo Operacional</h2>
+                <p class="section-subtitle">Metodologia avançada para resultados consistentes e discretos</p>
 
-                <div class="tech-grid">
-                    <div class="tech-card fade-in">
-                        <div class="tech-header">
-                            <div class="tech-icon">
-                                <i class="fas fa-gears"></i>
-                            </div>
-                            <h3>Arquitetura do Sistema</h3>
+                <div class="workflow">
+                    <div class="workflow-step fade-in">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Análise do Alvo</h3>
+                            <p>Exame detalhado do perfil para determinar a estratégia otimizada de atuação.</p>
+                            <ul>
+                                <li>Verificação de status do perfil</li>
+                                <li>Análise de histórico de violações</li>
+                                <li>Identificação de pontos vulneráveis</li>
+                            </ul>
                         </div>
-                        <p>Nossa plataforma opera através de uma rede distribuída de bots especializados que simulam comportamento humano autêntico. Cada unidade é uma instância independente com configurações únicas de hardware, software e comportamento.</p>
-                        <p>O sistema principal coordena milhares dessas instâncias, distribuindo tarefas de forma inteligente para maximizar a eficiência enquanto minimiza a detectabilidade.</p>
                     </div>
 
-                    <div class="tech-card fade-in">
-                        <div class="tech-header">
-                            <div class="tech-icon">
-                                <i class="fas fa-rotate"></i>
-                            </div>
-                            <h3>Sistema de Proxy Rotativo</h3>
+                    <div class="workflow-step fade-in">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Preparação da Infraestrutura</h3>
+                            <p>Ativação da rede de operações com configurações específicas para cada caso.</p>
+                            <ul>
+                                <li>Alocação de proxies residenciais</li>
+                                <li>Configuração de identidades verificadas</li>
+                                <li>Preparação de ambiente operacional</li>
+                            </ul>
                         </div>
-                        <p>Implementamos a tecnologia mais avançada de rotação de proxies do mercado:</p>
-                        <ul>
-                            <li>Utilizamos proxies residenciais e móveis reais, não detectáveis como data center</li>
-                            <li>Cada solicitação vem de um IP diferente, sem padrões previsíveis</li>
-                            <li>IPs distribuídos globalmente para simular acesso de diversas regiões</li>
-                            <li>O sistema ajusta automaticamente a velocidade com base no comportamento da plataforma alvo</li>
-                        </ul>
                     </div>
 
-                    <div class="tech-card fade-in">
-                        <div class="tech-header">
-                            <div class="tech-icon">
-                                <i class="fas fa-cookie"></i>
-                            </div>
-                            <h3>Gerenciamento de Cookies e Autenticação</h3>
+                    <div class="workflow-step fade-in">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Execução das Denúncias</h3>
+                            <p>Implementação do protocolo de reporting com timing estratégico e diversificação de padrões.</p>
+                            <ul>
+                                <li>Distribuição geográfica inteligente</li>
+                                <li>Intervalos aleatórios entre ações</li>
+                                <li>Variação de categorias de violação</li>
+                            </ul>
                         </div>
-                        <p>Desenvolvemos um sistema sofisticado de gestão de sessões:</p>
-                        <ul>
-                            <li>Contas são autenticadas através de múltiplos dispositivos e localizações</li>
-                            <li>Mantemos cookies realistas com históricos de navegação convincentes</li>
-                            <li>As sessões são rotacionadas para evitar padrões de uso detectáveis</li>
-                            <li>Cada instância possui fingerprint único de dispositivo e navegador</li>
-                        </ul>
                     </div>
 
-                    <div class="tech-card fade-in">
-                        <div class="tech-header">
-                            <div class="tech-icon">
-                                <i class="fas fa-ban"></i>
-                            </div>
-                            <h3>Sistema de Bypass de Plataformas</h3>
+                    <div class="workflow-step fade-in">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>Monitoramento e Ajustes</h3>
+                            <p>Acompanhamento em tempo real com adaptações baseadas na resposta das plataformas.</p>
+                            <ul>
+                                <li>Análise contínua de resultados</li>
+                                <li>Ajuste dinâmico de parâmetros</li>
+                                <li>Otimização de estratégias</li>
+                            </ul>
                         </div>
-                        <p>Nossa tecnologia exclusiva de bypass supera as defesas mais avançadas:</p>
-                        <ul>
-                            <li>O sistema imita perfeitamente padrões humanos reais de navegação</li>
-                            <li>Intervalos entre ações são randomizados para evitar detecção</li>
-                            <li>Realizamos ações miscelâneas para simular usuários reais</li>
-                            <li>O sistema ajusta estratégias baseado nas respostas da plataforma alvo</li>
-                        </ul>
-                    </div>
-
-                    <div class="tech-card fade-in">
-                        <div class="tech-header">
-                            <div class="tech-icon">
-                                <i class="fas fa-flag"></i>
-                            </div>
-                            <h3>Mecanismo de Reporting</h3>
-                        </div>
-                        <p>O coração do nosso sistema é o algoritmo de reporting inteligente:</p>
-                        <ul>
-                            <li>Cada report é único em conteúdo, timing e origem</li>
-                            <li>Utilizamos diferentes categorias de violação para cada denúncia</li>
-                            <li>IA gera descrições convincentes e não padronizadas</li>
-                            <li>Distribuímos denúncias ao longo do tempo para evitar picos detectáveis</li>
-                        </ul>
-                    </div>
-
-                    <div class="tech-card fade-in">
-                        <div class="tech-header">
-                            <div class="tech-icon">
-                                <i class="fas fa-triangle-exclamation"></i>
-                            </div>
-                            <h3>Por que as Contas são Removidas?</h3>
-                        </div>
-                        <p>As plataformas de redes sociais operam com sistemas automatizados de moderação que priorizam quantidade sobre análise detalhada:</p>
-                        <ul>
-                            <li>Após um número específico de reports, sistemas automáticos restringem ou removem conteúdos</li>
-                            <li>Múltiplas denúncias de origens diversas disparam verificações prioritárias</li>
-                            <li>Plataformas frequentemente optam por remover conteúdos contestados para evitar trabalho manual</li>
-                            <li>Sistemas de IA tendem a errar pelo lado da cautela, removendo conteúdos sob suspeita</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <h3 class="section-title" style="margin-top: 4rem;">Demonstração em Vídeo</h3>
-
-                <div class="video-container fade-in">
-                    <div class="video-wrapper">
-                        <video controls poster="thumbnail.jpg" preload="none" id="demoVideo">
-                            <source data-src="tutorial.mp4" type="video/mp4">
-                            Seu navegador não suporta o elemento de vídeo.
-                        </video>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="section">
-            <div class="container">
-                <div class="stats-grid">
-                    <div class="stat-card fade-in">
-                        <div class="stat-number">99.3%</div>
-                        <div class="stat-label">Taxa de Sucesso</div>
-                    </div>
-                    <div class="stat-card fade-in">
-                        <div class="stat-number">12,458</div>
-                        <div class="stat-label">Contas Removidas</div>
-                    </div>
-                    <div class="stat-card fade-in">
-                        <div class="stat-number">2,500+</div>
-                        <div class="stat-label">Proxies Ativos</div>
-                    </div>
-                    <div class="stat-card fade-in">
-                        <div class="stat-number">4.2h</div>
-                        <div class="stat-label">Tempo Médio</div>
                     </div>
                 </div>
             </div>
@@ -1059,57 +903,47 @@
 
         <section id="faq" class="section">
             <div class="container">
-                <h2 class="section-title">Perguntas Frequentes</h2>
-                <p class="section-subtitle">Tire suas dúvidas sobre nossa plataforma e funcionamento</p>
+                <h2 class="section-title">Questões Técnicas</h2>
+                <p class="section-subtitle">Informações essenciais sobre operação e segurança</p>
 
                 <div class="faq-container">
                     <div class="accordion fade-in">
                         <button class="accordion-header">
-                            Quanto tempo leva para uma conta ser removida?
+                            Como é mantido o anonimato das operações?
                             <i class="fas fa-chevron-down accordion-icon"></i>
                         </button>
                         <div class="accordion-content">
-                            <p>O tempo de remoção varia conforme a plataforma e a robustez do perfil alvo. Em média, levamos de 2 a 12 horas para perfis comuns. Perfis verificados ou com muitos seguidores podem levar até 48 horas. Nosso sistema otimiza continuamente a estratégia para acelerar ao máximo esse processo.</p>
+                            <p>Implementamos múltiplas camadas de proteção: proxies residenciais rotativos, criptografia de ponta a ponta, ausência de logs identificáveis e separação completa entre dados operacionais e clientes. Cada ação origina de fontes distintas e não rastreáveis.</p>
                         </div>
                     </div>
 
                     <div class="accordion fade-in">
                         <button class="accordion-header">
-                            É possível rastrear as denúncias até mim?
+                            Quais são os mecanismos de evasão de detecção?
                             <i class="fas fa-chevron-down accordion-icon"></i>
                         </button>
                         <div class="accordion-content">
-                            <p>Absolutamente não. Implementamos múltiplas camadas de anonimização, incluindo proxies residenciais rotativos, criptografia de ponta a ponta e nenhum registro de dados pessoais. Nossa infraestrutura foi projetada especificamente para garantir o anonimato total dos clientes.</p>
+                            <p>Utilizamos simulação avançada de comportamento humano, rotação inteligente de identidades, randomização de padrões temporais e adaptação em tempo real aos sistemas de defesa. Cada instância possui configurações únicas de hardware, software e comportamento.</p>
                         </div>
                     </div>
 
                     <div class="accordion fade-in">
                         <button class="accordion-header">
-                            Como vocês evitam a detecção pelos sistemas das plataformas?
+                            Como é garantida a eficácia do processo?
                             <i class="fas fa-chevron-down accordion-icon"></i>
                         </button>
                         <div class="accordion-content">
-                            <p>Utilizamos uma combinação de técnicas avançadas: comportamento humano simulado com IA, rotação inteligente de proxies, randomização de padrões de uso, fingerprints de dispositivos únicos e adaptação em tempo real aos sistemas de detecção. Constantemente atualizamos nossos métodos baseados em pesquisa contínua.</p>
+                            <p>Através de análise preditiva do alvo, diversificação de estratégias, escalonamento controlado de ações e monitoramento contínuo de resultados. O sistema ajusta automaticamente os parâmetros baseado na resposta das plataformas alvo.</p>
                         </div>
                     </div>
 
                     <div class="accordion fade-in">
                         <button class="accordion-header">
-                            Há garantia de que o perfil será removido?
+                            Há riscos para quem contrata o serviço?
                             <i class="fas fa-chevron-down accordion-icon"></i>
                         </button>
                         <div class="accordion-content">
-                            <p>Oferecemos uma taxa de sucesso de 99.3% em perfis padrão. Caso um perfil não seja removido após 3 tentativas dentro de 72 horas, oferecemos reembolso total ou crédito para tentativas adicionais. Perfis verificados ou com milhões de seguidores têm uma taxa de sucesso reduzida, que discutimos caso a caso.</p>
-                        </div>
-                    </div>
-
-                    <div class="accordion fade-in">
-                        <button class="accordion-header">
-                            Quantas denúncias são necessárias para remover um perfil?
-                            <i class="fas fa-chevron-down accordion-icon"></i>
-                        </button>
-                        <div class="accordion-content">
-                            <p>Isso varia significativamente entre plataformas e entre perfis. Perfis menores geralmente exigem entre 200-500 reports, enquanto perfis maiores podem necessitar de 2.000-5.000 reports. Nosso sistema analisa automaticamente o perfil alvo e calcula a quantidade ideal necessária.</p>
+                            <p>Não existem riscos identificáveis devido ao completo desacoplamento entre cliente e operação. Utilizamos infraestrutura independente, não há comunicação direta com as plataformas alvo e todas as ações são realizadas através de camadas intermediárias não rastreáveis.</p>
                         </div>
                     </div>
                 </div>
@@ -1120,9 +954,9 @@
             <div class="container">
                 <div class="cta-section fade-in">
                     <div class="cta-content">
-                        <h2 class="section-title">Pronto para Remover Perfis Indesejados?</h2>
-                        <p class="section-subtitle">Junte-se a milhares de clientes satisfeitos e experimente o poder do sistema de reporting mais avançado do mercado</p>
-                        <a href="/register" class="btn primary" style="margin-top: 2rem;">Criar Minha Conta Agora</a>
+                        <h2 class="section-title">Inicie o Processo</h2>
+                        <p class="section-subtitle">Sistema operacional completo para remoção definitiva de conteúdos indesejados</p>
+                        <a href="/register" class="btn primary" style="margin-top: 2rem;">Acessar Plataforma</a>
                     </div>
                 </div>
             </div>
@@ -1132,13 +966,8 @@
     <footer>
         <div class="container">
             <div class="footer-content">
-                <div class="footer-logo">
-                    <div class="footer-logo-badge">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <div class="footer-logo-text">Reporting Bot</div>
-                </div>
-                <p class="footer-description">A solução definitiva para remoção de perfis e páginas indesejadas em redes sociais através de tecnologia avançada de denúncias automatizadas.</p>
+                <div class="footer-logo">Reporting Bot</div>
+                <p class="footer-description">Sistema avançado de denúncias automatizadas para remoção de perfis e conteúdos em redes sociais através de tecnologia proprietária.</p>
             </div>
             <div class="footer-bottom">Reporting Bot © 2025 • Todos os direitos reservados</div>
         </div>
@@ -1157,7 +986,6 @@
             const backToTop = document.getElementById('backToTop');
             const accordions = document.querySelectorAll('.accordion');
             const fadeElements = document.querySelectorAll('.fade-in');
-            const demoVideo = document.getElementById('demoVideo');
 
             function toggleMobileMenu() {
                 mobileMenu.classList.toggle('active');
@@ -1207,24 +1035,6 @@
             fadeElements.forEach(element => {
                 observer.observe(element);
             });
-
-            const videoObserver = new IntersectionObserver(function(entries) {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const video = entry.target.querySelector('video');
-                        const source = video.querySelector('source[data-src]');
-                        if (source && !source.src) {
-                            source.src = source.dataset.src;
-                            video.load();
-                        }
-                        videoObserver.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.5 });
-
-            if (demoVideo) {
-                videoObserver.observe(demoVideo.parentElement);
-            }
 
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && mobileMenu.classList.contains('active')) {
