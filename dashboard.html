@@ -1404,494 +1404,543 @@
     </a>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const mobileToggle = document.getElementById('mobileToggle');
-            const mobileClose = document.getElementById('mobileClose');
-            const mobileMenu = document.getElementById('mobileMenu');
-            const overlay = document.getElementById('overlay');
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileToggle = document.getElementById('mobileToggle');
+    const mobileClose = document.getElementById('mobileClose');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const overlay = document.getElementById('overlay');
 
-            function toggleMobileMenu() {
-                mobileMenu.classList.toggle('active');
-                overlay.classList.toggle('active');
-                document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
-            }
+    function toggleMobileMenu() {
+        mobileMenu.classList.toggle('active');
+        overlay.classList.toggle('active');
+        document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+    }
 
-            mobileToggle.addEventListener('click', toggleMobileMenu);
-            mobileClose.addEventListener('click', toggleMobileMenu);
-            overlay.addEventListener('click', toggleMobileMenu);
+    mobileToggle.addEventListener('click', toggleMobileMenu);
+    mobileClose.addEventListener('click', toggleMobileMenu);
+    overlay.addEventListener('click', toggleMobileMenu);
 
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && mobileMenu.classList.contains('active')) {
-                    toggleMobileMenu();
-                }
-            });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && mobileMenu.classList.contains('active')) {
+            toggleMobileMenu();
+        }
+    });
 
-            const networkState = JSON.parse(localStorage.getItem('lucide_network_state')) || {
-                proxies: 23000 + Math.floor(Math.random() * 4000),
-                countries: 130 + Math.floor(Math.random() * 10),
-                lastUpdate: Date.now()
-            };
+    const networkState = JSON.parse(localStorage.getItem('lucide_network_state')) || {
+        proxies: 23000 + Math.floor(Math.random() * 4000),
+        countries: 130 + Math.floor(Math.random() * 10),
+        lastUpdate: Date.now()
+    };
 
-            function updateNetworkDisplay() {
-                document.getElementById('proxy-count').textContent = Math.round(networkState.proxies).toLocaleString('pt-BR');
-                document.getElementById('countries-count').textContent = Math.round(networkState.countries);
-                const minutesSinceUpdate = Math.floor((Date.now() - networkState.lastUpdate) / (1000 * 60));
-                let timeText = 'atualizado agora';
-                if (minutesSinceUpdate === 1) timeText = 'há 1 minuto';
-                else if (minutesSinceUpdate > 1 && minutesSinceUpdate < 60) timeText = `há ${minutesSinceUpdate} minutos`;
-                else if (minutesSinceUpdate >= 60) {
-                    const hours = Math.floor(minutesSinceUpdate / 60);
-                    timeText = `há ${hours} hora${hours > 1 ? 's' : ''}`;
-                }
-                document.getElementById('proxy-update').textContent = timeText;
-                document.getElementById('countries-update').textContent = timeText;
-            }
+    function updateNetworkDisplay() {
+        document.getElementById('proxy-count').textContent = Math.round(networkState.proxies).toLocaleString('pt-BR');
+        document.getElementById('countries-count').textContent = Math.round(networkState.countries);
+        const minutesSinceUpdate = Math.floor((Date.now() - networkState.lastUpdate) / (1000 * 60));
+        let timeText = 'atualizado agora';
+        if (minutesSinceUpdate === 1) timeText = 'há 1 minuto';
+        else if (minutesSinceUpdate > 1 && minutesSinceUpdate < 60) timeText = `há ${minutesSinceUpdate} minutos`;
+        else if (minutesSinceUpdate >= 60) {
+            const hours = Math.floor(minutesSinceUpdate / 60);
+            timeText = `há ${hours} hora${hours > 1 ? 's' : ''}`;
+        }
+        document.getElementById('proxy-update').textContent = timeText;
+        document.getElementById('countries-update').textContent = timeText;
+    }
 
-            function simulateNetworkChanges() {
-                const now = Date.now();
-                const hoursSinceLastUpdate = (now - networkState.lastUpdate) / (1000 * 60 * 60);
-                if (hoursSinceLastUpdate < 0.016) return;
-                networkState.proxies += Math.floor((Math.random() - 0.4) * hoursSinceLastUpdate * 100);
-                networkState.proxies = Math.max(23000, Math.min(27000, networkState.proxies));
-                if (Math.random() < 0.1 * hoursSinceLastUpdate) {
-                    networkState.countries += Math.random() < 0.5 ? 1 : -1;
-                    networkState.countries = Math.max(130, Math.min(140, networkState.countries));
-                }
-                networkState.lastUpdate = now;
-                localStorage.setItem('lucide_network_state', JSON.stringify(networkState));
-                updateNetworkDisplay();
-            }
+    function simulateNetworkChanges() {
+        const now = Date.now();
+        const hoursSinceLastUpdate = (now - networkState.lastUpdate) / (1000 * 60 * 60);
+        if (hoursSinceLastUpdate < 0.016) return;
+        networkState.proxies += Math.floor((Math.random() - 0.4) * hoursSinceLastUpdate * 100);
+        networkState.proxies = Math.max(23000, Math.min(27000, networkState.proxies));
+        if (Math.random() < 0.1 * hoursSinceLastUpdate) {
+            networkState.countries += Math.random() < 0.5 ? 1 : -1;
+            networkState.countries = Math.max(130, Math.min(140, networkState.countries));
+        }
+        networkState.lastUpdate = now;
+        localStorage.setItem('lucide_network_state', JSON.stringify(networkState));
+        updateNetworkDisplay();
+    }
 
-            updateNetworkDisplay();
-            setInterval(simulateNetworkChanges, 60000);
+    updateNetworkDisplay();
+    setInterval(simulateNetworkChanges, 60000);
 
-            const platformTrigger = document.getElementById('platform-trigger');
-            const platformMenu = document.getElementById('platform-menu');
-            const platformLabel = document.getElementById('platform-label');
-            const platformIcon = document.getElementById('platform-icon');
-            const platformInput = document.getElementById('platform');
+    const platformTrigger = document.getElementById('platform-trigger');
+    const platformMenu = document.getElementById('platform-menu');
+    const platformLabel = document.getElementById('platform-label');
+    const platformIcon = document.getElementById('platform-icon');
+    const platformInput = document.getElementById('platform');
 
-            platformTrigger.addEventListener('click', function(e) {
-                e.stopPropagation();
-                platformMenu.classList.toggle('open');
-            });
+    platformTrigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        platformMenu.classList.toggle('open');
+    });
 
-            platformMenu.querySelectorAll('.opt').forEach(opt => {
-                opt.addEventListener('click', function() {
-                    const value = this.getAttribute('data-value');
-                    const label = this.querySelector('span').textContent;
-                    const iconClass = this.querySelector('i').className;
-                    platformInput.value = value;
-                    platformLabel.textContent = label;
-                    platformIcon.innerHTML = `<i class="${iconClass}"></i>`;
-                    platformMenu.classList.remove('open');
-                });
-            });
-
-            document.addEventListener('click', function() {
-                platformMenu.classList.remove('open');
-            });
-
-            const reportSlider = document.getElementById('report-count-slider');
-            const reportValue = document.getElementById('report-count-value');
-            const reportTag = document.getElementById('report-count-tag');
-
-            function updateRisk(value) {
-                reportValue.textContent = parseInt(value).toLocaleString('pt-BR');
-                if (value < 2000) {
-                    reportTag.className = 'tag low';
-                    reportTag.textContent = 'BAIXO RISCO';
-                } else if (value < 6000) {
-                    reportTag.className = 'tag mid';
-                    reportTag.textContent = 'RISCO MODERADO';
-                } else if (value < 12000) {
-                    reportTag.className = 'tag high';
-                    reportTag.textContent = 'ALTO RISCO';
-                } else {
-                    reportTag.className = 'tag crit';
-                    reportTag.textContent = 'RISCO CRÍTICO';
-                }
-            }
-
-            updateRisk(reportSlider.value);
-            reportSlider.addEventListener('input', function() {
-                updateRisk(this.value);
-            });
-
-            const proxyToggle = document.getElementById('proxy-toggle');
-            const proxySlider = document.getElementById('proxy-slider');
-            const proxyValue = document.getElementById('proxy-value');
-
-            proxyToggle.addEventListener('change', function() {
-                proxySlider.disabled = !this.checked;
-                proxyValue.textContent = this.checked ? proxySlider.value : '0';
-            });
-
-            proxySlider.addEventListener('input', function() {
-                proxyValue.textContent = this.value;
-            });
-
-            const state = {
-                plan: 'padrao',
-                daily_limit: 0,
-                remaining_today: 0,
-                expires_at: null
-            };
-
-            const rangeByPlan = {
-                padrao: [100, 15950],
-                essencial: [100, 500],
-                profissional: [100, 5000],
-                vitalicio: [100, 15950]
-            };
-
-            function setPlanBadge(plan, remaining, limit, expires) {
-                let planName = 'Padrão';
-                let planClass = '';
-                if (plan === 'essencial') {
-                    planName = 'Essencial';
-                    planClass = 'essencial';
-                } else if (plan === 'profissional') {
-                    planName = 'Profissional';
-                    planClass = 'profissional';
-                } else if (plan === 'vitalicio') {
-                    planName = 'Vitalício';
-                    planClass = 'vitalicio';
-                }
-                document.getElementById('user-plan').textContent = planName;
-                document.getElementById('user-plan').className = `chip plan ${planClass}`;
-                if (plan === 'padrao') {
-                    document.getElementById('plan-status').className = 'chip status limited';
-                    document.getElementById('plan-status').innerHTML = '<i class="fa-solid fa-lock"></i> Acesso limitado';
-                } else {
-                    document.getElementById('plan-status').className = 'chip status ok';
-                    document.getElementById('plan-status').textContent = limit !== null ? `Hoje: ${remaining} restante(s)` : 'Acesso liberado';
-                }
-                setSliderBounds(plan);
-            }
-
-            function guard(enable, reason) {
-                const gateOverlay = document.getElementById('gate-overlay');
-                gateOverlay.classList.toggle('show', !enable);
-                const elements = [platformTrigger, document.getElementById('urls'), reportSlider, proxyToggle, proxySlider, document.getElementById('report-btn')];
-                elements.forEach(el => {
-                    if (el) el.disabled = !enable;
-                });
-                if (!enable) {
-                    if (reason === 'padrao') {
-                        document.getElementById('gate-title').textContent = 'Plano Padrão ativo';
-                        document.getElementById('gate-sub').textContent = 'Para liberar todas as funcionalidades, atualize seu plano';
-                    } else if (reason === 'sem_cota') {
-                        document.getElementById('gate-title').textContent = 'Limite diário esgotado';
-                        document.getElementById('gate-sub').textContent = 'Aguarde a renovação diária ou atualize seu plano';
-                    } else {
-                        document.getElementById('gate-title').textContent = 'Acesso indisponível';
-                        document.getElementById('gate-sub').textContent = 'Verifique seu plano em /plans';
-                    }
-                }
-            }
-
-            function setSliderBounds(plan) {
-                const range = rangeByPlan[plan] || [100, 15950];
-                reportSlider.min = range[0];
-                reportSlider.max = range[1];
-                const currentValue = parseInt(reportSlider.value, 10);
-                if (currentValue < range[0] || currentValue > range[1]) {
-                    reportSlider.value = Math.min(Math.max(currentValue || range[0], range[0]), range[1]);
-                }
-                updateRisk(parseInt(reportSlider.value, 10));
-            }
-
-            async function getStatus() {
-                try {
-                    const response = await fetch('/api/plan/status', {
-                        credentials: 'same-origin'
-                    });
-                    if (response.status === 401) {
-                        window.location.href = '/login';
-                        return;
-                    }
-                    const data = await response.json();
-                    if (!response.ok || !data || data.plan === 'padrao') {
-                        state.plan = 'padrao';
-                        state.daily_limit = 0;
-                        state.remaining_today = 0;
-                        setPlanBadge('padrao', 0, 0, null);
-                        setSliderBounds('padrao');
-                        guard(false, 'padrao');
-                        return;
-                    }
-                    state.plan = data.plan || 'padrao';
-                    state.daily_limit = data.daily_limit !== null ? data.daily_limit : 0;
-                    state.remaining_today = data.remaining_today !== null ? data.remaining_today : 0;
-                    state.expires_at = data.expires_at || null;
-                    setPlanBadge(state.plan, state.remaining_today, state.daily_limit, state.expires_at);
-                    if (state.plan === 'padrao') {
-                        guard(false, 'padrao');
-                    } else if (state.daily_limit !== null && state.remaining_today <= 0) {
-                        guard(false, 'sem_cota');
-                    } else {
-                        guard(true);
-                    }
-                } catch (error) {
-                    state.plan = 'padrao';
-                    setPlanBadge('padrao', 0, 0, null);
-                    setSliderBounds('padrao');
-                    guard(false, 'padrao');
-                }
-            }
-
-            function goPlans() {
-                window.location.href = '/plans';
-            }
-
-            document.getElementById('upgrade-btn-main').addEventListener('click', function(e) {
-                e.preventDefault();
-                goPlans();
-            });
-
-            document.getElementById('upgrade-btn-overlay').addEventListener('click', function(e) {
-                e.preventDefault();
-                goPlans();
-            });
-
-            async function createOrder(platform, urls, reports, proxies) {
-                const urlList = Array.isArray(urls) ? urls.map(u => String(u).trim()).filter(u => u !== '') : [String(urls || '').trim()];
-                if (!urlList.length) {
-                    alert('Por favor, insira pelo menos uma URL válida.');
-                    return null;
-                }
-
-                const range = rangeByPlan[state.plan] || [100, 15950];
-                const minPerOrder = range[0];
-                const maxPerOrder = range[1];
-
-                if (urlList.length === 1) {
-                    const payload = {
-                        platform: platform,
-                        url: urlList[0],
-                        reports: parseInt(reports, 10),
-                        proxies: parseInt(proxies, 10)
-                    };
-                    const response = await fetch('/api/orders/create', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        credentials: 'same-origin',
-                        body: JSON.stringify(payload)
-                    });
-                    const data = await response.json();
-                    if (!response.ok || !data || !data.ok) {
-                        if (data && data.error === 'Plano insuficiente') {
-                            goPlans();
-                            return null;
-                        }
-                        if (data && data.error === 'Limite diário excedido') {
-                            state.remaining_today = 0;
-                            setPlanBadge(state.plan, 0, state.daily_limit, null);
-                            guard(false, 'sem_cota');
-                            alert('Limite diário excedido.');
-                            return null;
-                        }
-                        if (data && data.error && data.error.startsWith('Quantidade permitida')) {
-                            alert(data.error);
-                            return null;
-                        }
-                        if (data && data.error === 'URL inválida') {
-                            alert('URL inválida: verifique se a URL fornecida está completa (inclua https://) e válida.');
-                            return null;
-                        }
-                        alert('Não foi possível iniciar.');
-                        return null;
-                    }
-                    if (state.daily_limit !== null) {
-                        state.remaining_today = typeof data.remaining_today === 'number' ? data.remaining_today : state.remaining_today - 1;
-                        setPlanBadge(state.plan, state.remaining_today, state.daily_limit, null);
-                    }
-                    return data;
-                }
-
-                const totalReports = parseInt(reports, 10);
-                if (totalReports < urlList.length * minPerOrder) {
-                    alert(`Ao dividir ${totalReports} denúncias por ${urlList.length} URLs, cada URL teria menos do que o mínimo permitido (${minPerOrder}). Diminua o número de URLs ou aumente as denúncias.`);
-                    return null;
-                }
-
-                const basePer = Math.floor(totalReports / urlList.length);
-                let remainder = totalReports % urlList.length;
-                const proxyBase = Math.floor(Math.max(0, parseInt(proxies, 10) || 0) / urlList.length);
-                let proxyRem = Math.max(0, parseInt(proxies, 10) || 0) % urlList.length;
-
-                const results = [];
-                for (let i = 0; i < urlList.length; i++) {
-                    const url = urlList[i];
-                    const reportsForThis = basePer + (remainder > 0 ? 1 : 0);
-                    if (remainder > 0) remainder--;
-                    if (reportsForThis < minPerOrder || reportsForThis > maxPerOrder) {
-                        alert('Divisão de denúncias por URL resultaria em valores fora dos limites do plano. Ajuste URLs ou quantidade.');
-                        return null;
-                    }
-                    const proxiesForThis = proxyBase + (proxyRem > 0 ? 1 : 0);
-                    if (proxyRem > 0) proxyRem--;
-                    const payload = {
-                        platform: platform,
-                        url: url,
-                        reports: reportsForThis,
-                        proxies: proxiesForThis
-                    };
-                    const response = await fetch('/api/orders/create', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        credentials: 'same-origin',
-                        body: JSON.stringify(payload)
-                    });
-                    const data = await response.json();
-                    if (!response.ok || !data || !data.ok) {
-                        if (data && data.error === 'Plano insuficiente') {
-                            goPlans();
-                            return null;
-                        }
-                        if (data && data.error === 'Limite diário excedido') {
-                            state.remaining_today = 0;
-                            setPlanBadge(state.plan, 0, state.daily_limit, null);
-                            guard(false, 'sem_cota');
-                            alert('Limite diário excedido durante criação de pedidos.');
-                            return null;
-                        }
-                        if (data && data.error === 'URL inválida') {
-                            alert(`URL inválida enviada ao servidor: "${url}". Verifique se está correta e inclui o protocolo (https://).`);
-                            return null;
-                        }
-                        alert('Falha ao criar pedido para: ' + url);
-                        return null;
-                    }
-                    results.push(data);
-                }
-
-                if (state.daily_limit !== null) {
-                    if (results.length) {
-                        const last = results[results.length - 1];
-                        state.remaining_today = typeof last.remaining_today === 'number' ? last.remaining_today : Math.max(0, state.remaining_today - results.length);
-                        setPlanBadge(state.plan, state.remaining_today, state.daily_limit, null);
-                    }
-                }
-
-                return results;
-            }
-
-            const reportBtn = document.getElementById('report-btn');
-            const reportContainer = document.getElementById('report-container');
-            const successModal = document.getElementById('success-modal');
-
-            reportBtn.addEventListener('click', async function() {
-                if (state.plan === 'padrao') {
-                    goPlans();
-                    return;
-                }
-
-                const platform = platformInput.value;
-                const urlsText = document.getElementById('urls').value.trim();
-                const proxies = proxyToggle.checked ? parseInt(proxySlider.value, 10) : 0;
-                const reports = parseInt(reportSlider.value, 10);
-
-                if (!platform) {
-                    alert('Por favor, selecione uma plataforma');
-                    return;
-                }
-
-                if (!urlsText) {
-                    alert('Por favor, insira pelo menos uma URL');
-                    return;
-                }
-
-                const urls = urlsText.split('\n').map(u => u.trim()).filter(u => u !== '');
-                const range = rangeByPlan[state.plan] || [100, 15950];
-
-                if (reports < range[0] || reports > range[1]) {
-                    alert('Para o seu plano, a quantidade deve estar entre ' + range[0] + ' e ' + range[1] + '.');
-                    return;
-                }
-
-                if (state.daily_limit !== null && state.remaining_today <= 0) {
-                    guard(false, 'sem_cota');
-                    return;
-                }
-
-                try {
-                    const result = await createOrder(platform, urls, reports, proxies);
-                    if (!result) return;
-
-                    reportContainer.classList.add('show');
-                    const urlCount = urls.length;
-                    document.getElementById('report-profiles-count').textContent = urlCount;
-                    document.getElementById('report-count-display').textContent = '0';
-                    document.getElementById('report-proxy-count').textContent = proxies.toLocaleString('pt-BR');
-                    document.getElementById('report-platform').textContent = platformLabel.textContent;
-                    document.getElementById('report-icon').className = platformIcon.querySelector('i').className;
-
-                    const startTime = Date.now();
-                    const totalTime = 30000 + (reports * 15);
-                    let sentReports = 0;
-                    const reportsPerSecond = Math.ceil(reports / (totalTime / 1000));
-
-                    function updateProgress() {
-                        const now = Date.now();
-                        const progress = Math.min(100, ((now - startTime) / totalTime) * 100);
-                        document.getElementById('progress-fill').style.width = progress + '%';
-                        document.getElementById('progress-percent').textContent = Math.floor(progress) + '%';
-                        sentReports = Math.min(reports, sentReports + reportsPerSecond);
-                        document.getElementById('report-count-display').textContent = sentReports.toLocaleString('pt-BR');
-                        const remaining = Math.max(0, totalTime - (now - startTime));
-                        const minutes = Math.floor(remaining / 60000);
-                        const seconds = Math.floor((remaining % 60000) / 1000);
-                        document.getElementById('eta-value').textContent = `${minutes}m ${seconds.toString().padStart(2, '0')}s`;
-                        if (progress < 100) {
-                            requestAnimationFrame(updateProgress);
-                        } else {
-                            document.getElementById('report-status').textContent = 'Concluído';
-                            document.getElementById('eta-value').textContent = 'Processo finalizado';
-                            document.getElementById('modal-profiles').textContent = urlCount;
-                            document.getElementById('modal-reports').textContent = reports.toLocaleString('pt-BR');
-                            document.getElementById('modal-proxies').textContent = proxies.toLocaleString('pt-BR');
-                            document.getElementById('modal-time').textContent = (totalTime / 3600000).toFixed(1) + 'h';
-                            successModal.classList.add('show');
-                            if (state.daily_limit !== null && state.remaining_today <= 0) {
-                                guard(false, 'sem_cota');
-                            }
-                        }
-                    }
-
-                    updateProgress();
-                } catch (error) {
-                    alert('Erro ao iniciar. Tente novamente.');
-                }
-            });
-
-            document.getElementById('modal-close').addEventListener('click', function() {
-                successModal.classList.remove('show');
-            });
-
-            document.getElementById('modal-close-btn').addEventListener('click', function() {
-                successModal.classList.remove('show');
-            });
-
-            document.getElementById('modal-refresh').addEventListener('click', function() {
-                window.location.reload();
-            });
-
-            successModal.addEventListener('click', function(e) {
-                if (e.target === successModal) {
-                    successModal.classList.remove('show');
-                }
-            });
-
-            window.addEventListener('load', function() {
-                getStatus();
-            });
+    platformMenu.querySelectorAll('.opt').forEach(opt => {
+        opt.addEventListener('click', function() {
+            const value = this.getAttribute('data-value');
+            const label = this.querySelector('span').textContent;
+            const iconClass = this.querySelector('i').className;
+            platformInput.value = value;
+            platformLabel.textContent = label;
+            platformIcon.innerHTML = `<i class="${iconClass}"></i>`;
+            platformMenu.classList.remove('open');
         });
-    </script>
-</body>
-</html>
+    });
+
+    document.addEventListener('click', function() {
+        platformMenu.classList.remove('open');
+    });
+
+    const reportSlider = document.getElementById('report-count-slider');
+    const reportValue = document.getElementById('report-count-value');
+    const reportTag = document.getElementById('report-count-tag');
+
+    function updateRisk(value) {
+        reportValue.textContent = parseInt(value).toLocaleString('pt-BR');
+        if (value < 2000) {
+            reportTag.className = 'tag low';
+            reportTag.textContent = 'BAIXO RISCO';
+        } else if (value < 6000) {
+            reportTag.className = 'tag mid';
+            reportTag.textContent = 'RISCO MODERADO';
+        } else if (value < 12000) {
+            reportTag.className = 'tag high';
+            reportTag.textContent = 'ALTO RISCO';
+        } else {
+            reportTag.className = 'tag crit';
+            reportTag.textContent = 'RISCO CRÍTICO';
+        }
+    }
+
+    updateRisk(reportSlider.value);
+    reportSlider.addEventListener('input', function() {
+        updateRisk(this.value);
+    });
+
+    const proxyToggle = document.getElementById('proxy-toggle');
+    const proxySlider = document.getElementById('proxy-slider');
+    const proxyValue = document.getElementById('proxy-value');
+
+    proxyToggle.addEventListener('change', function() {
+        proxySlider.disabled = !this.checked;
+        proxyValue.textContent = this.checked ? proxySlider.value : '0';
+    });
+
+    proxySlider.addEventListener('input', function() {
+        proxyValue.textContent = this.value;
+    });
+
+    const state = {
+        plan: 'padrao',
+        daily_limit: 0,
+        remaining_today: 0,
+        expires_at: null,
+        username: 'Usuário'
+    };
+
+    const rangeByPlan = {
+        padrao: [100, 15950],
+        essencial: [100, 500],
+        profissional: [100, 5000],
+        vitalicio: [100, 15950]
+    };
+
+    function updateUserName() {
+        const usernameElement = document.getElementById('user-name');
+        if (usernameElement) {
+            usernameElement.textContent = state.username;
+        }
+    }
+
+    function setPlanBadge(plan, remaining, limit, expires) {
+        let planName = 'Padrão';
+        let planClass = '';
+        if (plan === 'essencial') {
+            planName = 'Essencial';
+            planClass = 'essencial';
+        } else if (plan === 'profissional') {
+            planName = 'Profissional';
+            planClass = 'profissional';
+        } else if (plan === 'vitalicio') {
+            planName = 'Vitalício';
+            planClass = 'vitalicio';
+        }
+        document.getElementById('user-plan').textContent = planName;
+        document.getElementById('user-plan').className = `chip plan ${planClass}`;
+        if (plan === 'padrao') {
+            document.getElementById('plan-status').className = 'chip status limited';
+            document.getElementById('plan-status').innerHTML = '<i class="fa-solid fa-lock"></i> Acesso limitado';
+        } else {
+            document.getElementById('plan-status').className = 'chip status ok';
+            document.getElementById('plan-status').textContent = limit !== null ? `Hoje: ${remaining} restante(s)` : 'Acesso liberado';
+        }
+        setSliderBounds(plan);
+    }
+
+    function guard(enable, reason) {
+        const gateOverlay = document.getElementById('gate-overlay');
+        gateOverlay.classList.toggle('show', !enable);
+        const elements = [platformTrigger, document.getElementById('urls'), reportSlider, proxyToggle, proxySlider, document.getElementById('report-btn')];
+        elements.forEach(el => {
+            if (el) el.disabled = !enable;
+        });
+        if (!enable) {
+            if (reason === 'padrao') {
+                document.getElementById('gate-title').textContent = 'Plano Padrão ativo';
+                document.getElementById('gate-sub').textContent = 'Para liberar todas as funcionalidades, atualize seu plano';
+            } else if (reason === 'sem_cota') {
+                document.getElementById('gate-title').textContent = 'Limite diário esgotado';
+                document.getElementById('gate-sub').textContent = 'Aguarde a renovação diária ou atualize seu plano';
+            } else {
+                document.getElementById('gate-title').textContent = 'Acesso indisponível';
+                document.getElementById('gate-sub').textContent = 'Verifique seu plano em /plans';
+            }
+        }
+    }
+
+    function setSliderBounds(plan) {
+        const range = rangeByPlan[plan] || [100, 15950];
+        reportSlider.min = range[0];
+        reportSlider.max = range[1];
+        const currentValue = parseInt(reportSlider.value, 10);
+        if (currentValue < range[0] || currentValue > range[1]) {
+            reportSlider.value = Math.min(Math.max(currentValue || range[0], range[0]), range[1]);
+        }
+        updateRisk(parseInt(reportSlider.value, 10));
+    }
+
+    async function getUserProfile() {
+        try {
+            const response = await fetch('/api/user/profile', {
+                credentials: 'same-origin'
+            });
+            if (response.status === 401) {
+                window.location.href = '/login';
+                return null;
+            }
+            if (response.ok) {
+                const data = await response.json();
+                if (data && data.username) {
+                    return data.username;
+                }
+            }
+        } catch (error) {
+        }
+        try {
+            const response = await fetch('/dashboard', {
+                credentials: 'same-origin'
+            });
+            if (response.ok) {
+                const text = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(text, 'text/html');
+                const metaUser = doc.querySelector('meta[name="username"]');
+                if (metaUser) return metaUser.content;
+                const scriptTags = doc.querySelectorAll('script');
+                for (let script of scriptTags) {
+                    if (script.textContent.includes('username') || script.textContent.includes('session')) {
+                        const match = script.textContent.match(/username["']?\s*:\s*["']([^"']+)["']/i);
+                        if (match) return match[1];
+                    }
+                }
+            }
+        } catch (error) {
+        }
+        return null;
+    }
+
+    async function getStatus() {
+        try {
+            const username = await getUserProfile();
+            if (username) {
+                state.username = username;
+                updateUserName();
+            }
+            const response = await fetch('/api/plan/status', {
+                credentials: 'same-origin'
+            });
+            if (response.status === 401) {
+                window.location.href = '/login';
+                return;
+            }
+            const data = await response.json();
+            if (!response.ok || !data || data.plan === 'padrao') {
+                state.plan = 'padrao';
+                state.daily_limit = 0;
+                state.remaining_today = 0;
+                setPlanBadge('padrao', 0, 0, null);
+                setSliderBounds('padrao');
+                guard(false, 'padrao');
+                return;
+            }
+            state.plan = data.plan || 'padrao';
+            state.daily_limit = data.daily_limit !== null ? data.daily_limit : 0;
+            state.remaining_today = data.remaining_today !== null ? data.remaining_today : 0;
+            state.expires_at = data.expires_at || null;
+            setPlanBadge(state.plan, state.remaining_today, state.daily_limit, state.expires_at);
+            if (state.plan === 'padrao') {
+                guard(false, 'padrao');
+            } else if (state.daily_limit !== null && state.remaining_today <= 0) {
+                guard(false, 'sem_cota');
+            } else {
+                guard(true);
+            }
+        } catch (error) {
+            state.plan = 'padrao';
+            setPlanBadge('padrao', 0, 0, null);
+            setSliderBounds('padrao');
+            guard(false, 'padrao');
+        }
+    }
+
+    function goPlans() {
+        window.location.href = '/plans';
+    }
+
+    document.getElementById('upgrade-btn-main').addEventListener('click', function(e) {
+        e.preventDefault();
+        goPlans();
+    });
+
+    document.getElementById('upgrade-btn-overlay').addEventListener('click', function(e) {
+        e.preventDefault();
+        goPlans();
+    });
+
+    async function createOrder(platform, urls, reports, proxies) {
+        const urlList = Array.isArray(urls) ? urls.map(u => String(u).trim()).filter(u => u !== '') : [String(urls || '').trim()];
+        if (!urlList.length) {
+            alert('Por favor, insira pelo menos uma URL válida.');
+            return null;
+        }
+
+        const range = rangeByPlan[state.plan] || [100, 15950];
+        const minPerOrder = range[0];
+        const maxPerOrder = range[1];
+
+        if (urlList.length === 1) {
+            const payload = {
+                platform: platform,
+                url: urlList[0],
+                reports: parseInt(reports, 10),
+                proxies: parseInt(proxies, 10)
+            };
+            const response = await fetch('/api/orders/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            if (!response.ok || !data || !data.ok) {
+                if (data && data.error === 'Plano insuficiente') {
+                    goPlans();
+                    return null;
+                }
+                if (data && data.error === 'Limite diário excedido') {
+                    state.remaining_today = 0;
+                    setPlanBadge(state.plan, 0, state.daily_limit, null);
+                    guard(false, 'sem_cota');
+                    alert('Limite diário excedido.');
+                    return null;
+                }
+                if (data && data.error && data.error.startsWith('Quantidade permitida')) {
+                    alert(data.error);
+                    return null;
+                }
+                if (data && data.error === 'URL inválida') {
+                    alert('URL inválida: verifique se a URL fornecida está completa (inclua https://) e válida.');
+                    return null;
+                }
+                alert('Não foi possível iniciar.');
+                return null;
+            }
+            if (state.daily_limit !== null) {
+                state.remaining_today = typeof data.remaining_today === 'number' ? data.remaining_today : state.remaining_today - 1;
+                setPlanBadge(state.plan, state.remaining_today, state.daily_limit, null);
+            }
+            return data;
+        }
+
+        const totalReports = parseInt(reports, 10);
+        if (totalReports < urlList.length * minPerOrder) {
+            alert(`Ao dividir ${totalReports} denúncias por ${urlList.length} URLs, cada URL teria menos do que o mínimo permitido (${minPerOrder}). Diminua o número de URLs ou aumente as denúncias.`);
+            return null;
+        }
+
+        const basePer = Math.floor(totalReports / urlList.length);
+        let remainder = totalReports % urlList.length;
+        const proxyBase = Math.floor(Math.max(0, parseInt(proxies, 10) || 0) / urlList.length);
+        let proxyRem = Math.max(0, parseInt(proxies, 10) || 0) % urlList.length;
+
+        const results = [];
+        for (let i = 0; i < urlList.length; i++) {
+            const url = urlList[i];
+            const reportsForThis = basePer + (remainder > 0 ? 1 : 0);
+            if (remainder > 0) remainder--;
+            if (reportsForThis < minPerOrder || reportsForThis > maxPerOrder) {
+                alert('Divisão de denúncias por URL resultaria em valores fora dos limites do plano. Ajuste URLs ou quantidade.');
+                return null;
+            }
+            const proxiesForThis = proxyBase + (proxyRem > 0 ? 1 : 0);
+            if (proxyRem > 0) proxyRem--;
+            const payload = {
+                platform: platform,
+                url: url,
+                reports: reportsForThis,
+                proxies: proxiesForThis
+            };
+            const response = await fetch('/api/orders/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            if (!response.ok || !data || !data.ok) {
+                if (data && data.error === 'Plano insuficiente') {
+                    goPlans();
+                    return null;
+                }
+                if (data && data.error === 'Limite diário excedido') {
+                    state.remaining_today = 0;
+                    setPlanBadge(state.plan, 0, state.daily_limit, null);
+                    guard(false, 'sem_cota');
+                    alert('Limite diário excedido durante criação de pedidos.');
+                    return null;
+                }
+                if (data && data.error === 'URL inválida') {
+                    alert(`URL inválida enviada ao servidor: "${url}". Verifique se está correta e inclui o protocolo (https://).`);
+                    return null;
+                }
+                alert('Falha ao criar pedido para: ' + url);
+                return null;
+            }
+            results.push(data);
+        }
+
+        if (state.daily_limit !== null) {
+            if (results.length) {
+                const last = results[results.length - 1];
+                state.remaining_today = typeof last.remaining_today === 'number' ? last.remaining_today : Math.max(0, state.remaining_today - results.length);
+                setPlanBadge(state.plan, state.remaining_today, state.daily_limit, null);
+            }
+        }
+
+        return results;
+    }
+
+    const reportBtn = document.getElementById('report-btn');
+    const reportContainer = document.getElementById('report-container');
+    const successModal = document.getElementById('success-modal');
+
+    reportBtn.addEventListener('click', async function() {
+        if (state.plan === 'padrao') {
+            goPlans();
+            return;
+        }
+
+        const platform = platformInput.value;
+        const urlsText = document.getElementById('urls').value.trim();
+        const proxies = proxyToggle.checked ? parseInt(proxySlider.value, 10) : 0;
+        const reports = parseInt(reportSlider.value, 10);
+
+        if (!platform) {
+            alert('Por favor, selecione uma plataforma');
+            return;
+        }
+
+        if (!urlsText) {
+            alert('Por favor, insira pelo menos uma URL');
+            return;
+        }
+
+        const urls = urlsText.split('\n').map(u => u.trim()).filter(u => u !== '');
+        const range = rangeByPlan[state.plan] || [100, 15950];
+
+        if (reports < range[0] || reports > range[1]) {
+            alert('Para o seu plano, a quantidade deve estar entre ' + range[0] + ' e ' + range[1] + '.');
+            return;
+        }
+
+        if (state.daily_limit !== null && state.remaining_today <= 0) {
+            guard(false, 'sem_cota');
+            return;
+        }
+
+        try {
+            const result = await createOrder(platform, urls, reports, proxies);
+            if (!result) return;
+
+            reportContainer.classList.add('show');
+            const urlCount = urls.length;
+            document.getElementById('report-profiles-count').textContent = urlCount;
+            document.getElementById('report-count-display').textContent = '0';
+            document.getElementById('report-proxy-count').textContent = proxies.toLocaleString('pt-BR');
+            document.getElementById('report-platform').textContent = platformLabel.textContent;
+            document.getElementById('report-icon').className = platformIcon.querySelector('i').className;
+
+            const startTime = Date.now();
+            const totalTime = 30000 + (reports * 15);
+            let sentReports = 0;
+            const reportsPerSecond = Math.ceil(reports / (totalTime / 1000));
+
+            function updateProgress() {
+                const now = Date.now();
+                const progress = Math.min(100, ((now - startTime) / totalTime) * 100);
+                document.getElementById('progress-fill').style.width = progress + '%';
+                document.getElementById('progress-percent').textContent = Math.floor(progress) + '%';
+                sentReports = Math.min(reports, sentReports + reportsPerSecond);
+                document.getElementById('report-count-display').textContent = sentReports.toLocaleString('pt-BR');
+                const remaining = Math.max(0, totalTime - (now - startTime));
+                const minutes = Math.floor(remaining / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                document.getElementById('eta-value').textContent = `${minutes}m ${seconds.toString().padStart(2, '0')}s`;
+                if (progress < 100) {
+                    requestAnimationFrame(updateProgress);
+                } else {
+                    document.getElementById('report-status').textContent = 'Concluído';
+                    document.getElementById('eta-value').textContent = 'Processo finalizado';
+                    document.getElementById('modal-profiles').textContent = urlCount;
+                    document.getElementById('modal-reports').textContent = reports.toLocaleString('pt-BR');
+                    document.getElementById('modal-proxies').textContent = proxies.toLocaleString('pt-BR');
+                    document.getElementById('modal-time').textContent = (totalTime / 3600000).toFixed(1) + 'h';
+                    successModal.classList.add('show');
+                    if (state.daily_limit !== null && state.remaining_today <= 0) {
+                        guard(false, 'sem_cota');
+                    }
+                }
+            }
+
+            updateProgress();
+        } catch (error) {
+            alert('Erro ao iniciar. Tente novamente.');
+        }
+    });
+
+    document.getElementById('modal-close').addEventListener('click', function() {
+        successModal.classList.remove('show');
+    });
+
+    document.getElementById('modal-close-btn').addEventListener('click', function() {
+        successModal.classList.remove('show');
+    });
+
+    document.getElementById('modal-refresh').addEventListener('click', function() {
+        window.location.reload();
+    });
+
+    successModal.addEventListener('click', function(e) {
+        if (e.target === successModal) {
+            successModal.classList.remove('show');
+        }
+    });
+
+    updateUserName();
+    getStatus();
+});
